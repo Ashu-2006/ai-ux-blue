@@ -1,0 +1,221 @@
+@import 'tailwindcss';
+@import '@xyflow/react/dist/style.css';
+@source "./";
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * Learning Roadmap: visual system (overhauled with the taste skill).
+ * Design read: a premium design-education tool (Linear / Craft / Rauno tier)
+ * for a design-conscious audience. Dials: VARIANCE 6 / MOTION 5 / DENSITY 4.
+ * Anti-slop: no pure black, no neon glow, one accent, tinted shadows, one
+ * radius scale, real display type (Geist), restraint over decoration.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ---- Surfaces: warm off-white, layered by elevation (no #fff glare) ---- */
+  --bg:        #f6f5f3;   /* the canvas */
+  --surface:   #fdfdfc;   /* raised cards */
+  --surface-2: #f0efec;   /* inset / hover well */
+  --hairline:  rgba(23,22,20,0.09);
+  --hairline-2:rgba(23,22,20,0.055);
+
+  /* ---- Ink: warm near-black hierarchy (never pure #000) ---- */
+  --ink:   #201f1c;   /* primary */
+  --ink-2: #4a4843;   /* secondary body */
+  --ink-3: #75726b;   /* tertiary / captions */
+  --ink-4: #a6a29a;   /* faint / placeholder */
+
+  /* ---- Accent: one confident, slightly-desaturated cobalt. Not AI-glow blue. */
+  --accent:       #2f6bff;
+  --accent-press: #2557d6;
+  --accent-tint:  rgba(47,107,255,0.10);
+
+  /* ---- Node-type semantics (desaturated to blend, not candy) ---- */
+  --model:    #2f6bff;  --model-tint:    rgba(47,107,255,0.12);
+  --pattern:  #1f9d63;  --pattern-tint:  rgba(31,157,99,0.12);
+  --anti:     #e0483d;  --anti-tint:     rgba(224,72,61,0.11);
+  --invisible:#d98418;  --invisible-tint:rgba(217,132,24,0.13);
+
+  /* topic hues (muted, editorial - hue is a quiet index, never the loud signal) */
+  --h-model: #2f6bff; --h-systems: #5b57d6; --h-data: #1497a6;
+  --h-dash:  #1f9d63; --h-task:    #2aa84a; --h-deceptive: #d98418;
+  --h-buying:#d84a6b; --h-methods: #7d7a72;
+
+  /* ---- Materials ---- */
+  --material:        rgba(253,253,252,0.72);
+  --material-strong: rgba(253,253,252,0.85);
+  --scrim:           rgba(23,22,20,0.30);
+
+  /* ---- Shadows: tinted to the warm base, layered, soft. No pure-black drop. */
+  --shadow-card:  0 1px 2px rgba(40,38,34,0.05), 0 4px 12px rgba(40,38,34,0.06);
+  --shadow-float: 0 2px 8px rgba(40,38,34,0.07), 0 14px 34px rgba(40,38,34,0.11);
+  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 60px rgba(40,38,34,0.13);
+
+  /* ---- ONE radius scale (shape-consistency lock) ---- */
+  --r-sm: 7px; --r-md: 11px; --r-lg: 15px; --r-xl: 22px; --r-pill: 980px;
+
+  /* ---- Motion: strong custom curves ---- */
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  /* charcoal, NOT pure black (taste-skill §9.A) */
+  --bg:        #17161a;
+  --surface:   #201f24;
+  --surface-2: #26252b;
+  --hairline:  rgba(255,255,255,0.10);
+  --hairline-2:rgba(255,255,255,0.06);
+
+  --ink:   #f3f2ef;
+  --ink-2: #cbc9c3;
+  --ink-3: #96938c;
+  --ink-4: #66635d;
+
+  --accent:       #5b8cff;
+  --accent-press: #7ba3ff;
+  --accent-tint:  rgba(91,140,255,0.16);
+
+  --model-tint:    rgba(91,140,255,0.18);
+  --pattern-tint:  rgba(52,190,120,0.20);
+  --anti-tint:     rgba(255,107,99,0.18);
+  --invisible-tint:rgba(233,163,70,0.20);
+
+  --material:        rgba(32,31,36,0.68);
+  --material-strong: rgba(32,31,36,0.84);
+  --scrim:           rgba(0,0,0,0.52);
+
+  --shadow-card:  0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.42);
+  --shadow-float: 0 2px 10px rgba(0,0,0,0.42), 0 16px 40px rgba(0,0,0,0.55);
+  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 70px rgba(0,0,0,0.55);
+
+  color-scheme: dark;
+}
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hairline: var(--hairline);
+  --color-hairline-2: var(--hairline-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-model: var(--model);
+  --color-pattern: var(--pattern);
+  --color-anti: var(--anti);
+  --color-invisible: var(--invisible);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace;
+}
+
+/* ---- Fonts (self-hosted, no CDN) ---- */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist.ttf') format('truetype');
+  font-weight: 100 900; font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono.ttf') format('truetype');
+  font-weight: 100 900; font-display: swap;
+}
+
+/* ---- Base ---- */
+html, body, #root { height: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv01';
+  transition: background-color 400ms var(--ease-out), color 400ms var(--ease-out);
+}
+
+/* Type: control hierarchy with WEIGHT, restrained scale (taste-skill §9.B).
+ * Negative tracking on large, near-zero on body. */
+.t-hero    { font-size: clamp(1.9rem, 4vw, 2.9rem); line-height: 1.04; letter-spacing: -0.025em; font-weight: 620; }
+.t-title   { font-size: 1.4rem;   line-height: 1.12; letter-spacing: -0.02em;  font-weight: 600; }
+.t-h2      { font-size: 1.15rem;  line-height: 1.2;  letter-spacing: -0.015em; font-weight: 580; }
+.t-lg      { font-size: 1.0625rem;line-height: 1.4;  letter-spacing: -0.008em; }
+.t-body    { font-size: 0.9375rem;line-height: 1.6;  letter-spacing: -0.003em; }
+.t-sm      { font-size: 0.8125rem;line-height: 1.5;  letter-spacing: 0; }
+.t-caption { font-size: 0.6875rem;line-height: 1.3;  letter-spacing: 0.04em; }
+.t-mono    { font-family: var(--font-mono); font-feature-settings: 'tnum'; }
+.vibrant   { letter-spacing: 0.003em; }
+
+/* ---- Press feedback: instant, subtle ---- */
+.pressable {
+  transition: transform 140ms var(--ease-out), box-shadow 200ms var(--ease-out),
+    border-color 200ms var(--ease-out), background-color 200ms var(--ease-out), color 160ms var(--ease-out);
+  will-change: transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pressable:hover { transform: translateY(-1px); }
+}
+.pressable:active { transform: scale(0.98); transition-duration: 90ms; }
+
+/* ---- Materials ---- */
+.material {
+  background: var(--material);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  backdrop-filter: saturate(160%) blur(20px);
+}
+.material-strong {
+  background: var(--material-strong);
+  -webkit-backdrop-filter: saturate(160%) blur(30px);
+  backdrop-filter: saturate(160%) blur(30px);
+}
+
+/* ---- Scrollbars ---- */
+.scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 8px; }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+.scroll { scrollbar-width: thin; scrollbar-color: var(--ink-4) transparent; }
+
+/* ══════════════ React Flow canvas ══════════════ */
+.react-flow { background: transparent; }
+.react-flow__attribution { display: none; }
+.react-flow__edge-path { stroke: var(--hairline); stroke-width: 1.5; }
+.react-flow__edge.spine .react-flow__edge-path { stroke: var(--hairline); stroke-width: 2; }
+html[data-theme='dark'] .react-flow__edge-path { stroke: rgba(255,255,255,0.13); }
+
+.react-flow__controls {
+  border-radius: var(--r-md); overflow: hidden;
+  box-shadow: var(--shadow-float); border: 0.5px solid var(--hairline);
+}
+.react-flow__controls-button {
+  background: var(--material); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--hairline); color: var(--ink-2);
+  width: 30px; height: 30px; transition: background-color 150ms var(--ease-out);
+}
+.react-flow__controls-button:hover { background: var(--material-strong); }
+.react-flow__controls-button svg { fill: currentColor; }
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  .pressable { transition: opacity 150ms ease, background-color 150ms ease; }
+  .pressable:hover { transform: none; }
+  .pressable:active { transform: none; opacity: 0.7; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+/* ---- Reduced transparency ---- */
+@media (prefers-reduced-transparency: reduce) {
+  .material, .material-strong, .react-flow__controls-button {
+    background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
