@@ -7,7 +7,7 @@ import { KIND_LABEL, type SubKind } from '@/lib/types';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onPick: (payload: { topicKey: string; subId?: string; focusId: string }) => void;
+  onPick: (payload: { topicKey: string; subId?: string; focusId?: string }) => void;
 }
 
 const KIND_FG: Record<SubKind, string> = {

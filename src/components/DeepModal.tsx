@@ -93,10 +93,10 @@ export function DeepModal({ id, onClose }: Props) {
                   edge matches the body; close button floats top-right of the modal */}
               <div className="relative mx-auto w-full max-w-[640px] px-9 pt-7">
                 <span
-                  className="inline-flex items-center rounded-[var(--r-pill)] px-2.5 py-1 t-caption font-semibold uppercase"
+                  className="inline-flex items-center rounded-[var(--r-sm)] px-2.5 py-1 t-caption t-mono font-semibold uppercase"
                   style={{ color: tone.fg, background: tone.tint }}
                 >
-                  {deep.kindLabel}
+                  [ {deep.kindLabel} ]
                 </span>
                 <h1 className="t-title vibrant mt-3 text-ink">{deep.title}</h1>
               </div>
