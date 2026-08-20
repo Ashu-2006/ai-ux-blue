@@ -1,33 +1,53 @@
-# Learning Roadmap (app)
+# Learning Roadmap
 
-An interactive roadmap.sh-style map of the `Learning/` research: **8 topics, 256 sub-topics** for designing trustworthy AI and crypto products. Click any node to open a detail sheet with the full mental model / pattern / anti-pattern / invisible problem, plus each topic's measurement methods, tactics, fact-checked resources, and real teardown targets.
+A single File Explorer for designing AI products. 12 topic folders, ~150 lessons distilled from the AI Engineering from Scratch curriculum, plus an idea library on trust and deceptive-pattern UX. Every lesson has a diagram, an interactive demo, and 3 copy-ready X posts.
 
-## Design
+## What it is
 
-Built in **Apple product style**, following the `apple-design` and `emil-design-eng` skills (from [github.com/emilkowalski/skills](https://github.com/emilkowalski/skills), distilled from Apple's WWDC design talks). No third-party design system.
+- **File Explorer navigation**: 12 topic folders (Talking to a model, Making it use tools, Reasoning and agents, Governance and control, and so on). Folders nest three levels deep where the material earns it. The URL is a slug path (`?p=making-it-use-tools/mcp-end-to-end`), so every folder and every lesson is a deep link. Browser back and forward walk the tree.
+- **Real folders, not tiles**: an SVG-silhouette folder with a tab, a frosted flap, and peek cards fanning on hover. Clicking the flap descends; clicking a peek card opens that item.
+- **Lesson modal** with three tabs: Learn (read), Interactive (one of six demo archetypes: slider-map, toggle-fix, sequence, reveal, before-after, meter), Post (three drafted X posts in the mechanism / design angle / one-liner format).
+- **Search + kind filter + sort**, scoped to the current subtree.
 
-- **Type:** SF system font (`-apple-system`), size-specific tracking (negative on large display, near-zero on body), weight+size hierarchy.
-- **Materials & depth:** translucent floating chrome (`backdrop-filter` blur + saturate), content scrolls under; soft layered shadows, hairline borders, no hard 1px dividers.
-- **Color:** restrained neutral system + one systemBlue accent; semantic color only for the 4 node types. Full light/dark with an eased theme transition, true-black OLED dark.
-- **Motion:** spring animations (Framer Motion, `bounce`+`duration` ~ Apple's damping+response); press-scale `0.97` on cards; strong custom ease-out curves; interruptible; never `scale(0)`; the sheet materializes (blur+slide) and dismisses along the same path.
-- **Accessibility:** `prefers-reduced-motion` (cross-fade, no vestibular motion), `prefers-reduced-transparency` (frost → solid), hover gated behind `(hover: hover)`.
+## Tech
+
+Vite 7, React 19, TypeScript, Tailwind 4, Framer Motion. Static SPA, deploys anywhere. Configured for Vercel via `vercel.json`.
 
 ## Run it
+
 ```bash
-cd Learning/app
 npm install
 npm run dev      # http://localhost:5173
+npm run build    # outputs dist/
 ```
-Build for hosting: `npm run build` (outputs `dist/`, relative base).
 
 ## Structure
-- `src/styles.css` — the entire Apple-style foundation (tokens, `@theme`, materials, motion, light/dark). Single source of styling truth.
-- `src/components/RoadmapGraph.tsx` — React Flow canvas + central-spine layout (`lib/layout.ts`).
-- `src/components/nodes.tsx` — root / topic / sub-topic node cards.
-- `src/components/DetailDrawer.tsx` — the translucent detail sheet.
-- `src/components/CommandK.tsx` — Spotlight-style search (Cmd/Ctrl-K), fuzzy across all 256 sub-topics + cluster filter.
-- `src/data/roadmap.json` — generated from the 8 files in `../research/`. Node types: 🔵 model · 🟢 pattern · 🔴 anti-pattern · 🟡 invisible problem.
 
-## Not yet wired (easy to add)
-- Progress tracking (Pending/Learning/Done per node in localStorage) — `Status` type in `types.ts` is the stub.
-- Post generator (sub-topic × teardown-target → ready hooks).
+- `src/lib/library.ts` - the taxonomy tree. 12 root folders + nesting rules, mapping every lesson id and roadmap idea to a path.
+- `src/lib/useLibraryRoute.ts` - URL routing via `?p=<slug/path>`.
+- `src/sections/Library.tsx` - the Explorer shell: breadcrumb, search + filter + sort rail, grid.
+- `src/components/LessonFolder.tsx` - the generic folder component (accepts any mix of sub-folders, lessons, ideas).
+- `src/components/LessonCard.tsx`, `LessonModal.tsx` - lesson leaf tile and modal.
+- `src/components/demos/archetypes.tsx` - the six interactive-demo archetypes.
+- `src/data/lessons/phase<N>-part<M>.ts` - one file per curriculum part.
+- `public/lessons/p<phase>-<NN>.svg` - lesson diagrams.
+
+## Deploy on Vercel
+
+Any of:
+
+```bash
+# CLI
+npx vercel               # first-time link
+npx vercel --prod        # deploy to production
+```
+
+Or import the GitHub repo in the Vercel dashboard. Framework detects as Vite; `vercel.json` sets build command, output dir, cache headers, and SPA rewrite.
+
+## Design system
+
+Dark-first canvas (`#171717`), one accent (`#12b0ff`), Inter for prose, Geist Mono for labels. Light mode at parity. All motion respects `prefers-reduced-motion`.
+
+## License
+
+Curriculum content adapted from [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch) (MIT, Rohit Ghumare). App code MIT.

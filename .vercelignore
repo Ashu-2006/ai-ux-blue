@@ -1,0 +1,9 @@
+node_modules
+dist
+.playwright-mcp
+*.log
+.claude
+.agents
+skills-lock.json
+tsconfig.tsbuildinfo
+REDESIGN-PLAN.md

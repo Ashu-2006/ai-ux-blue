@@ -3,94 +3,108 @@
 @source "./";
 
 /* ══════════════════════════════════════════════════════════════════════════
- * Learning Roadmap: visual system (overhauled with the taste skill).
- * Design read: a premium design-education tool (Linear / Craft / Rauno tier)
- * for a design-conscious audience. Dials: VARIANCE 6 / MOTION 5 / DENSITY 4.
- * Anti-slop: no pure black, no neon glow, one accent, tinted shadows, one
- * radius scale, real display type (Geist), restraint over decoration.
+ * Learning Roadmap: visual system, retuned to the interfaces.dev design language.
+ * Design read: a design-engineering magazine — near-white canvas, near-black
+ * ink, ONE electric-blue accent used sparingly, Inter display type at a big
+ * sentence-case scale, fully-rounded pill buttons, soft hairline cards, very
+ * soft shadows, generous whitespace. Extracted with designlang from interfaces.dev.
  * ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ---- Surfaces: warm off-white, layered by elevation (no #fff glare) ---- */
-  --bg:        #f6f5f3;   /* the canvas */
-  --surface:   #fdfdfc;   /* raised cards */
-  --surface-2: #f0efec;   /* inset / hover well */
-  --hairline:  rgba(23,22,20,0.09);
-  --hairline-2:rgba(23,22,20,0.055);
+  /* ---- Surfaces: near-black warm-neutral canvas (interfaces.dev is DARK) ----
+   * bg ≈ the site's oklch(0.173 0 0). Cards sit one step up. */
+  --bg:        #171717;   /* the canvas */
+  --surface:   #1e1e1e;   /* raised cards */
+  --surface-2: #262626;   /* inset / hover well */
+  --hairline:  rgba(255,255,255,0.10);
+  --hairline-2:rgba(255,255,255,0.06);
 
-  /* ---- Ink: warm near-black hierarchy (never pure #000) ---- */
-  --ink:   #201f1c;   /* primary */
-  --ink-2: #4a4843;   /* secondary body */
-  --ink-3: #75726b;   /* tertiary / captions */
-  --ink-4: #a6a29a;   /* faint / placeholder */
+  /* ---- Ink: near-white hierarchy ---- */
+  --ink:   #f5f5f5;   /* primary */
+  --ink-2: #c8c8c8;   /* secondary body */
+  --ink-3: #8f8f8f;   /* tertiary / captions */
+  --ink-4: #626262;   /* faint / placeholder + annotation labels */
 
-  /* ---- Accent: one confident, slightly-desaturated cobalt. Not AI-glow blue. */
-  --accent:       #2f6bff;
-  --accent-press: #2557d6;
-  --accent-tint:  rgba(47,107,255,0.10);
+  /* ---- Accent: the vivid interfaces.dev cyan (the "Subscribe"/"Connect" pill) ---- */
+  --accent:       #12b0ff;
+  --accent-press: #38bdff;
+  --accent-tint:  rgba(18,176,255,0.14);
+  --accent-ink:   #04121f;  /* dark text on the bright cyan fill */
 
-  /* ---- Node-type semantics (desaturated to blend, not candy) ---- */
-  --model:    #2f6bff;  --model-tint:    rgba(47,107,255,0.12);
-  --pattern:  #1f9d63;  --pattern-tint:  rgba(31,157,99,0.12);
-  --anti:     #e0483d;  --anti-tint:     rgba(224,72,61,0.11);
-  --invisible:#d98418;  --invisible-tint:rgba(217,132,24,0.13);
+  /* ---- Kind semantics (model / pattern / anti / invisible) ---- */
+  --model:    #12b0ff;  --model-tint:    rgba(18,176,255,0.16);
+  --pattern:  #34c88b;  --pattern-tint:  rgba(52,200,139,0.18);
+  --anti:     #ff6b6f;  --anti-tint:     rgba(255,107,111,0.16);
+  --invisible:#e9a346;  --invisible-tint:rgba(233,163,70,0.18);
 
-  /* topic hues (muted, editorial - hue is a quiet index, never the loud signal) */
-  --h-model: #2f6bff; --h-systems: #5b57d6; --h-data: #1497a6;
-  --h-dash:  #1f9d63; --h-task:    #2aa84a; --h-deceptive: #d98418;
-  --h-buying:#d84a6b; --h-methods: #7d7a72;
+  /* topic hues (a quiet per-category index dot) */
+  --h-model: #12b0ff; --h-systems: #9aa0ff; --h-data: #3cc6dc;
+  --h-dash:  #34c88b; --h-task:    #4bd06a; --h-deceptive: #e9a346;
+  --h-buying:#ff6b9d; --h-methods: #9a9a9a;
 
-  /* ---- Materials ---- */
-  --material:        rgba(253,253,252,0.72);
-  --material-strong: rgba(253,253,252,0.85);
-  --scrim:           rgba(23,22,20,0.30);
+  /* ---- annotation motif (Figma-canvas labels + connector lines in the hero) ---- */
+  --anno-line: rgba(255,255,255,0.22);
+  --anno-mag:  #ff4d8d;  /* the pink "32px" measurement tag */
 
-  /* ---- Shadows: tinted to the warm base, layered, soft. No pure-black drop. */
-  --shadow-card:  0 1px 2px rgba(40,38,34,0.05), 0 4px 12px rgba(40,38,34,0.06);
-  --shadow-float: 0 2px 8px rgba(40,38,34,0.07), 0 14px 34px rgba(40,38,34,0.11);
-  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 60px rgba(40,38,34,0.13);
+  /* ---- Materials (translucent chrome) ---- */
+  --material:        rgba(23,23,23,0.72);
+  --material-strong: rgba(23,23,23,0.88);
+  --scrim:           rgba(0,0,0,0.55);
 
-  /* ---- ONE radius scale (shape-consistency lock) ---- */
-  --r-sm: 7px; --r-md: 11px; --r-lg: 15px; --r-xl: 22px; --r-pill: 980px;
+  /* ---- Shadows: soft, near-flat with a hairline ring ---- */
+  --shadow-card:  0 0 0 1px rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.45);
+  --shadow-float: 0 0 0 1px rgba(255,255,255,0.06), 0 2px 10px rgba(0,0,0,0.45), 0 16px 40px rgba(0,0,0,0.55);
+  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 70px rgba(0,0,0,0.6);
+
+  /* ---- Radius scale (soft cards; pills for buttons) ---- */
+  --r-sm: 4px; --r-md: 8px; --r-lg: 14px; --r-xl: 20px; --r-pill: 980px;
 
   /* ---- Motion: strong custom curves ---- */
   --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
-html[data-theme='dark'] {
-  /* charcoal, NOT pure black (taste-skill §9.A) */
-  --bg:        #17161a;
-  --surface:   #201f24;
-  --surface-2: #26252b;
-  --hairline:  rgba(255,255,255,0.10);
-  --hairline-2:rgba(255,255,255,0.06);
+html[data-theme='light'] {
+  /* secondary light mode: crisp near-white, cool grey ink */
+  --bg:        #fcfcfc;
+  --surface:   #ffffff;
+  --surface-2: #f4f5f7;
+  --hairline:  rgba(10,10,10,0.10);
+  --hairline-2:rgba(10,10,10,0.06);
 
-  --ink:   #f3f2ef;
-  --ink-2: #cbc9c3;
-  --ink-3: #96938c;
-  --ink-4: #66635d;
+  --ink:   #0a0a0a;
+  --ink-2: #37393f;
+  --ink-3: #6b7280;
+  --ink-4: #9ca3af;
 
-  --accent:       #5b8cff;
-  --accent-press: #7ba3ff;
-  --accent-tint:  rgba(91,140,255,0.16);
+  --accent:       #0080ff;
+  --accent-press: #0061e7;
+  --accent-tint:  rgba(0,128,255,0.10);
+  --accent-ink:   #ffffff;
 
-  --model-tint:    rgba(91,140,255,0.18);
-  --pattern-tint:  rgba(52,190,120,0.20);
-  --anti-tint:     rgba(255,107,99,0.18);
-  --invisible-tint:rgba(233,163,70,0.20);
+  --model:    #0080ff;  --model-tint:    rgba(0,128,255,0.12);
+  --pattern:  #10a56b;  --pattern-tint:  rgba(16,165,107,0.12);
+  --anti:     #e5484d;  --anti-tint:     rgba(229,72,77,0.11);
+  --invisible:#d98418;  --invisible-tint:rgba(217,132,24,0.13);
 
-  --material:        rgba(32,31,36,0.68);
-  --material-strong: rgba(32,31,36,0.84);
-  --scrim:           rgba(0,0,0,0.52);
+  --h-model: #0080ff; --h-systems: #7c83ff; --h-data: #06a6bd;
+  --h-dash:  #10a56b; --h-task:    #22a84a; --h-deceptive: #d98418;
+  --h-buying:#e5487d; --h-methods: #6b7280;
 
-  --shadow-card:  0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.42);
-  --shadow-float: 0 2px 10px rgba(0,0,0,0.42), 0 16px 40px rgba(0,0,0,0.55);
-  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 70px rgba(0,0,0,0.55);
+  --anno-line: rgba(10,10,10,0.18);
+  --anno-mag:  #e5487d;
 
-  color-scheme: dark;
+  --material:        rgba(252,252,252,0.72);
+  --material-strong: rgba(252,252,252,0.88);
+  --scrim:           rgba(10,10,10,0.28);
+
+  --shadow-card:  0 0 0 1px rgba(10,10,10,0.05), 0 1px 2px rgba(10,10,10,0.05), 0 2px 4px rgba(10,10,10,0.04);
+  --shadow-float: 0 0 0 1px rgba(10,10,10,0.05), 0 2px 8px rgba(10,10,10,0.07), 0 14px 34px rgba(10,10,10,0.10);
+  --shadow-sheet: 0 0 0 0.5px var(--hairline), -24px 0 60px rgba(10,10,10,0.12);
+
+  color-scheme: light;
 }
 
 @theme {
@@ -114,20 +128,26 @@ html[data-theme='dark'] {
   --radius-lg: var(--r-lg);
   --radius-xl: var(--r-xl);
 
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace;
 }
 
 /* ---- Fonts (self-hosted, no CDN) ---- */
 @font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist.ttf') format('truetype');
-  font-weight: 100 900; font-display: swap;
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Geist Mono';
   src: url('/fonts/GeistMono.ttf') format('truetype');
   font-weight: 100 900; font-display: swap;
+}
+@font-face {
+  /* the italic serif display accent, per the interfaces.dev "Magazine" wordmark */
+  font-family: 'Libre Baskerville';
+  src: url('/fonts/LibreBaskerville-Italic.ttf') format('truetype');
+  font-weight: 400 700; font-style: italic; font-display: swap;
 }
 
 /* ---- Base ---- */
@@ -141,21 +161,53 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: 'ss01', 'cv01';
+  font-feature-settings: 'cv05', 'cv08', 'ss03';  /* Inter: single-story a/g, refined details */
   transition: background-color 400ms var(--ease-out), color 400ms var(--ease-out);
 }
 
-/* Type: control hierarchy with WEIGHT, restrained scale (taste-skill §9.B).
- * Negative tracking on large, near-zero on body. */
-.t-hero    { font-size: clamp(1.9rem, 4vw, 2.9rem); line-height: 1.04; letter-spacing: -0.025em; font-weight: 620; }
-.t-title   { font-size: 1.4rem;   line-height: 1.12; letter-spacing: -0.02em;  font-weight: 600; }
-.t-h2      { font-size: 1.15rem;  line-height: 1.2;  letter-spacing: -0.015em; font-weight: 580; }
-.t-lg      { font-size: 1.0625rem;line-height: 1.4;  letter-spacing: -0.008em; }
-.t-body    { font-size: 0.9375rem;line-height: 1.6;  letter-spacing: -0.003em; }
-.t-sm      { font-size: 0.8125rem;line-height: 1.5;  letter-spacing: 0; }
-.t-caption { font-size: 0.6875rem;line-height: 1.3;  letter-spacing: 0.04em; }
+/* Type: interfaces.dev scale — big sentence-case display at weight 500, tight
+ * leading on the hero, cool-grey supporting text. Hierarchy via size + weight. */
+.t-hero    { font-size: clamp(2.4rem, 5.2vw, 3.75rem); line-height: 1.02; letter-spacing: -0.03em; font-weight: 560; }
+.t-title   { font-size: clamp(1.5rem, 2.6vw, 1.9rem); line-height: 1.1; letter-spacing: -0.022em; font-weight: 540; }
+.t-h2      { font-size: 1.3125rem; line-height: 1.2;  letter-spacing: -0.018em; font-weight: 540; }
+.t-lg      { font-size: 1.0625rem; line-height: 1.45; letter-spacing: -0.006em; }
+.t-body    { font-size: 0.9375rem; line-height: 1.6;  letter-spacing: -0.002em; }
+.t-sm      { font-size: 0.8125rem; line-height: 1.5;  letter-spacing: 0; }
+.t-caption { font-size: 0.6875rem; line-height: 1.3;  letter-spacing: 0.06em; }
 .t-mono    { font-family: var(--font-mono); font-feature-settings: 'tnum'; }
+.t-serif   { font-family: 'Libre Baskerville', Georgia, serif; font-style: italic; letter-spacing: -0.01em; }
 .vibrant   { letter-spacing: 0.003em; }
+
+/* ---- Buttons: pill is the interfaces.dev default ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  border-radius: var(--r-pill); font-weight: 500; white-space: nowrap;
+  padding: 0.625rem 1.125rem; font-size: 0.9375rem; letter-spacing: -0.004em;
+  border: 0.5px solid transparent; cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-card); }
+.btn-primary:hover { background: var(--accent-press); }
+.btn-secondary {
+  background: var(--surface); color: var(--ink); border-color: var(--hairline); box-shadow: var(--shadow-card);
+}
+.btn-secondary:hover { background: var(--surface-2); }
+.btn-ghost { background: transparent; color: var(--ink-2); }
+.btn-ghost:hover { background: var(--surface-2); color: var(--ink); }
+
+/* ---- Soft card (hairline ring + very soft shadow) ---- */
+.card {
+  background: var(--surface); border: 0.5px solid var(--hairline);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-card);
+}
+
+/* ---- Kind pill (model / pattern / anti / invisible) ---- */
+.kind-pill {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  border-radius: var(--r-pill); padding: 0.1875rem 0.5rem 0.1875rem 0.4375rem;
+  font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.01em;
+  border: 0.5px solid var(--hairline); background: var(--surface);
+}
+.kind-dot { width: 6px; height: 6px; border-radius: 999px; }
 
 /* ---- Press feedback: instant, subtle ---- */
 .pressable {
@@ -218,4 +270,128 @@ html[data-theme='dark'] .react-flow__edge-path { stroke: rgba(255,255,255,0.13);
   .material, .material-strong, .react-flow__controls-button {
     background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none;
   }
+}
+
+/* ── Lesson folders ─────────────────────────────────────────────────────────
+   Ported from the portfolio template's Folder.astro, retinted to this app's
+   tokens. The folder is one continuous SVG silhouette; the flap is frosted
+   glass over it; the cards inside are cqw-scaled miniatures. */
+
+/* Three stacked shadows rather than one: a tight contact shadow to seat the
+   folder, a mid layer for form, and a wide ambient one for depth. Each is faint
+   on its own, because a single shadow dark enough to read here would look like
+   a drop shadow instead of light. drop-shadow follows the silhouette, which
+   box-shadow cannot do around the tab. */
+.folder-back {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.06))
+    drop-shadow(0 4px 10px rgb(0 0 0 / 0.05))
+    drop-shadow(0 12px 24px rgb(0 0 0 / 0.06));
+}
+
+/* The back panel's corners are SVG units that scale with the folder, so a fixed
+   rem radius drifts out of sync at any size but one. Percentage radii track it
+   exactly: r=30 against a 400-wide viewBox and a 258.4-tall flap. */
+.folder-flap {
+  border-radius: 7.5% / 11.6%;
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--surface) 58%, transparent),
+    color-mix(in oklab, var(--surface) 78%, transparent)
+  );
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 0.5px var(--hairline),
+    0 -2px 6px -1px rgb(0 0 0 / 0.18);
+}
+
+.lesson-folder {
+  transition: transform 160ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lesson-folder:active {
+    transform: scale(0.985);
+  }
+}
+
+/* Everything inside a peek card sizes in cqw (% of the card's own width), so a
+   card rendered at 90px in a folder is proportionally identical to one at any
+   other size rather than having chunky corners and hairline text. */
+.peek-frame {
+  container-type: inline-size;
+  position: relative;
+  --pad: 4cqw;
+  --radius: 8cqw;
+}
+
+.peek-photo,
+.peek-note {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow:
+    0 0 0 0.5px var(--hairline),
+    0 2px 4px rgb(0 0 0 / 0.18),
+    0 8px 16px rgb(0 0 0 / 0.22);
+  overflow: hidden;
+}
+
+/* The curriculum diagrams are ink-on-cream, so they keep their paper. */
+.peek-photo {
+  background: #faf6ef;
+  padding: var(--pad);
+}
+
+.peek-photo img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: top left;
+  /* Concentric corners: inner radius is the outer minus the gap between them.
+     Matching the two makes the matte look pinched at the corners. */
+  border-radius: calc(var(--radius) - var(--pad));
+}
+
+.peek-note {
+  background: var(--surface);
+  padding: 9cqw;
+}
+
+.peek-index {
+  font-family: var(--font-mono);
+  font-size: 5cqw;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.peek-title {
+  margin-top: 3cqw;
+  font-size: 7cqw;
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.peek-body {
+  margin-top: 4cqw;
+  font-size: 4.4cqw;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.peek-arrow {
+  position: absolute;
+  right: 6cqw;
+  bottom: 6cqw;
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.lesson-folder button:hover .peek-arrow,
+.lesson-folder button:focus-visible .peek-arrow {
+  opacity: 1;
 }

@@ -15,12 +15,13 @@ function read<T extends string>(key: string, fallback: T): T {
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => read('ds-theme', 'light'));
+  // Dark is the default (matches interfaces.dev); light is the opt-in toggle.
+  const [theme, setTheme] = useState<Theme>(() => read('ds-theme', 'dark'));
   const [density, setDensity] = useState<Density>(() => read('ds-density', 'comfortable'));
 
   useEffect(() => {
     const el = document.documentElement;
-    if (theme === 'dark') el.setAttribute('data-theme', 'dark');
+    if (theme === 'light') el.setAttribute('data-theme', 'light');
     else el.removeAttribute('data-theme');
     try {
       localStorage.setItem('ds-theme', theme);

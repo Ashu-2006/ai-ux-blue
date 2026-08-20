@@ -1,20 +1,8 @@
-import { DitherGradient } from '@/components/dither-kit/gradient';
-import type { SubNode, SubKind } from '@/lib/types';
-
-// A paxel-style card: a dithered blue texture top, a mono question/kind label,
-// and a bold title. Rounded corners + blue accent per the brief. Click -> modal.
-const KIND_QUESTION: Record<SubKind, string> = {
-  model: 'Which mental model?',
-  pattern: 'Which pattern?',
-  anti: 'Which anti-pattern?',
-  invisible: 'Which invisible problem?',
-};
-const KIND_FG: Record<SubKind, string> = {
-  model: 'var(--model)',
-  pattern: 'var(--pattern)',
-  anti: 'var(--anti)',
-  invisible: 'var(--invisible)',
-};
+import { Sparkles } from 'lucide-react';
+import type { SubNode } from '@/lib/types';
+import { KIND_LABEL } from '@/lib/types';
+import { HeroCard, HeroBadge } from '@/components/HeroCard';
+import { DemoSpecimen, TypeSpecimen, specimenKindFor } from '@/components/specimens';
 
 interface Props {
   sub: SubNode;
@@ -22,34 +10,48 @@ interface Props {
   onOpen: () => void;
 }
 
+// Roadmap idea card on the unified hero-card system. Hero priority:
+// image (subs have none today) > demo specimen (mini UI mirroring the
+// sub-topic's interactive archetype) > type specimen.
 export function SubTopicCard({ sub, index, onOpen }: Props) {
-  return (
-    <button
-      onClick={onOpen}
-      className="pressable group relative flex flex-col overflow-hidden rounded-[var(--r-lg)] text-left"
-      style={{ background: 'var(--surface)', border: '0.5px solid var(--hairline)', boxShadow: 'var(--shadow-card)' }}
-    >
-      {/* dithered texture top */}
-      <div className="relative h-28 w-full overflow-hidden" style={{ borderBottom: '0.5px solid var(--hairline)' }}>
-        <DitherGradient from="blue" to="transparent" direction="down" cell={3} opacity={0.9} />
-        {/* three window dots, like the reference */}
-        <div className="absolute right-3 top-3 flex gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <span key={i} className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--surface)', opacity: 0.9 }} />
-          ))}
-        </div>
-      </div>
+  const color = `var(--${sub.kind})`;
+  const specimen = specimenKindFor(sub.id);
 
-      {/* body */}
-      <div className="flex flex-1 flex-col gap-1.5 p-4">
-        <span className="t-caption t-mono uppercase" style={{ color: KIND_FG[sub.kind] }}>
-          {KIND_QUESTION[sub.kind]}
+  const hero = specimen ? (
+    <div className="absolute inset-0 p-3 pt-11">
+      <DemoSpecimen kind={specimen} color={color} />
+    </div>
+  ) : (
+    <div className="absolute inset-0">
+      <TypeSpecimen label={sub.label} sub="click to open" />
+    </div>
+  );
+
+  return (
+    <HeroCard
+      onOpen={onOpen}
+      index={index}
+      hero={hero}
+      badge={
+        index === 0 ? (
+          <HeroBadge color="var(--accent)">
+            <Sparkles size={10} strokeWidth={2.6} /> New
+          </HeroBadge>
+        ) : (
+          <HeroBadge>
+            <span className="kind-dot" style={{ background: color }} />
+            {KIND_LABEL[sub.kind]}
+          </HeroBadge>
+        )
+      }
+      title={sub.label}
+      oneLiner={sub.oneLiner}
+      meta={
+        <span className="t-caption t-mono flex items-center justify-between uppercase text-ink-4">
+          <span>Idea {String(index + 1).padStart(2, '0')}</span>
+          <span>{specimen ? 'interactive inside' : 'read inside'}</span>
         </span>
-        <span className="t-lg font-semibold leading-tight text-ink">{sub.label}</span>
-        <span className="t-sm mt-auto pt-2 t-mono text-ink-4">
-          {String(index + 1).padStart(2, '0')}
-        </span>
-      </div>
-    </button>
+      }
+    />
   );
 }
