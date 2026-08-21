@@ -38,12 +38,12 @@ export function Hero({ onSearch, onExplore }: Props) {
           </motion.div>
 
           <motion.h1 custom={1} variants={rise} initial="hidden" animate="show" className="t-hero text-ink">
-            trustworthy AI &amp; crypto
+            on top of AI models,
           </motion.h1>
 
           <motion.div custom={2} variants={rise} initial="hidden" animate="show">
             <span className="t-hero t-serif" style={{ color: 'var(--ink)', fontWeight: 500 }}>
-              interfaces
+              interfaces.
             </span>
           </motion.div>
         </div>
@@ -63,7 +63,7 @@ export function Hero({ onSearch, onExplore }: Props) {
           >
             A
           </span>
-          <span className="t-sm text-ink-2">a roadmap by Ashutosh</span>
+          <span className="t-sm text-ink-2">AI UX, by Ashutosh</span>
         </motion.div>
 
         {/* ── CTAs (the cyan pill is the "Call To Action") ── */}
@@ -93,9 +93,9 @@ export function Hero({ onSearch, onExplore }: Props) {
             oklch(0.173 0 0)
           </Annotation>
 
-          {/* metric tag, top-right (the roadmap facts) */}
+          {/* metric tag, top-right */}
           <Annotation i={1} x="60%" y="-16%" line={{ toX: '52%', toY: '6%' }}>
-            {roadmap.meta.topicCount} topics · {roadmap.meta.subTopicCount} ideas
+            12 folders · 150 lessons
           </Annotation>
 
           {/* font tag pointing at the serif accent word */}

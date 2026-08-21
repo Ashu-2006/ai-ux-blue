@@ -20,10 +20,10 @@ export function Nav({ onSearch }: Props) {
           className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)]"
           style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
         >
-          <span className="t-caption font-semibold" style={{ letterSpacing: 0 }}>L</span>
+          <span className="t-caption font-semibold" style={{ letterSpacing: 0 }}>A</span>
         </span>
         <span className="t-sm font-semibold text-ink" style={{ letterSpacing: '-0.01em' }}>
-          Learning Roadmap
+          AI UX
         </span>
       </a>
 
