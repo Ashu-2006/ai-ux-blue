@@ -79,7 +79,12 @@ export function DeepModal({ id, onClose }: Props) {
             transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}
             onClick={onClose}
           />
-          <div className="fixed inset-0 z-[61] flex items-center justify-center p-4 sm:p-8">
+          <div
+            className="fixed inset-0 z-[61] flex items-center justify-center p-4 sm:p-8"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) onClose();
+            }}
+          >
             <motion.div
               className="material-strong relative flex max-h-[90vh] w-full max-w-[1080px] flex-col overflow-hidden rounded-[var(--r-xl)]"
               style={{ boxShadow: 'var(--shadow-float)', border: '0.5px solid var(--hairline)', transformOrigin: 'center' }}
