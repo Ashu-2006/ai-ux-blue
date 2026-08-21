@@ -11,7 +11,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'A model emits tokens. A program takes actions. The tool interface is the contract between them, and it is always the same four steps: describe, decide, execute, observe. Function calling, MCP, and A2A are three encodings of that one loop.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-01.svg',
+    diagram: '/lessons/p13-01.svg',
     diagramCaption:
       'The four-step loop: host describes tools, model decides a call, host validates and executes, result returns as context.',
     whyItMatters:
@@ -112,7 +112,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'OpenAI, Anthropic, and Gemini converged on the same tool-call loop and diverged on every field name in it. Arguments come back as a string on one, an object on two. Ids look different. Limits differ by 2x. The port costs days if you did not build a translator.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-02.svg',
+    diagram: '/lessons/p13-02.svg',
     diagramCaption:
       'One canonical tool declaration translated into the OpenAI, Anthropic, and Gemini payload shapes.',
     whyItMatters:
@@ -205,7 +205,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'Three weather lookups run serially is three model round trips. Run them in one turn and wall clock collapses from the sum of latencies to the max. Production fan-out benchmarks show 60 to 70 percent reduction, and the price is id correlation plus a stream you cannot parse yet.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-03.svg',
+    diagram: '/lessons/p13-03.svg',
     diagramCaption:
       'One model turn emitting three calls, executed concurrently, results returned keyed by id in completion order.',
     whyItMatters:
@@ -304,7 +304,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'Asking nicely for JSON fails 5 to 15 percent of the time on frontier models. Constrained decoding masks invalid tokens out of the sampling distribution, so the output is guaranteed to parse and guaranteed to validate. Three failure modes collapse to one: refusal.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-04.svg',
+    diagram: '/lessons/p13-04.svg',
     diagramCaption:
       'Prompt-for-JSON, validate-after, and constrained decoding compared: where each one can still fail.',
     whyItMatters:
@@ -403,7 +403,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'A tool schema is a form the model fills in, so every rule you already know applies. Naming, affordance, constraint, error copy. Renaming and rewriting descriptions alone moved selection accuracy 10 to 20 points, and one 50-tool registry went from 62 percent to 89 percent.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-05.svg',
+    diagram: '/lessons/p13-05.svg',
     diagramCaption:
       'A 30-tool registry with two ambiguous descriptions, and the disambiguating "Do not use for" line that separates them.',
     whyItMatters:
@@ -504,7 +504,7 @@ export const phase13Part1: Lesson[] = [
     oneLiner:
       'Sonnet costs about 3x Haiku, so a triage step and a synthesis step should not hit the same model. A routing gateway gives you one OpenAI-shaped API plus aliases, fallback chains, semantic caching worth 30 to 60 percent, cost tracking, and guardrails.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-21.svg',
+    diagram: '/lessons/p13-21.svg',
     diagramCaption:
       'One OpenAI-shaped request hitting an alias, cascading down a priority fallback chain, with cost attributed per leg.',
     whyItMatters:

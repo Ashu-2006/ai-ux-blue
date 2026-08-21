@@ -11,7 +11,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'Du et al. turned Minsky\'s 1986 premise into an algorithm: N agents answer, read each other, revise for R rounds, then majority-vote. The ablation is the real finding. More agents helps and plateaus, more rounds alone barely helps, and both together produce the jump.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-07.svg',
+    diagram: '/lessons/p16-07.svg',
     diagramCaption:
       'Three agents over three rounds: independent answers, then each reading the others and revising, converging on a majority.',
     whyItMatters:
@@ -98,7 +98,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'Star, chain, tree, graph. MultiAgentBench measured all four and found graph best for research, chain for pipelines, star for fast factual answers, and a coordination tax past roughly 4 agents. Heterogeneity beats numerosity: three different models usually beat five copies of one.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-15.svg',
+    diagram: '/lessons/p16-15.svg',
     diagramCaption:
       'The four topologies side by side, with the edge count that drives token cost growing from chain to fully connected graph.',
     whyItMatters:
@@ -197,7 +197,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'LLMs close tightly parameterized bargains at about 27 percent. Split the job in two, a deterministic offer generator plus an LLM narrator, and the deal rate goes to about 89 percent. Scale does not fix it; decomposition does.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-16.svg',
+    diagram: '/lessons/p16-16.svg',
     diagramCaption:
       'The OG-Narrator split: negotiation state feeds a deterministic offer generator, whose price the LLM wraps in language.',
     whyItMatters:
@@ -296,7 +296,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'Park et al. populated Smallville with 25 agents on three components: an append-only memory stream, periodic reflection that synthesizes beliefs, and a revisable plan tree. One seeded goal produced a party that 24 unseeded agents organized themselves.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-17.svg',
+    diagram: '/lessons/p16-17.svg',
     diagramCaption:
       'Observations enter the append-only stream, reflection synthesizes higher-order beliefs back into it, and plans read from ranked retrieval.',
     whyItMatters:
@@ -389,7 +389,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'Riedl measured coordination at population scale and found it only clears baseline under the theory-of-mind prompt condition. Without it, apparent coordination does not survive statistical controls. In a token-collection task, first-order ToM cut duplicate effort from about 35 percent to about 5 percent.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-18.svg',
+    diagram: '/lessons/p16-18.svg',
     diagramCaption:
       'A zeroth-order agent acting on its own observations, beside a first-order agent carrying an explicit per-peer belief model.',
     whyItMatters:
@@ -476,7 +476,7 @@ export const phase16Part3: Lesson[] = [
     oneLiner:
       'When agents produce value jointly you have to reward them individually. Shapley values are fair by construction and factorially expensive, second-price auctions are truthful under monotone aggregation, and reputation is the cheap layer that actually ships first.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-21.svg',
+    diagram: '/lessons/p16-21.svg',
     diagramCaption:
       'Five agents bidding for one task slot: the highest value wins and pays the second-highest, which is what makes truthful bidding optimal.',
     whyItMatters:

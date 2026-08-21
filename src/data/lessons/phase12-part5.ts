@@ -11,7 +11,7 @@ export const phase12Part5: Lesson[] = [
     oneLiner:
       'A vision-language-action model is a VLM whose output is not text but motion: joint targets, gripper commands, whole-body poses. RT-2 proved web knowledge transfers to robots; OpenVLA, π0, and GR00T made it a product category.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-21.svg',
+    diagram: '/lessons/p12-21.svg',
     diagramCaption:
       'The VLA lineage: RT-2 discretizes actions as text tokens, FAST compresses them, π0 goes continuous with flow matching, GR00T splits planning from control.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase12Part5: Lesson[] = [
     oneLiner:
       'Documents are not photos: layout, tables, and typography carry meaning that raw OCR throws away. Document AI moved through three eras, and by 2026 the frontier answer is "feed the page image to the VLM", with the pipeline surviving only where audit trails matter.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-22.svg',
+    diagram: '/lessons/p12-22.svg',
     diagramCaption:
       'Three eras of document AI: staged OCR pipeline, OCR-free specialists that emit markup, and VLM-native page reading at high resolution.',
     whyItMatters:
@@ -209,7 +209,7 @@ export const phase12Part5: Lesson[] = [
     oneLiner:
       'Text-RAG on PDFs is five lossy steps that drop charts, break tables, and flatten layout. ColPali embeds the page image directly and retrieves with ColBERT-style MaxSim over patches, beating text-RAG by 20 to 40 percent on visually rich documents.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-23.svg',
+    diagram: '/lessons/p12-23.svg',
     diagramCaption:
       'MaxSim over patches: each query token picks its best-matching page patch, and the page\'s score is the sum of those maxima.',
     whyItMatters:
@@ -308,7 +308,7 @@ export const phase12Part5: Lesson[] = [
     oneLiner:
       'Production multimodal RAG retrieves evidence across modalities ("quiet vegan brunch with natural light" needs reviews, photos, and sound), fuses the scores, and generates an answer that cites images and audio clips the way text-RAG cites passages.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-24.svg',
+    diagram: '/lessons/p12-24.svg',
     diagramCaption:
       'The multimodal RAG pipeline: decompose the query, retrieve per modality, fuse scores, generate with cross-modal citations.',
     whyItMatters:
@@ -399,7 +399,7 @@ export const phase12Part5: Lesson[] = [
     oneLiner:
       'The capstone of multimodal AI: an agent that reads screenshots, emits click and type actions as JSON, and loops until the workflow is done. The primitive works; the hard benchmarks still hold the frontier under 40 percent.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-25.svg',
+    diagram: '/lessons/p12-25.svg',
     diagramCaption:
       'The agent loop: screenshot in, plan, one JSON action out, execute, observe the new state, repeat until done.',
     whyItMatters:

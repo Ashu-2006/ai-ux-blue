@@ -109,7 +109,7 @@ export const phase16Part1: Lesson[] = [
     oneLiner:
       'Agent, handoff, shared state, orchestrator. That is the whole design space. AutoGen, LangGraph, CrewAI, the OpenAI Agents SDK, and Microsoft Agent Framework are just different defaults on those four axes.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-04.svg',
+    diagram: '/lessons/p16-04.svg',
     diagramCaption:
       'The four primitives and the axis each one sets: agent, handoff, shared state, orchestrator.',
     whyItMatters:
@@ -210,7 +210,7 @@ export const phase16Part1: Lesson[] = [
     oneLiner:
       'One lead plans and delegates, workers execute in their own contexts and report back. Anthropic measured plus 90.2 percent over single-agent Opus 4 on internal research evals, and 80 percent of the BrowseComp variance was explained by token usage alone.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-05.svg',
+    diagram: '/lessons/p16-05.svg',
     diagramCaption:
       'A lead decomposing one query into three sub-questions, workers running in parallel contexts, and one synthesis step.',
     whyItMatters:
@@ -311,7 +311,7 @@ export const phase16Part1: Lesson[] = [
     oneLiner:
       'Hierarchical is supervisor nested: managers over sub-managers over workers. It is the right shape when the task is a real org chart, and the pattern most likely to collapse into managers reassigning work forever. Sequential often beats it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-06.svg',
+    diagram: '/lessons/p16-06.svg',
     diagramCaption:
       'A three-level tree where every internal node plans, delegates, and synthesizes, and only leaves do work.',
     whyItMatters:
@@ -412,7 +412,7 @@ export const phase16Part1: Lesson[] = [
     oneLiner:
       'Three coders in a group chat write three flavors of the same mediocre code. The fix is not more agents, it is different ones, and one of them must be a verifier whose pass or fail is decided by code. PwC moved accuracy from 10 percent to 70 percent by adding that one role.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-08.svg',
+    diagram: '/lessons/p16-08.svg',
     diagramCaption:
       'The four roles and their distinct tool sets: planner, executor, critic (subjective, LLM), verifier (objective, code).',
     whyItMatters:
@@ -513,7 +513,7 @@ export const phase16Part1: Lesson[] = [
     oneLiner:
       'Remove the orchestrator. Workers pull tasks off a shared queue and write results back, so the system scales until the queue does. You pay for it in determinism, traceability, and the ability to reproduce a bug.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-09.svg',
+    diagram: '/lessons/p16-09.svg',
     diagramCaption:
       'Workers pulling from one shared queue with no central decider, each writing results and optionally enqueuing follow-ups.',
     whyItMatters:

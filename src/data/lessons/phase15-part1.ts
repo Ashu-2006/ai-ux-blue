@@ -11,7 +11,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'METR fits a curve to task success against expert completion time and reads off the 50 percent point. In January 2026 that point sits above 14 hours of expert work, and it has been doubling roughly every seven months since GPT-2.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-01.svg',
+    diagram: '/lessons/p15-01.svg',
     diagramCaption:
       'The horizon curve: task success probability against log expert time, with the 50 percent crossing moving right by one doubling.',
     whyItMatters:
@@ -100,7 +100,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'A model writes its own reasoning traces, keeps the ones that reach the right answer, and fine-tunes on those. It works without any new human annotation. It also preserves every shortcut that happened to land correctly.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-02.svg',
+    diagram: '/lessons/p15-02.svg',
     diagramCaption:
       'The bootstrap loop: sample rationale, filter by answer correctness, fine-tune, repeat, with rationalization catching the problems the model always fails.',
     whyItMatters:
@@ -193,7 +193,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'Pair a frontier coding model with an evolutionary loop and a machine-checkable evaluator, then let it run for hours to weeks. It found a 48-multiplication 4x4 complex matrix product, the first improvement on Strassen in 56 years, and a Borg scheduling heuristic that recovered about 0.7 percent of Google cluster compute.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-03.svg',
+    diagram: '/lessons/p15-03.svg',
     diagramCaption:
       'The evolutionary loop: sample parents from a MAP-elites database, prompt for a targeted edit, evaluate on a held-out oracle, insert by score and feature vector.',
     whyItMatters:
@@ -292,7 +292,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'Sakana closed the full research loop, hypothesis through submission, and one generated paper passed peer review at an ICLR 2025 workshop. An independent evaluation found 42 percent of experiments failed on coding errors and the novelty check routinely labelled established work as new.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-05.svg',
+    diagram: '/lessons/p15-05.svg',
     diagramCaption:
       'The research state machine: idea, novelty check, experiment, figure critique, writeup, review, with the failure rate attached to each transition.',
     whyItMatters:
@@ -384,7 +384,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'A system that edits itself produces two curves: capability and alignment. If capability compounds faster, the gap between them grows every cycle, and small rate differences become large gaps quickly.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-07.svg',
+    diagram: '/lessons/p15-07.svg',
     diagramCaption:
       'Two compounding curves over cycles, with the misalignment gap widening and crossing a pause threshold.',
     whyItMatters:
@@ -473,7 +473,7 @@ export const phase15Part1: Lesson[] = [
     oneLiner:
       'Research converged on four primitives for bounding a self-improvement loop: formal invariants, an immutable alignment anchor, multi-objective constraints, and regression detection. All four must pass for an edit to land, and none of them is a proof of safety.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-08.svg',
+    diagram: '/lessons/p15-08.svg',
     diagramCaption:
       'A proposed self-edit passing through invariant, anchor, multi-objective, and regression gates, with any single failure pausing the loop.',
     whyItMatters:

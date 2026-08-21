@@ -1,20 +1,26 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Nav } from '@/sections/Nav';
 import { Hero } from '@/sections/Hero';
 import { DemoCard } from '@/sections/DemoCard';
 import { Library } from '@/sections/Library';
-import { CardPlayground } from '@/sections/CardPlayground';
 import { Footer } from '@/sections/Footer';
+
+// Playground is a dev-only route (#playground); code-split so it does not
+// ship with the main bundle unless someone actually navigates to it.
+const CardPlayground = lazy(() =>
+  import('@/sections/CardPlayground').then((m) => ({ default: m.CardPlayground })),
+);
 import { DeepModal } from '@/components/DeepModal';
 import { LessonModal } from '@/components/LessonModal';
 import { CommandK } from '@/components/CommandK';
 import { getDeep } from '@/lib/deep';
+import { useLibraryRoute } from '@/lib/useLibraryRoute';
+import { leafBySlug } from '@/lib/library';
 
 export default function App() {
-  const [deepId, setDeepId] = useState<string | null>(null);
-  const [lessonId, setLessonId] = useState<string | null>(null);
   const [cmdkOpen, setCmdkOpen] = useState(false);
   const [route, setRoute] = useState(window.location.hash);
+  const { leaf, setLeaf } = useLibraryRoute();
 
   useEffect(() => {
     const onHash = () => setRoute(window.location.hash);
@@ -22,13 +28,14 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  // Library dispatches: a lesson opens LessonModal, an idea with authored deep
-  // content opens DeepModal (fallback: ideas without deep content still get a
-  // modal-worthy card, but we do not force an empty modal open).
-  const openLesson = (id: string) => setLessonId(id);
-  const openIdea = ({ subId }: { topicKey: string; subId: string }) => {
-    if (getDeep(subId)) setDeepId(subId);
-  };
+  // The URL owns modal state, so a close (which clears `l`) cannot be undone
+  // by an effect firing on the next render. This is the fix for the modal
+  // "reopens on close" bug: previously Library set component state via a
+  // dispatcher effect that read the same URL segment the modal used.
+  const leafNode = leaf ? leafBySlug(leaf) : null;
+  const lessonId = leafNode?.kind === 'lesson' ? leafNode.slug : null;
+  const ideaId = leafNode?.kind === 'idea' && getDeep(leafNode.slug) ? leafNode.slug : null;
+  const closeModal = () => setLeaf(null);
 
   const scrollToLibrary = () => {
     document.getElementById('library')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -45,7 +52,13 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  if (route === '#playground') return <CardPlayground />;
+  if (route === '#playground') {
+    return (
+      <Suspense fallback={<div className="min-h-[100dvh] bg-bg" />}>
+        <CardPlayground />
+      </Suspense>
+    );
+  }
 
   return (
     <div id="top" className="min-h-[100dvh] bg-bg">
@@ -54,17 +67,17 @@ export default function App() {
       <main>
         <Hero onSearch={() => setCmdkOpen(true)} onExplore={scrollToLibrary} />
         <DemoCard />
-        <Library onOpenLesson={openLesson} onOpenIdea={openIdea} />
+        <Library onOpenLesson={(id) => setLeaf(id)} onOpenIdea={({ subId }) => setLeaf(subId)} />
       </main>
 
       <Footer />
 
-      <DeepModal id={deepId} onClose={() => setDeepId(null)} />
-      <LessonModal id={lessonId} onClose={() => setLessonId(null)} />
+      <DeepModal id={ideaId} onClose={closeModal} />
+      <LessonModal id={lessonId} onClose={closeModal} />
       <CommandK
         open={cmdkOpen}
         onClose={() => setCmdkOpen(false)}
-        onPick={({ topicKey, subId }) => subId && openIdea({ topicKey, subId })}
+        onPick={({ subId }) => subId && setLeaf(subId)}
       />
     </div>
   );

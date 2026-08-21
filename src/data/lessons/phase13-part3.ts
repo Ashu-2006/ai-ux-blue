@@ -11,7 +11,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'Sampling flips the direction of an MCP call. Instead of the client asking the server to run code, the server asks the client\'s LLM for a completion, so the server keeps the algorithm and the user keeps the credentials and the bill.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-11.svg',
+    diagram: '/lessons/p13-11.svg',
     diagramCaption:
       'A normal tool call runs left to right; a sampling call reverses it, with the server requesting a completion from the client\'s model.',
     whyItMatters:
@@ -106,7 +106,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'Roots are the URI boundary the client declares on the user\'s behalf, and the server may not widen it. Elicitation is the server pausing a tool call to ask the user a structured question, which makes it an interaction-design problem, not a protocol detail.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-12.svg',
+    diagram: '/lessons/p13-12.svg',
     diagramCaption:
       'The declared root set as a boundary: reads and writes inside are allowed, anything outside is rejected before it runs.',
     whyItMatters:
@@ -205,7 +205,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'SEP-1686 lets any MCP request be promoted to a task. The server returns an id and a ttl immediately, the client polls status or subscribes to updates, and work that takes minutes stops depending on a connection staying open.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-13.svg',
+    diagram: '/lessons/p13-13.svg',
     diagramCaption:
       'The task lifecycle: working loops through input_required and ends in exactly one of completed, failed, or cancelled.',
     whyItMatters:
@@ -306,7 +306,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'A tool description lands in the model\'s context verbatim, so any text a server puts there reads as instructions. Frontier models complied with hidden-instruction descriptions 70 to 90 percent of the time, and adaptive attackers still hit about 85 percent against state-of-the-art defenses.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-15.svg',
+    diagram: '/lessons/p13-15.svg',
     diagramCaption:
       'A benign-looking tool whose description carries hidden instructions the user never sees but the model reads as its own brief.',
     whyItMatters:
@@ -401,7 +401,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'Remote MCP servers need authorization, not just authentication. The 2025-11-25 spec mandates OAuth 2.1 with PKCE, pins every token to one audience via RFC 8707, and adds step-up consent so a read-scoped session can ask for write exactly when it needs it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-16.svg',
+    diagram: '/lessons/p13-16.svg',
     diagramCaption:
       'A read-scoped token hitting a 403 insufficient_scope, a scoped consent prompt, and a retry with the widened token.',
     whyItMatters:
@@ -500,7 +500,7 @@ export const phase13Part3: Lesson[] = [
     oneLiner:
       'A gateway sits between clients and backend MCP servers and takes over five jobs: auth, RBAC, audit, rate limiting, and policy. To the developer it looks like a single MCP server. The Official Registry is the namespace-verified upstream it pulls from.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-17.svg',
+    diagram: '/lessons/p13-17.svg',
     diagramCaption:
       'Many clients into one gateway endpoint, policy and hash pinning applied at the boundary, then routed to N backend servers.',
     whyItMatters:

@@ -11,7 +11,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'In 2000 the IEEE ratified an agent communication language with twenty performatives, formal semantics, and a protocol library. It faded because ontologies were too heavy for the web. MCP, A2A, and ACP are the same envelope in JSON with looser semantics.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-02.svg',
+    diagram: '/lessons/p16-02.svg',
     diagramCaption:
       'A FIPA-ACL envelope beside an MCP tools/call: seven metadata fields around one payload, in both cases.',
     whyItMatters:
@@ -112,7 +112,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'Prompts are not differentiable, so gradient methods are out. PSO and ACO only need an evaluator. Model Swarms reports a 13.3 percent average gain over 12 baselines, and AMRO-S pheromone routing reports a 4.7x speedup with interpretable routing evidence.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-19.svg',
+    diagram: '/lessons/p16-19.svg',
     diagramCaption:
       'Stigmergy: agents leave a pheromone trail on routes that passed the quality gate, and the trail decays so routes can be rediscovered.',
     whyItMatters:
@@ -213,7 +213,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'MADDPG, QMIX, and MAPPO are three answers to one problem: independent learners see a non-stationary world and centralized control does not deploy. CTDE trains with global information and ships local policies. MAPPO is the 2026 default baseline.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-20.svg',
+    diagram: '/lessons/p16-20.svg',
     diagramCaption:
       'CTDE: a critic seeing all observations and actions during training, and actors that see only their own observation at runtime.',
     whyItMatters:
@@ -312,7 +312,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'Durable execution means a checkpoint after every super-step, so any worker resumes any run after any crash. Async is not an optimization at this scale, it is the architecture. And the honest default is still FastAPI plus Postgres until you measure it failing.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-22.svg',
+    diagram: '/lessons/p16-22.svg',
     diagramCaption:
       'A run checkpointing after each super-step, crashing mid-step, and a second worker picking up the thread from the last saved state.',
     whyItMatters:
@@ -413,7 +413,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'Cemri et al. read 1642 execution traces across 7 open-source multi-agent systems and found 41 to 86.7 percent failure rates sorting into three root categories: specification problems at 41.77 percent, coordination failures at 36.94 percent, verification gaps at 21.30 percent.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-23.svg',
+    diagram: '/lessons/p16-23.svg',
     diagramCaption:
       'A retry storm: a 10 percent payment failure amplifying through order and inventory retries into 10x load, and the circuit breaker that caps it.',
     whyItMatters:
@@ -514,7 +514,7 @@ export const phase16Part4: Lesson[] = [
     oneLiner:
       'Frontier models score around 23 percent on SWE-bench Pro against 70 percent plus on Verified, and the gap is the contamination signal. COMMA finds frontier models struggling to beat random on multimodal coordination. MedAgentBoard finds multi-agent often does not beat one model.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-24.svg',
+    diagram: '/lessons/p16-24.svg',
     diagramCaption:
       'The same models on SWE-bench Verified and Pro, with the gap between the two bars standing in for benchmark contamination.',
     whyItMatters:

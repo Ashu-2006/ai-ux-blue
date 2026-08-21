@@ -11,7 +11,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'An e-commerce agent went from $1,200 to $4,800 a month after one new skill shipped. The defense is not a bigger cap, it is twelve limits at different time scales, each of which catches a different failure and each of which needs somewhere on screen to say it fired.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-13.svg',
+    diagram: '/lessons/p15-13.svg',
     diagramCaption:
       'The layered cost-governor stack: per-request max_tokens up through velocity limit, daily cap, and the kill switch on breach.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'A cost governor bounds what an agent can spend. It does not bound what the agent can do inside the budget, because the destructive action is usually the cheap one. Three detectors sit next to the budget layer, and each one puts the run in a different state.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-14.svg',
+    diagram: '/lessons/p15-14.svg',
     diagramCaption:
       'The circuit breaker state machine: closed to open on a trip, then half-open probes that either close it or re-open it.',
     whyItMatters:
@@ -209,7 +209,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'The 2026 human-in-the-loop consensus is not "the agent asks, the user clicks Approve." It is a durable proposal record with intent, lineage, permissions, blast radius, rollback plan, and an idempotency key, committed only on positive acknowledgement and verified after execution.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-15.svg',
+    diagram: '/lessons/p15-15.svg',
     diagramCaption:
       'The four-state machine: propose to a durable store, surface to a reviewer, commit on positive acknowledgement, verify the side effect.',
     whyItMatters:
@@ -303,7 +303,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'Anthropic\'s January 22, 2026 Claude Constitution runs 79 pages, is CC0, and establishes a priority order: safety and human oversight, then ethics, then Anthropic guidelines, then helpfulness. Some behaviours are hardcoded and no operator or user can override them.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-17.svg',
+    diagram: '/lessons/p15-17.svg',
     diagramCaption:
       'The four-tier priority hierarchy with the hardcoded prohibition floor that operator settings cannot reach.',
     whyItMatters:
@@ -402,7 +402,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'Llama Guard classifies both inputs and outputs against a named hazard taxonomy in milliseconds, and a 1B-INT4 variant does over 30 tokens per second on a mobile CPU. It is also beatable: emoji smuggling hit a 100 percent attack success rate on six prominent guard systems.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-18.svg',
+    diagram: '/lessons/p15-18.svg',
     diagramCaption:
       'The guard sieve: input rail, model, output rail, and the attack classes that pass through each layer.',
     whyItMatters:
@@ -501,7 +501,7 @@ export const phase15Part3: Lesson[] = [
     oneLiner:
       'Anthropic ran parallel Claude Opus 4.6 alignment researchers in independent sandboxes, coordinating through a shared forum whose logs live outside every sandbox. On weak-to-strong training they beat the human baseline. The log placement is the whole reason the result is trustworthy.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-06.svg',
+    diagram: '/lessons/p15-06.svg',
     diagramCaption:
       'Parallel sandboxed researchers writing to a shared append-only forum whose storage sits outside every sandbox.',
     whyItMatters:

@@ -11,7 +11,7 @@ export const phase13Part4: Lesson[] = [
     oneLiner:
       'An in-memory OAuth demo becomes a production auth surface at three points: how clients enroll without an admin, how signing keys refresh without a restart, and how a token proves it was minted for this server and no other.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-18.svg',
+    diagram: '/lessons/p13-18.svg',
     diagramCaption:
       'Discovery to validated tool call: protected-resource metadata, authorization-server metadata, enrollment, PKCE code flow with a resource indicator, then per-request JWT validation against a cached JWKS.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase13Part4: Lesson[] = [
     oneLiner:
       'MCP is agent-to-tool and transparent. A2A is agent-to-agent and deliberately opaque: you send a Task, you watch a lifecycle, you receive Artifacts, and you never learn how the other agent did it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-19.svg',
+    diagram: '/lessons/p13-19.svg',
     diagramCaption:
       'A caller sends a Task with mixed Parts, the called agent moves through working and input-required, and returns a named Artifact while its internals stay hidden.',
     whyItMatters:
@@ -209,7 +209,7 @@ export const phase13Part4: Lesson[] = [
     oneLiner:
       'An agent calls five tools, three MCP servers, and two sub-agents. The GenAI semantic conventions give every one of those hops a span with the same attribute names, so a single trace id explains where the 30 seconds went.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-20.svg',
+    diagram: '/lessons/p13-20.svg',
     diagramCaption:
       'One trace id with nested spans: invoke_agent at the root, chat spans for the model, execute_tool spans for each dispatch, and a CLIENT span per MCP round-trip.',
     whyItMatters:
@@ -302,7 +302,7 @@ export const phase13Part4: Lesson[] = [
     oneLiner:
       'MCP says what tools exist. A skill says how to do a task. AGENTS.md says how this project works. Three layers with three load times, and most agent frustration is a thing sitting in the wrong one.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-22.svg',
+    diagram: '/lessons/p13-22.svg',
     diagramCaption:
       'Three layers by load time: AGENTS.md at session start, SKILL.md on invocation with sub-resources pulled on demand, MCP tools when an action is needed.',
     whyItMatters:
@@ -401,7 +401,7 @@ export const phase13Part4: Lesson[] = [
     oneLiner:
       'One question, "summarize the three most-cited 2026 arXiv papers on agent protocols," touches every primitive in the phase: an MCP server, an OAuth gateway with RBAC, an A2A sub-agent, a ui:// render surface, and one OTel trace over all of it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-23.svg',
+    diagram: '/lessons/p13-23.svg',
     diagramCaption:
       'Client to gateway to MCP servers, with an A2A delegation to a writer agent, a ui:// resource returned to the host, and one trace id spanning every hop.',
     whyItMatters:

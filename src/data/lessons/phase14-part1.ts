@@ -11,7 +11,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'Every agent shipping in 2026 is a variant of the ReAct loop from 2022. The model thinks, calls a tool, reads the result, and repeats until a stop condition fires. Everything else is scaffolding.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-01.svg',
+    diagram: '/lessons/p14-01.svg',
     diagramCaption:
       'One iteration of the loop: message buffer, model turn, tool dispatch, observation appended, stop condition checked.',
     whyItMatters:
@@ -112,7 +112,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'ReAct interleaves thinking and acting in one stream. ReWOO separates them: one plan up front, then execution. Roughly 5x fewer tokens and plus 4 points on HotpotQA, and the plan becomes an object you can show a human before anything runs.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-02.svg',
+    diagram: '/lessons/p14-02.svg',
     diagramCaption:
       'Planner emits a DAG with evidence references, workers execute nodes in dependency order, solver composes the final answer.',
     whyItMatters:
@@ -213,7 +213,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'Gradient RL needs thousands of trials and a GPU cluster to fix one failure mode. Reflexion fixes it in a sentence: the agent writes down why it failed, stores it, and reads it before the next attempt.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-03.svg',
+    diagram: '/lessons/p14-03.svg',
     diagramCaption:
       'Actor produces a trajectory, evaluator scores it, self-reflector writes a reflection into episodic memory, and the next trial starts fresh with that memory prepended.',
     whyItMatters:
@@ -306,7 +306,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'A single chain of thought cannot backtrack. Tree of Thoughts turns reasoning into a scored tree, taking Game of 24 from 4 percent to 74 percent, and LATS wraps it in Monte Carlo Tree Search for 92.7 percent pass@1 on HumanEval. The bill is 100 to 1000x the tokens.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-04.svg',
+    diagram: '/lessons/p14-04.svg',
     diagramCaption:
       'A thought tree: each node expands to K children, each child gets a self-evaluated score, and search keeps the promising branches and abandons the rest.',
     whyItMatters:
@@ -398,7 +398,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'Self-Refine runs one model in three roles, generate, critique, revise, for plus 20 absolute across seven tasks. CRITIC fixes its blind spot: a model cannot verify its own facts, so route the critique through real tools.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-05.svg',
+    diagram: '/lessons/p14-05.svg',
     diagramCaption:
       'The refine loop: generate, feedback or external verification, revise with full history, and a stop condition that combines a passing verifier with an iteration cap.',
     whyItMatters:
@@ -499,7 +499,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'Single-turn function calling is effectively solved. Berkeley Function Calling Leaderboard V4 weights 40 percent agentic and 30 percent multi-turn because the remaining failures are memory, long chains, and knowing when not to call a tool at all.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-06.svg',
+    diagram: '/lessons/p14-06.svg',
     diagramCaption:
       'A tool call from schema to result: description-driven selection, argument validation and coercion, sandboxed execution, and correlation by tool_use_id.',
     whyItMatters:
@@ -596,7 +596,7 @@ export const phase14Part1: Lesson[] = [
     oneLiner:
       'Two cases the LLM loop handles badly: plans that must be provably sound, and optimizations with a machine-checkable score. HTN owns the first, AlphaEvolve owns the second, and in both the model is an amplifier that never touches the correctness layer.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-11.svg',
+    diagram: '/lessons/p14-11.svg',
     diagramCaption:
       'HTN decomposition: a compound task expands through methods into primitive operators, each gated by preconditions, with an LLM fallback proposing candidates the schema must accept.',
     whyItMatters:

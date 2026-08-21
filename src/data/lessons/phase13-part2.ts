@@ -11,7 +11,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'MCP is JSON-RPC 2.0 plus six named primitives and a three-phase lifecycle. Three primitives belong to the server (tools, resources, prompts) and three to the client (roots, sampling, elicitation), and the initialize handshake decides which of them are legal for the rest of the session.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-06.svg',
+    diagram: '/lessons/p13-06.svg',
     diagramCaption:
       'The initialize handshake, then the operation phase where either side may originate a request per the negotiated capabilities.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'A working MCP server over stdio is a dict of method name to handler, a strict rule that stdout carries nothing but JSON-RPC, and tool results returned as typed content blocks rather than strings. About 180 lines of stdlib, or under 80 with FastMCP.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-07.svg',
+    diagram: '/lessons/p13-07.svg',
     diagramCaption:
       'The stdio dispatch loop: one JSON object per line in, handler lookup by method name, one response per id out.',
     whyItMatters:
@@ -206,7 +206,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'A host runs several MCP servers at once, handshakes each independently, and flattens their tool lists into one namespace the model can see. The hard parts are collision policy, routing, and a reader loop that never blocks on a call while a notification waits in the stream.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-08.svg',
+    diagram: '/lessons/p13-08.svg',
     diagramCaption:
       'Three servers, three sessions, one merged tool namespace, and a dispatch table from tool name back to the owning session.',
     whyItMatters:
@@ -297,7 +297,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'Two transports, no overlap. stdio is a child process on the same box. Streamable HTTP is one endpoint handling POST, GET, and DELETE with a server-assigned Mcp-Session-Id. The old two-endpoint HTTP+SSE mode is deprecated and gone through mid-2026.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-09.svg',
+    diagram: '/lessons/p13-09.svg',
     diagramCaption:
       'Streamable HTTP on one path: POST carries requests, GET holds the server-to-client stream, both keyed by Mcp-Session-Id.',
     whyItMatters:
@@ -398,7 +398,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'Tools get most of the attention and cause most of the bad servers. If the model should call it on every related query it is a tool, if the user should attach it to a conversation it is a resource, if a whole workflow is the reusable unit it is a prompt. Each choice buys a different piece of host UI.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-10.svg',
+    diagram: '/lessons/p13-10.svg',
     diagramCaption:
       'Sorting one server\'s capabilities across the three primitives, with the host affordance each choice unlocks.',
     whyItMatters:
@@ -499,7 +499,7 @@ export const phase13Part2: Lesson[] = [
     oneLiner:
       'SEP-1724, official January 26, 2026, lets a tool return a ui:// resource with MIME text/html;profile=mcp-app. The host mounts it in a sandboxed iframe under a server-declared CSP, and the UI talks back over a postMessage JSON-RPC dialect. One HTML bundle renders in Claude Desktop, ChatGPT, Goose, Cursor, and VS Code.',
     readTime: '~8 min read',
-    diagram: 'lessons/p13-14.svg',
+    diagram: '/lessons/p13-14.svg',
     diagramCaption:
       'A tool result carrying a ui:// resource, the host reading it, mounting the sandboxed iframe, and mediating host.callTool over postMessage.',
     whyItMatters:

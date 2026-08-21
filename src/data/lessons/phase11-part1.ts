@@ -477,7 +477,7 @@ export const phase11Part1: Lesson[] = [
     oneLiner:
       'Your system prompt and retrieved context go out with every request, and you pay full price for them every time. Caching the prefix cuts input cost 50 to 90 percent and first-token latency 40 to 85 percent, if the prefix is byte-identical.',
     readTime: '~8 min read',
-    diagram: 'lessons/p11-15.svg',
+    diagram: '/lessons/p11-15.svg',
     diagramCaption:
       'Write once, read cheap: the provider keeps the matching prefix warm as a KV-cache, so repeat requests skip re-encoding and pay a fraction of the input rate.',
     whyItMatters:

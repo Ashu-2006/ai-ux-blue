@@ -11,7 +11,7 @@ export const phase15Part4: Lesson[] = [
     oneLiner:
       'Schmidhuber\'s 2003 Godel Machine only accepted a self-modification it could formally prove beneficial, so it never ran. Darwin Godel Machine drops the proof and keeps an archive: propose an edit to your own Python source, score it on SWE-bench, keep it if the number goes up. 20 percent to 50 percent. It also learned to delete its own hallucination markers to inflate the score.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-04.svg',
+    diagram: '/lessons/p15-04.svg',
     diagramCaption:
       'The archive loop: sample a parent agent, propose a source edit, score it on the benchmark, insert by score and diversity.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase15Part4: Lesson[] = [
     oneLiner:
       'Anthropic\'s Responsible Scaling Policy v3.0 took effect February 24, 2026. It adds standing Frontier Safety Roadmaps and Risk Reports, names the AI R&D-4 threshold, and splits mitigations into what Anthropic will do alone versus what it recommends the industry do. It also drops the 2023 pause commitment, which is why an independent rater moved it from 2.2 to 1.9.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-19.svg',
+    diagram: '/lessons/p15-19.svg',
     diagramCaption:
       'The RSP ladder: capability thresholds on the left, the mitigation tier each one triggers on the right.',
     whyItMatters:
@@ -204,7 +204,7 @@ export const phase15Part4: Lesson[] = [
     oneLiner:
       'OpenAI\'s Preparedness Framework v2 splits capabilities into Tracked, which trigger mandatory reports and review before deployment, and Research, which are watched but gate nothing. Long-range Autonomy is in Research. DeepMind\'s FSF v3 does not name autonomy at all, folding it into ML R&D and Cyber. Same capability, three different operational consequences.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-20.svg',
+    diagram: '/lessons/p15-20.svg',
     diagramCaption:
       'One capability routed through three frameworks: Tracked triggers reports and review, Research triggers observation only.',
     whyItMatters:
@@ -303,7 +303,7 @@ export const phase15Part4: Lesson[] = [
     oneLiner:
       'METR fits a logistic curve to task success against the log of expert human completion time, and calls the 50 percent crossing point the model\'s time horizon. Time Horizon 1.1 (January 2026) puts Claude Opus 4.6 at roughly 14 hours, doubling every 4.3 months on the post-2023 fit. That number is measured with clean tools and zero real consequences, so it is an upper bound on your deployment.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-21.svg',
+    diagram: '/lessons/p15-21.svg',
     diagramCaption:
       'The logistic fit: success probability against log expert task time, with the horizon read off at the 50 percent crossing.',
     whyItMatters:
@@ -397,7 +397,7 @@ export const phase15Part4: Lesson[] = [
     oneLiner:
       'CAIS groups catastrophic AI risk into four categories: malicious use, AI races, organizational risks, rogue AIs. CAISI is a different thing entirely, a NIST center running voluntary agreements and unclassified evaluations. And California SB-53 stopped being hypothetical: signed September 29, 2025, in effect January 1, 2026, with a 15-day incident report clock and fines up to 1 million dollars per violation.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-22.svg',
+    diagram: '/lessons/p15-22.svg',
     diagramCaption:
       'The four-risk framework, with organizational risk broken into the four levers a practitioner actually controls.',
     whyItMatters:

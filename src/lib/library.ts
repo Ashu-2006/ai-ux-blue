@@ -375,18 +375,6 @@ export const ROOT: FolderNode = (() => {
   };
 })();
 
-// Walk to a node by path. Returns Home for empty path.
-export function nodeAtPath(path: string[]): Node | null {
-  let node: Node = ROOT;
-  for (const seg of path) {
-    if (node.kind !== 'folder') return null;
-    const next: Node | undefined = node.children.find((c) => c.slug === seg);
-    if (!next) return null;
-    node = next;
-  }
-  return node;
-}
-
 // Every leaf reachable from a folder, for search/filter/sort.
 export function collectLeaves(folder: FolderNode): (LessonNode | IdeaNode)[] {
   const out: (LessonNode | IdeaNode)[] = [];
@@ -398,28 +386,40 @@ export function collectLeaves(folder: FolderNode): (LessonNode | IdeaNode)[] {
   return out;
 }
 
-// URL round-tripping: '?p=a/b/c' <-> ['a','b','c'].
-export function parsePath(raw: string | null | undefined): string[] {
-  if (!raw) return [];
-  return raw
-    .split('/')
-    .map((s) => s.trim())
-    .filter(Boolean);
+// Slug lookups. Every folder slug and every leaf id is unique across the tree
+// (a build-time invariant), so a bare slug is enough to locate any node.
+const FOLDER_BY_SLUG = new Map<string, FolderNode>();
+const LEAF_BY_SLUG = new Map<string, LessonNode | IdeaNode>();
+(function index(node: Node) {
+  if (node.kind === 'folder') {
+    if (node.slug) FOLDER_BY_SLUG.set(node.slug, node);
+    node.children.forEach(index);
+  } else {
+    LEAF_BY_SLUG.set(node.slug, node);
+  }
+})(ROOT);
+
+export function folderBySlug(slug: string | null | undefined): FolderNode | null {
+  if (!slug) return ROOT;
+  return FOLDER_BY_SLUG.get(slug) ?? null;
 }
-export function serializePath(path: string[]): string {
-  return path.join('/');
+export function leafBySlug(slug: string | null | undefined): LessonNode | IdeaNode | null {
+  if (!slug) return null;
+  return LEAF_BY_SLUG.get(slug) ?? null;
 }
 
-// Ancestor chain for breadcrumb rendering, including Home at index 0.
-export function ancestors(path: string[]): FolderNode[] {
+// Ancestor chain for breadcrumb rendering, including Home at index 0. The
+// chain is derived from the folder's `path` array which we assembled at build
+// time, so no re-walk of the tree is needed.
+export function ancestorsOfFolder(folder: FolderNode): FolderNode[] {
   const out: FolderNode[] = [ROOT];
-  let node: Node = ROOT;
-  for (const seg of path) {
-    if (node.kind !== 'folder') break;
-    const next: Node | undefined = node.children.find((c) => c.slug === seg);
-    if (!next || next.kind !== 'folder') break;
+  let node: FolderNode = ROOT;
+  for (const seg of folder.path) {
+    const next = node.children.find((c) => c.kind === 'folder' && c.slug === seg) as FolderNode | undefined;
+    if (!next) break;
     out.push(next);
     node = next;
   }
   return out;
 }
+

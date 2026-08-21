@@ -11,7 +11,7 @@ export const phase12Part4: Lesson[] = [
     oneLiner:
       'Video is not a stack of photos: it has ordering, actions, and timing. The models that can answer "at what second does the cat jump?" earned it through one specific mechanism, timestamps baked into position encoding.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-17.svg',
+    diagram: '/lessons/p12-17.svg',
     diagramCaption:
       'Three temporal designs side by side: Q-former per clip, pooled tokens per frame, and TMRoPE with an absolute timestamp on every token.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase12Part4: Lesson[] = [
     oneLiner:
       'An hour of video overflows every context window that exists. Four escape routes emerged: buy a bigger context, distribute attention across devices, compress clips to summary tokens, or stop feeding the video in at all and retrieve from it instead.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-18.svg',
+    diagram: '/lessons/p12-18.svg',
     diagramCaption:
       'The token budget wall: video duration against token count, with the four scaling paths (brute context, ring attention, compression, retrieval) marked where each takes over.',
     whyItMatters:
@@ -196,7 +196,7 @@ export const phase12Part4: Lesson[] = [
     oneLiner:
       'Whisper made transcription a commodity. But a transcript is not the audio: emotion, speakers, music, and timing all live in the sound and die in the text. Audio-LLMs feed the sound itself into the model.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-19.svg',
+    diagram: '/lessons/p12-19.svg',
     diagramCaption:
       'The arc from ASR to audio reasoning: waveform to log-Mel spectrogram, through paired Whisper and BEATs encoders, into an audio Q-former, into the LLM.',
     whyItMatters:
@@ -288,7 +288,7 @@ export const phase12Part4: Lesson[] = [
     oneLiner:
       'Real-time voice AI feels conversational under roughly 500ms of round-trip. The architecture that gets there splits the model in two: a big Thinker that decides what to say and a small Talker that starts saying it before the thought is finished.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-20.svg',
+    diagram: '/lessons/p12-20.svg',
     diagramCaption:
       'The Thinker-Talker pipeline: mic to audio tokens, Thinker emitting text tokens, Talker converting each into speech tokens, and the streaming decoder playing audio while the Thinker is still mid-thought.',
     whyItMatters:

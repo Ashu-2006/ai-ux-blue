@@ -11,7 +11,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Adapter VLMs can read images but only ever answer in text. Chameleon turned images into discrete tokens from the same vocabulary as words, so one decoder can emit text and images interleaved in a single pass.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-11.svg',
+    diagram: '/lessons/p12-11.svg',
     diagramCaption:
       'Early fusion: a VQ-VAE maps the image to 1024 codebook indices that sit in the same token vocabulary as text, one sequence, one loss.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Emu3 trained one Llama-style decoder with nothing but next-token prediction across text, image, and video tokens, and beat SDXL on image generation anyway. A better tokenizer plus scale was the whole trick.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-12.svg',
+    diagram: '/lessons/p12-12.svg',
     diagramCaption:
       'One decoder, one loss: text, 2D image tokens, and 3D video tokens drawn from a unified vocabulary, all trained with next-token prediction.',
     whyItMatters:
@@ -196,7 +196,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Instead of forcing images through a lossy codebook, Transfusion keeps them continuous: one transformer trains next-token prediction on text and a diffusion loss on image patches, in the same gradient step.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-13.svg',
+    diagram: '/lessons/p12-13.svg',
     diagramCaption:
       'One backbone, two heads: cross-entropy on text tokens, flow-matching MSE on continuous image patches, joined by a block-triangular attention mask.',
     whyItMatters:
@@ -295,7 +295,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Show-o keeps image tokens discrete but stops generating them one at a time. Start fully masked, predict everything in parallel, keep the confident guesses, repeat. An image lands in about 16 steps, and inpainting comes free.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-14.svg',
+    diagram: '/lessons/p12-14.svg',
     diagramCaption:
       'Masked discrete diffusion: from a fully masked token grid, each step predicts all masked positions in parallel and commits the most confident, on a cosine schedule.',
     whyItMatters:
@@ -397,7 +397,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Understanding wants semantic features; generation wants reconstruction-friendly codes. One encoder cannot serve both well. Janus-Pro routes each task through its own encoder into a shared transformer, and beats DALL-E 3 on GenEval with 7B open weights.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-15.svg',
+    diagram: '/lessons/p12-15.svg',
     diagramCaption:
       'Decoupled routing: SigLIP features feed the shared body for understanding; VQ tokens feed it (and come out of it) for generation.',
     whyItMatters:
@@ -496,7 +496,7 @@ export const phase12Part3: Lesson[] = [
     oneLiner:
       'Four tokenizers (text, image, speech, music), disjoint ID ranges in one 48k vocabulary, one causal transformer over the lot. MIO is the open recipe for the GPT-4o-style agent that hears, sees, and talks back in near real time.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-16.svg',
+    diagram: '/lessons/p12-16.svg',
     diagramCaption:
       'The any-to-any pattern: four modality tokenizers feeding disjoint ranges of one shared vocabulary, one transformer, streaming decode out the other side.',
     whyItMatters:

@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronRight, Search, FolderOpen, ArrowLeft, Home as HomeIcon } from 'lucide-react';
-import { ancestors, collectLeaves, nodeAtPath, ROOT, type FolderNode, type IdeaNode, type Node } from '@/lib/library';
+import {
+  ancestorsOfFolder,
+  collectLeaves,
+  folderBySlug,
+  ROOT,
+  type FolderNode,
+  type IdeaNode,
+  type Node,
+} from '@/lib/library';
 import { useLibraryRoute } from '@/lib/useLibraryRoute';
 import { LessonCard } from '@/components/LessonCard';
 import { LessonFolder } from '@/components/LessonFolder';
@@ -30,72 +38,76 @@ const ease = [0.23, 1, 0.32, 1] as const;
 
 export function Library({ onOpenLesson, onOpenIdea }: Props) {
   const reduce = useReducedMotion();
-  const { path, go, up } = useLibraryRoute();
+  const { folder: folderSlug, setFolder } = useLibraryRoute();
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<KindFilter>('all');
   const [sort, setSort] = useState<SortMode>('curriculum');
 
-  // Reset search when the folder changes.
-  useEffect(() => setQuery(''), [path.join('/')]);
+  const currentFolder: FolderNode = folderBySlug(folderSlug) ?? ROOT;
+  const crumbs = ancestorsOfFolder(currentFolder);
 
-  // Escape and Backspace go up one level.
+  // Reset the local search when the folder changes.
+  useEffect(() => setQuery(''), [currentFolder.slug]);
+
+  // Escape / Backspace go up one level (unless typing).
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
       const active = document.activeElement;
       const typing =
-        active instanceof HTMLElement && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+        active instanceof HTMLElement &&
+        (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
       if (typing) return;
-      if (path.length === 0) return;
+      if (currentFolder.slug === '') return;
       if (e.key === 'Escape' || (e.key === 'Backspace' && !e.metaKey && !e.ctrlKey)) {
         e.preventDefault();
-        up();
+        const parent = crumbs[crumbs.length - 2];
+        setFolder(parent && parent.slug ? parent.slug : null);
       }
     };
     window.addEventListener('keydown', on);
     return () => window.removeEventListener('keydown', on);
-  }, [path, up]);
+  }, [currentFolder.slug, crumbs, setFolder]);
 
-  // Resolve the target: if the path ends on a lesson/idea, open the modal and
-  // keep the parent folder as the visible directory.
-  const target = useMemo(() => nodeAtPath(path), [path]);
-  const currentFolder: FolderNode =
-    target && target.kind === 'folder' ? target : ancestors(path).slice(-1)[0] ?? ROOT;
-
-  useEffect(() => {
-    if (!target) return;
-    if (target.kind === 'lesson') onOpenLesson(target.slug);
-    else if (target.kind === 'idea') {
-      const node = target as IdeaNode;
-      onOpenIdea({ topicKey: node.topicId, subId: node.slug });
-    }
-  }, [target, onOpenLesson, onOpenIdea]);
-
-  const crumbs = ancestors(currentFolder.path);
-
-  // What we render: either just this folder's direct children (browsing), or a
-  // flat, filtered list of every leaf reachable from here (searching/filtering).
+  // What the grid renders.
   const isSearching = query.trim().length > 0 || kind !== 'all';
   const contents: Node[] = useMemo(() => {
     if (!isSearching) return sortNodes(currentFolder.children, sort);
-    const leaves = collectLeaves(currentFolder);
+
+    // Filter mode: matching sub-folders first, then matching leaves. Folders
+    // survive the kind filter only when kind === 'all' (folders don't have a
+    // "kind"); a specific-kind filter is a leaf-only view by definition.
     const q = query.trim().toLowerCase();
-    const filtered = leaves.filter((n) => {
-      // kind filter
+    const matchQuery = (hay: string) => (!q ? true : hay.toLowerCase().includes(q));
+
+    const folders =
+      kind === 'all'
+        ? currentFolder.children.filter(
+            (n) => n.kind === 'folder' && matchQuery(`${n.title} ${n.blurb}`),
+          )
+        : [];
+
+    const leaves = collectLeaves(currentFolder).filter((n) => {
       if (kind === 'lesson' && n.kind !== 'lesson') return false;
       if (kind === 'idea' && n.kind !== 'idea') return false;
       if (kind !== 'all' && kind !== 'lesson' && kind !== 'idea') {
         if (n.kind !== 'idea' || n.idea.kind !== kind) return false;
       }
-      // query filter (title + one-liner + phase/topic hint)
-      if (!q) return true;
       const hay =
         n.kind === 'lesson'
           ? `${n.title} ${n.lesson.oneLiner} ${n.lesson.phase} ${n.lesson.part}`
           : `${n.title} ${n.idea.oneLiner} ${n.topicId}`;
-      return hay.toLowerCase().includes(q);
+      return matchQuery(hay);
     });
-    return sortNodes(filtered, sort);
+
+    return [...sortNodes(folders, sort), ...sortNodes(leaves as Node[], sort)];
   }, [currentFolder, query, kind, sort, isSearching]);
+
+  // Dispatchers for leaf clicks: modals open via the route setter, not local
+  // component state, so Close (which clears `l`) actually stays closed.
+  const openLeaf = (n: LeafNode) => {
+    if (n.kind === 'lesson') onOpenLesson(n.slug);
+    else onOpenIdea({ topicKey: (n as IdeaNode).topicId, subId: n.slug });
+  };
 
   return (
     <section id="library" className="mx-auto max-w-[1180px] px-8 pb-32 pt-8 sm:px-14 lg:px-20">
@@ -105,10 +117,13 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
         blurb="Twelve topic folders that group the whole curriculum and roadmap by what the material is about. Open a folder to go inside, click a file to read it."
       />
 
-      {/* breadcrumb + up button */}
+      {/* breadcrumb */}
       <nav aria-label="Breadcrumb" className="mt-10 flex flex-wrap items-center gap-x-1.5 gap-y-1">
-        {path.length > 0 && (
-          <button onClick={up} className="btn btn-secondary pressable mr-2 !px-2.5 !py-1.5 t-sm inline-flex items-center gap-1.5">
+        {currentFolder.slug !== '' && (
+          <button
+            onClick={() => setFolder(crumbs[crumbs.length - 2]?.slug || null)}
+            className="btn btn-secondary pressable mr-2 !px-2.5 !py-1.5 t-sm inline-flex items-center gap-1.5"
+          >
             <ArrowLeft size={13} strokeWidth={2} /> Back
           </button>
         )}
@@ -118,7 +133,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
           return (
             <span key={c.slug || 'home'} className="inline-flex items-center gap-x-1.5">
               <button
-                onClick={() => go(c.path)}
+                onClick={() => setFolder(c.slug || null)}
                 disabled={last}
                 className="pressable inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-2 py-1 t-sm"
                 style={{
@@ -137,8 +152,13 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
         })}
       </nav>
 
-      {/* filter rail */}
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      {/* sticky filter rail: pinned to the top on scroll so search stays
+          reachable without a long scroll back up. The material class carries
+          the frosted-glass tint from the design system. */}
+      <div
+        className="material sticky top-[60px] z-30 -mx-8 mt-6 flex flex-wrap items-center gap-3 px-8 py-3 sm:-mx-14 sm:px-14 lg:-mx-20 lg:px-20"
+        style={{ borderBottom: '0.5px solid var(--hairline)' }}
+      >
         <label
           className="inline-flex items-center gap-2 rounded-full px-3 py-2 t-sm flex-1 min-w-[220px] max-w-[380px]"
           style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
@@ -182,7 +202,10 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
           })}
         </div>
 
-        <div className="ml-auto flex items-center gap-1 rounded-full p-1" style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}>
+        <div
+          className="ml-auto flex items-center gap-1 rounded-full p-1"
+          style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+        >
           {(['curriculum', 'a-z'] as const).map((m) => (
             <button
               key={m}
@@ -200,7 +223,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
         </div>
       </div>
 
-      {/* current directory blurb, only meaningful when browsing */}
+      {/* current folder blurb, only meaningful when browsing */}
       {!isSearching && currentFolder.blurb && (
         <p className="t-lg mt-8 max-w-[70ch] text-ink-3">{currentFolder.blurb}</p>
       )}
@@ -208,7 +231,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
       {/* the grid */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={path.join('/') + (isSearching ? ':search' : ':browse')}
+          key={(currentFolder.slug || 'home') + (isSearching ? ':search' : ':browse')}
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
@@ -229,13 +252,16 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
                 items={n.children}
                 count={n.lessonCount}
                 index={i}
-                onOpenFolder={() => go(n.path)}
-                onOpenItem={(item) => go(item.path)}
+                onOpenFolder={() => setFolder(n.slug)}
+                onOpenItem={(item) => {
+                  if (item.kind === 'folder') setFolder(item.slug);
+                  else openLeaf(item as LeafNode);
+                }}
               />
             ) : n.kind === 'lesson' ? (
-              <LessonCard key={n.slug} lesson={n.lesson} index={i} onOpen={() => go(n.path)} />
+              <LessonCard key={n.slug} lesson={n.lesson} index={i} onOpen={() => openLeaf(n)} />
             ) : (
-              <IdeaTile key={n.slug} node={n} index={i} onOpen={() => go(n.path)} />
+              <IdeaTile key={n.slug} node={n} index={i} onOpen={() => openLeaf(n)} />
             ),
           )}
         </motion.div>
@@ -243,6 +269,8 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
     </section>
   );
 }
+
+type LeafNode = { kind: 'lesson'; slug: string } | { kind: 'idea'; slug: string; topicId: string };
 
 function sortNodes<T extends Node>(nodes: T[], mode: SortMode): T[] {
   if (mode === 'curriculum') return nodes;
@@ -260,10 +288,7 @@ function IdeaTile({ node, index, onOpen }: { node: IdeaNode; index: number; onOp
       transition={{ duration: 0.45, ease, delay: Math.min(index, 8) * 0.03 }}
       className="card pressable flex flex-col items-start gap-4 p-6 text-left"
     >
-      <span
-        className="kind-pill text-ink-2"
-        style={{ borderColor: 'var(--hairline)' }}
-      >
+      <span className="kind-pill text-ink-2" style={{ borderColor: 'var(--hairline)' }}>
         <span className="kind-dot" style={{ background: color }} />
         {KIND_LABEL[node.idea.kind]}
       </span>

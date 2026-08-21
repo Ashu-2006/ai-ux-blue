@@ -11,7 +11,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'Three benchmarks anchor agent evaluation in 2026: SWE-bench for code patches, GAIA for generalist tool use, AgentBench for multi-environment reasoning. Each number is a product constraint in disguise.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-19.svg',
+    diagram: '/lessons/p14-19.svg',
     diagramCaption:
       'The SWE-bench gate: agent patch, FAIL_TO_PASS tests must flip, PASS_TO_PASS tests must hold, both or the task is scored zero.',
     whyItMatters:
@@ -97,7 +97,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'WebArena scores agents on 812 tasks across four self-hosted web apps. OSWorld scores them on 369 real desktop tasks. At release both showed roughly a 60 point gap to human performance, and the two failure modes behind it are UI problems.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-20.svg',
+    diagram: '/lessons/p14-20.svg',
     diagramCaption:
       'The agent-human gap at release: WebArena 14.41 percent versus 78.24 percent, OSWorld 12.24 percent versus 72.36 percent, with grounding and operational knowledge as the two causes.',
     whyItMatters:
@@ -198,7 +198,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'Three production computer-use models ship in 2026. All three are vision-based, and all three treat everything on the screen as untrusted input. Only a direct user instruction counts as permission.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-21.svg',
+    diagram: '/lessons/p14-21.svg',
     diagramCaption:
       'The computer-use loop: screenshot in, proposed action, per-step safety classifier, confirmation gate on sensitive actions, keyboard and mouse out.',
     whyItMatters:
@@ -292,7 +292,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'A voice agent is not a text loop with speech bolted on. It is a frame pipeline running against a 600ms budget, where turn-taking, barge-in, and transcription confidence are the interaction design.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-22.svg',
+    diagram: '/lessons/p14-22.svg',
     diagramCaption:
       'The voice pipeline: VAD, STT, LLM, TTS, transport, flowing downstream, with an upstream cancel frame carrying barge-in back through the chain.',
     whyItMatters:
@@ -385,7 +385,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'OpenTelemetry\'s GenAI SIG defines one standard schema for agent telemetry. Span names, attributes, and content-capture rules that mean the same thing in Datadog, Grafana, Jaeger, and Honeycomb.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-23.svg',
+    diagram: '/lessons/p14-23.svg',
     diagramCaption:
       'A GenAI span tree: create_agent at the root, invoke_agent as INTERNAL, per-tool spans and chat spans nested underneath with parent links intact.',
     whyItMatters:
@@ -487,7 +487,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'Three open-source platforms dominate agent observability in 2026. OpenTelemetry gives you the schema; these give you evaluation, prompt versioning, session replay, and the ability to bisect a regression to the prompt that caused it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-24.svg',
+    diagram: '/lessons/p14-24.svg',
     diagramCaption:
       'Trace ingest to insight: spans arrive, group by session, an LLM judge scores against a rubric, failures cluster by reason, prompt versions tie back to the runs they produced.',
     whyItMatters:
@@ -586,7 +586,7 @@ export const phase14Part4: Lesson[] = [
     oneLiner:
       'Anthropic\'s guidance is to start with simple prompts, optimize them with comprehensive evaluation, and add agentic machinery only when needed. Evaluation is not the last step; it is the loop that decides every other choice.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-30.svg',
+    diagram: '/lessons/p14-30.svg',
     diagramCaption:
       'Three evaluation layers: static benchmarks for cross-model comparison, custom offline evals on your product shape, online evals on production traffic, feeding back into the same suite.',
     whyItMatters:

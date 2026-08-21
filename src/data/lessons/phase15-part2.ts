@@ -11,7 +11,7 @@ export const phase15Part2: Lesson[] = [
     oneLiner:
       'Claude Sonnet 4.5 scored 43.2 percent on SWE-bench Verified inside SWE-agent and 59.8 percent inside Cline. Same weights, 16.6 points apart. What you are choosing when you pick a coding agent is the retrieval layer, the verifier loop, and the sandbox.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-09.svg',
+    diagram: '/lessons/p15-09.svg',
     diagramCaption:
       'One model, two scaffolds: retrieval, planner, executor, and verifier loop moving the same weights from 43.2 to 59.8 percent.',
     whyItMatters:
@@ -102,7 +102,7 @@ export const phase15Part2: Lesson[] = [
     oneLiner:
       'Claude Code exposes six permission modes from plan to bypassPermissions. They are not six features. They are one dial, and every notch you turn buys fewer interruptions by widening the blast radius of a wrong action.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-10.svg',
+    diagram: '/lessons/p15-10.svg',
     diagramCaption:
       'The ladder from plan to bypassPermissions, with interruption rate falling and reachable state widening at each notch.',
     whyItMatters:
@@ -191,7 +191,7 @@ export const phase15Part2: Lesson[] = [
     oneLiner:
       'A browser agent has to read pages the user did not write, and every token it reads could be an instruction. OpenAI\'s head of preparedness said indirect prompt injection is not a bug that can be fully patched. The defensible move is a read/write boundary, not a better filter.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-11.svg',
+    diagram: '/lessons/p15-11.svg',
     diagramCaption:
       'The trust boundary: reads flow in freely, writes cross a gate that demands fresh approval when the initiating content came from outside.',
     whyItMatters:
@@ -290,7 +290,7 @@ export const phase15Part2: Lesson[] = [
     oneLiner:
       'Production long-horizon agents do not run in a while loop. Every LLM call becomes an activity with a logged input, a logged output, and a retry policy, so a crash replays the log instead of re-billing forty calls and re-asking for approvals the user already gave.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-12.svg',
+    diagram: '/lessons/p15-12.svg',
     diagramCaption:
       'A four-hour run crashing at activity three: naive retry re-executes everything, replay returns logged results and runs only what is missing.',
     whyItMatters:
@@ -391,7 +391,7 @@ export const phase15Part2: Lesson[] = [
     oneLiner:
       'An undo affordance the system cannot honour is worse than no undo, because the user relies on it. Real rollback needs four things wired in order: an idempotency key, a precondition check, a post-action verify, and a rollback plan named in advance.',
     readTime: '~8 min read',
-    diagram: 'lessons/p15-16.svg',
+    diagram: '/lessons/p15-16.svg',
     diagramCaption:
       'Persist intent, execute with an idempotency key, verify the side effect, then mark committed. Verify failure routes to the named rollback.',
     whyItMatters:

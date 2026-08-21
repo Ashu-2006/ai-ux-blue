@@ -11,7 +11,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Anthropic split agentic systems in two: workflows, where the engineer owns the graph, and agents, where the model owns it. Five workflow patterns cover most production work, and each one renders as a different UI.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-12.svg',
+    diagram: '/lessons/p14-12.svg',
     diagramCaption:
       'The five workflow patterns on top of the augmented LLM: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer.',
     whyItMatters:
@@ -112,7 +112,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Nodes are functions, edges are transitions, and state is serialized after every node. When a 40-step run dies at step 38, you resume at 38 instead of paying for the first 37 again.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-13.svg',
+    diagram: '/lessons/p14-13.svg',
     diagramCaption:
       'A state graph: typed state flowing through nodes, conditional edges branching, and the checkpointer writing after every node so resume is a load call.',
     whyItMatters:
@@ -213,7 +213,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Give every agent a private inbox and make messages the only way they interact. One agent crashing stops being a stack trace that takes down the run, and concurrency stops being something you bolt on.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-14.svg',
+    diagram: '/lessons/p14-14.svg',
     diagramCaption:
       'Actors with private state and inboxes, a runtime routing typed messages between them, and one handler failing without touching its neighbours.',
     whyItMatters:
@@ -314,7 +314,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Four primitives (Agent, Task, Crew, Process) and two shapes. Crews are autonomous and exploratory. Flows are event-driven and deterministic. CrewAI\'s own docs say start with a Flow.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-15.svg',
+    diagram: '/lessons/p14-15.svg',
     diagramCaption:
       'Crew versus Flow: an LLM-routed team of roles on one side, an event-driven graph of @start and @listen steps on the other, with a Crew nested inside one Flow step.',
     whyItMatters:
@@ -410,7 +410,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Delegation is modeled as a tool the model calls, named transfer_to_<agent>. Guardrails run on input, output, or a specific tool, and whether they run in parallel or block is a latency-versus-token tradeoff you feel in the UI.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-16.svg',
+    diagram: '/lessons/p14-16.svg',
     diagramCaption:
       'A triage agent handing off via transfer_to_billing, with input, output, and tool guardrails wrapping the run and spans emitted at every boundary.',
     whyItMatters:
@@ -499,7 +499,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'The same loop Claude Code runs, importable: built-in tools, subagents with their own context windows, lifecycle hooks, a session store, and W3C trace propagation across the process boundary.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-17.svg',
+    diagram: '/lessons/p14-17.svg',
     diagramCaption:
       'An orchestrator spawning subagents with isolated context windows: only results return, so the orchestrator budget stays bounded while each subagent burns its own.',
     whyItMatters:
@@ -595,7 +595,7 @@ export const phase14Part3: Lesson[] = [
     oneLiner:
       'Not every agent needs a graph framework. Agno optimizes Python instantiation to microseconds behind a stateless FastAPI backend. Mastra ships typed agents, tools, and workflows on the Vercel AI SDK, in the same TypeScript your frontend is written in.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-18.svg',
+    diagram: '/lessons/p14-18.svg',
     diagramCaption:
       'Two production shapes: a stateless session-scoped Python backend spawning a fresh agent per request, and a TypeScript runtime with Zod-typed tools sitting next to the app that renders them.',
     whyItMatters:

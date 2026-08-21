@@ -11,7 +11,7 @@ export const phase12Part1: Lesson[] = [
     oneLiner:
       'An image cannot enter a transformer as pixels. It gets cut into a grid of small patches, and each patch becomes one token. Everything multimodal starts with this move.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-01-patch-pipeline.svg',
+    diagram: '/lessons/p12-01-patch-pipeline.svg',
     diagramCaption:
       'The patch-token pipeline: image, grid of patches, flatten, linear projection, position encoding, token sequence.',
     whyItMatters:
@@ -88,7 +88,7 @@ export const phase12Part1: Lesson[] = [
     oneLiner:
       'CLIP trained an image encoder and a text encoder to agree, using 400M noisy web captions and no labels at all. The shared embedding space it produced is the substrate of modern multimodal AI.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-02-contrastive-matrix.svg',
+    diagram: '/lessons/p12-02-contrastive-matrix.svg',
     diagramCaption:
       'The contrastive similarity matrix: N images vs N captions per batch. The diagonal pairs are pulled together, everything else is pushed apart.',
     whyItMatters:
@@ -165,7 +165,7 @@ export const phase12Part1: Lesson[] = [
     oneLiner:
       'CLIP can match images to text but cannot talk about them. BLIP-2 connected a frozen vision encoder to a frozen LLM with a tiny trainable bridge, and invented the adapter pattern every VLM now uses.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-03-qformer-bridge.svg',
+    diagram: '/lessons/p12-03-qformer-bridge.svg',
     diagramCaption:
       'The Q-Former bridge: 32 learnable queries cross-attend over frozen ViT patch tokens, then feed a frozen LLM as 32 visual tokens.',
     whyItMatters:

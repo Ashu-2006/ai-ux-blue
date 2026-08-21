@@ -11,7 +11,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'Flamingo (DeepMind, 2022) threaded vision into a frozen 70B LLM through new cross-attention layers behind a tanh gate initialized to zero, so at step zero the model was still a perfect language model. It was the first VLM to read interleaved images and learn from examples in the prompt.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-04.svg',
+    diagram: '/lessons/p12-04.svg',
     diagramCaption:
       'Gated cross-attention: text flows through the frozen LLM as always; between blocks, a tanh-gated layer adds visual information from the Perceiver resampler on top.',
     whyItMatters:
@@ -97,7 +97,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'LLaVA (2023) replaced the Q-Former with a two-layer MLP, replaced gated cross-attention with plain token concatenation, and trained on 158k instruction turns written by GPT-4 from text captions. It became the most copied multimodal architecture on the planet.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-05.svg',
+    diagram: '/lessons/p12-05.svg',
     diagramCaption:
       'The LLaVA pipeline: ViT patches, a two-layer MLP projector into LLM space, and the <image> placeholder in the prompt replaced by 576 visual tokens.',
     whyItMatters:
@@ -198,7 +198,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'Real images are receipts, charts, and phone screenshots, not 224px squares. Squashing them to a square destroys exactly the detail OCR needs. Patch-n-pack, tiling, and multimodal RoPE are the three ways models learned to eat images at native resolution.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-06.svg',
+    diagram: '/lessons/p12-06.svg',
     diagramCaption:
       'Patch-n-pack: three images of different sizes flattened into one packed sequence, with a block-diagonal mask keeping each image\'s patches attending only to themselves.',
     whyItMatters:
@@ -297,7 +297,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'MM1, Idefics2, Molmo, Cambrian-1, and Prismatic ran hundreds of controlled ablations on VLM design. The verdict: visual token count and encoder choice explain most of the quality; the connector everyone argues about explains almost none.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-07.svg',
+    diagram: '/lessons/p12-07.svg',
     diagramCaption:
       'The five-axis VLM design space: encoder, connector, LLM, data mix, resolution schedule, sized by how much benchmark variance each axis explains.',
     whyItMatters:
@@ -388,7 +388,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'Single-image, multi-image, and video used to need three separate models. LLaVA-OneVision trained one model to handle all three by fixing the visual token budget and ordering the training curriculum, and got emergent skills nobody trained.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-08.svg',
+    diagram: '/lessons/p12-08.svg',
     diagramCaption:
       'One token budget, three allocations: tiles for a single image, moderate resolution for image sets, aggressively pooled frames for video, all landing near the same total.',
     whyItMatters:
@@ -486,7 +486,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'Four Qwen-VL generations each made one architectural bet the open ecosystem copied within a year: native dynamic resolution via M-RoPE, timestamps as tokens with dynamic FPS, and structured JSON output that turned a chat model into a GUI agent.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-09.svg',
+    diagram: '/lessons/p12-09.svg',
     diagramCaption:
       'M-RoPE splits the hidden dimension into three bands, rotating each by temporal, height, and width position, so text, images, and video share one encoding.',
     whyItMatters:
@@ -572,7 +572,7 @@ export const phase12Part2: Lesson[] = [
     oneLiner:
       'Every VLM so far bolted vision onto a finished text LLM and paid for it in alignment debt: forgotten text skills, drifting answers, self-contradiction. InternVL3 trained text and vision together from the first gradient step and matched Gemini 2.5 Pro on MMMU-Pro with open weights.',
     readTime: '~8 min read',
-    diagram: 'lessons/p12-10.svg',
+    diagram: '/lessons/p12-10.svg',
     diagramCaption:
       'Post-hoc vs native: bolt vision onto a finished LLM and repair the seams, or mix text, interleaved, caption, and video data into one pretraining run from step one.',
     whyItMatters:

@@ -109,7 +109,7 @@ export const phase16Part2: Lesson[] = [
     oneLiner:
       'Put N agents in one conversation and a selector function decides who speaks next. Round-robin is deterministic and context-blind. LLM-selected is context-aware and adds a model call per turn. That one choice sets everything else.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-10.svg',
+    diagram: '/lessons/p16-10.svg',
     diagramCaption:
       'N agents on one shared message pool with a selector invoked between turns to pick the next speaker.',
     whyItMatters:
@@ -210,7 +210,7 @@ export const phase16Part2: Lesson[] = [
     oneLiner:
       'OpenAI Swarm reduced multi-agent orchestration to a routine (a prompt plus tools) and a handoff (a tool that returns another agent). No DSL, no state machine. It is stateless, which is why "the second agent forgot what I said" is a structural outcome, not a bug.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-11.svg',
+    diagram: '/lessons/p16-11.svg',
     diagramCaption:
       'A triage agent calling handoff tools that return refund, sales, or support agents, each with its own tools.',
     whyItMatters:
@@ -311,7 +311,7 @@ export const phase16Part2: Lesson[] = [
     oneLiner:
       'Google announced A2A in April 2025; by April 2026 it has 150 plus backing organizations. Agent Cards for discovery, tasks with typed artifacts, and a deliberately opaque lifecycle: you see state transitions and results, never how the remote agent got there.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-12.svg',
+    diagram: '/lessons/p16-12.svg',
     diagramCaption:
       'Discovery, task submission, polling or SSE, and a typed artifact returned across an organizational boundary.',
     whyItMatters:
@@ -405,7 +405,7 @@ export const phase16Part2: Lesson[] = [
     oneLiner:
       'Message pool or blackboard, shared state is the only stateful part of a multi-agent system, so it is where every interesting bug lives. The reference failure is memory poisoning: one agent writes 42 percent when the source said 4.2 percent, and every downstream agent adopts it as verified.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-13.svg',
+    diagram: '/lessons/p16-13.svg',
     diagramCaption:
       'A full message pool where everyone reads everything, beside a topic-subscribed blackboard that routes only relevant writes.',
     whyItMatters:
@@ -506,7 +506,7 @@ export const phase16Part2: Lesson[] = [
     oneLiner:
       'Classical BFT assumes independent faults, honest honest nodes, and a ground truth. LLM agents violate all three: same base model means correlated hallucinations, so a majority can be confidently, unanimously wrong.',
     readTime: '~8 min read',
-    diagram: 'lessons/p16-14.svg',
+    diagram: '/lessons/p16-14.svg',
     diagramCaption:
       'Three attack shapes against a vote: a byzantine lie, a sycophantic copy, and a correlated-error monoculture.',
     whyItMatters:

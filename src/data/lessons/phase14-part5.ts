@@ -11,7 +11,7 @@ export const phase14Part5: Lesson[] = [
     oneLiner:
       'Run N model instances on the same question, let them read and critique each other for R rounds, and return what they converge on. It measurably improves factuality. It also multiplies your latency by N times R.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-25.svg',
+    diagram: '/lessons/p14-25.svg',
     diagramCaption:
       'Three proposers, two rounds: independent proposals, cross-critique, convergence on one answer.',
     whyItMatters:
@@ -110,7 +110,7 @@ export const phase14Part5: Lesson[] = [
     oneLiner:
       'Agent failures are not random noise. Berkeley catalogued 14 modes across 3 categories, and field data from production keeps landing on the same five: hallucinated actions, scope creep, cascading errors, context loss, tool misuse.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-26.svg',
+    diagram: '/lessons/p14-26.svg',
     diagramCaption:
       'One hallucinated SKU cascading into four downstream API calls, ending in a fabricated success message.',
     whyItMatters:
@@ -211,7 +211,7 @@ export const phase14Part5: Lesson[] = [
     oneLiner:
       'A model cannot reliably tell an instruction from the user apart from an instruction inside a PDF it just read. Retrieved content is arbitrary code execution on your tool surface, and the only real fix is a gate before the call, not after it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-27.svg',
+    diagram: '/lessons/p14-27.svg',
     diagramCaption:
       'Injected text inside retrieved content overriding the developer prompt and reaching the tool registry.',
     whyItMatters:
@@ -303,7 +303,7 @@ export const phase14Part5: Lesson[] = [
     oneLiner:
       'Four topologies recur across every 2026 agent framework. Picking one is a decision about latency, debuggability, and context budget, and the correct first answer is usually to pick none of them.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-28.svg',
+    diagram: '/lessons/p14-28.svg',
     diagramCaption:
       'The four topologies side by side: central router, peer handoffs, nested supervisors, parallel proposers.',
     whyItMatters:
@@ -404,7 +404,7 @@ export const phase14Part5: Lesson[] = [
     oneLiner:
       'Request-response, streaming, durable, queue-based, event-driven, scheduled. Pick the runtime shape before the framework, because the shape decides which failures your product can recover from and what the user sees while it recovers.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-29.svg',
+    diagram: '/lessons/p14-29.svg',
     diagramCaption:
       'Six runtime shapes over the same agent logic, each with a different outer shell and failure surface.',
     whyItMatters:

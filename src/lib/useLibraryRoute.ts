@@ -1,24 +1,36 @@
 import { useCallback, useSyncExternalStore } from 'react';
-import { parsePath, serializePath } from '@/lib/library';
 
-// One route param, `?p=<slug/path>`. Browser back and forward walk the tree.
-// Deep links work. The modal opens for path segments whose final slug resolves
-// to a lesson or an idea, not a folder, so the same URL scheme covers reading
-// and browsing.
+// URL is the source of truth for two orthogonal pieces of state:
+//   ?f=<folder-slug>    : which folder the Explorer is currently inside
+//   ?l=<lesson-or-idea> : which leaf's modal is open, if any
+//
+// Every folder slug and every leaf id is unique across the whole tree
+// (verified: no duplicates), so single-segment identifiers replace the
+// old nested `?p=a/b/c` path. Deep links stay compact and, more
+// importantly, closing the modal only clears `l` without disturbing `f`,
+// so the effect that dispatches the modal cannot re-open itself.
 
-// useSyncExternalStore compares snapshots by identity, so we must cache the
-// derived array and only replace it when the underlying query string changes.
-let cachedRaw: string | null | undefined = undefined;
-let cachedPath: string[] = [];
-const EMPTY: string[] = [];
+// useSyncExternalStore compares snapshots by identity, so we memoize
+// the derived tuple until the underlying search string changes.
+let cachedSearch: string | undefined = undefined;
+let cachedState: RouteState = { folder: null, leaf: null };
 
-function read(): string[] {
-  if (typeof window === 'undefined') return EMPTY;
-  const raw = new URLSearchParams(window.location.search).get('p');
-  if (raw === cachedRaw) return cachedPath;
-  cachedRaw = raw;
-  cachedPath = parsePath(raw);
-  return cachedPath;
+export interface RouteState {
+  folder: string | null;
+  leaf: string | null;
+}
+
+function read(): RouteState {
+  if (typeof window === 'undefined') return cachedState;
+  const s = window.location.search;
+  if (s === cachedSearch) return cachedState;
+  cachedSearch = s;
+  const q = new URLSearchParams(s);
+  cachedState = {
+    folder: q.get('f') || null,
+    leaf: q.get('l') || null,
+  };
+  return cachedState;
 }
 
 function subscribe(fn: () => void) {
@@ -30,19 +42,24 @@ function subscribe(fn: () => void) {
   };
 }
 
+function write(next: Partial<RouteState>, replace = false): void {
+  const url = new URL(window.location.href);
+  const merged: RouteState = { ...read(), ...next };
+  if (merged.folder) url.searchParams.set('f', merged.folder);
+  else url.searchParams.delete('f');
+  if (merged.leaf) url.searchParams.set('l', merged.leaf);
+  else url.searchParams.delete('l');
+  const method = replace ? 'replaceState' : 'pushState';
+  window.history[method](null, '', url.toString());
+  window.dispatchEvent(new Event('librarynav'));
+}
+
 export function useLibraryRoute() {
-  const path = useSyncExternalStore(subscribe, read, () => []);
+  const state = useSyncExternalStore(subscribe, read, () => cachedState);
 
-  const go = useCallback((next: string[]) => {
-    const url = new URL(window.location.href);
-    if (next.length === 0) url.searchParams.delete('p');
-    else url.searchParams.set('p', serializePath(next));
-    // Preserve hash so #library scroll target still works.
-    window.history.pushState(null, '', url.toString());
-    window.dispatchEvent(new Event('librarynav'));
-  }, []);
+  const setFolder = useCallback((folder: string | null) => write({ folder }), []);
+  const setLeaf = useCallback((leaf: string | null) => write({ leaf }), []);
+  const set = useCallback((next: Partial<RouteState>) => write(next), []);
 
-  const up = useCallback(() => go(path.slice(0, -1)), [go, path]);
-
-  return { path, go, up };
+  return { ...state, setFolder, setLeaf, set };
 }

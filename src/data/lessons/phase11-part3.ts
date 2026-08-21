@@ -316,7 +316,7 @@ export const phase11Part3: Lesson[] = [
     oneLiner:
       'Every LLM app before 2025 invented its own tool schema, producing an N by M integration matrix. MCP collapses it: write one server, and every compliant host can discover and call it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p11-14.svg',
+    diagram: '/lessons/p11-14.svg',
     diagramCaption:
       'One host mounting many servers, each exposing the same three primitives: tools, resources, and prompts, over JSON-RPC.',
     whyItMatters:
@@ -424,7 +424,7 @@ export const phase11Part3: Lesson[] = [
     oneLiner:
       'A ReAct loop written by hand is a while-true with no hooks. The same loop drawn as an explicit graph gets checkpointing, interrupts, streaming, and time travel for free.',
     readTime: '~8 min read',
-    diagram: 'lessons/p11-16.svg',
+    diagram: '/lessons/p11-16.svg',
     diagramCaption:
       'A StateGraph: typed state flowing through nodes, conditional edges routing on model output, and a checkpointer persisting every transition.',
     whyItMatters:
@@ -524,7 +524,7 @@ export const phase11Part3: Lesson[] = [
     oneLiner:
       'Every agent framework sells the same demo and hides the same bug: its state model fighting your problem. Pick the one whose core abstraction matches the shape of what you are building.',
     readTime: '~8 min read',
-    diagram: 'lessons/p11-17.svg',
+    diagram: '/lessons/p11-17.svg',
     diagramCaption:
       'The framework matrix: each core abstraction (graph, org chart, chat, agent box) plotted against the problem shape it fits.',
     whyItMatters:

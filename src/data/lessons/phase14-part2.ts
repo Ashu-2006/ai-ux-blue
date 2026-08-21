@@ -11,7 +11,7 @@ export const phase14Part2: Lesson[] = [
     oneLiner:
       'The context window is RAM, an external store is disk, and the agent pages between them with tool calls. MemGPT named the pattern in 2023 and every production memory system since is a variant of it.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-07.svg',
+    diagram: '/lessons/p14-07.svg',
     diagramCaption:
       'Main context as RAM, external archival store as disk, and the memory tool call as the page fault that moves a record between them.',
     whyItMatters:
@@ -106,7 +106,7 @@ export const phase14Part2: Lesson[] = [
     oneLiner:
       'Memory stops being a blob when you give it typed, editable, capped blocks. It stops costing latency when a second agent consolidates them while the user is not waiting.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-08.svg',
+    diagram: '/lessons/p14-08.svg',
     diagramCaption:
       'Three tiers (core, recall, archival), typed blocks pinned inside core, and a sleep-time agent rewriting them off the critical path.',
     whyItMatters:
@@ -211,7 +211,7 @@ export const phase14Part2: Lesson[] = [
     oneLiner:
       'Three query classes, three stores, one fused ranking. A single-store memory is always wrong for two out of three questions the user is about to ask.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-09.svg',
+    diagram: '/lessons/p14-09.svg',
     diagramCaption:
       'One add() writes a fact to vector, KV, and graph in parallel; one search() fuses the three recall paths through a weighted relevance, importance, and recency score.',
     whyItMatters:
@@ -298,7 +298,7 @@ export const phase14Part2: Lesson[] = [
     oneLiner:
       'Voyager stored each learned capability as executable code, retrievable by description and composable with other skills. Every skill system you use in 2026, including the one in your editor, is that architecture.',
     readTime: '~8 min read',
-    diagram: 'lessons/p14-10.svg',
+    diagram: '/lessons/p14-10.svg',
     diagramCaption:
       'The Voyager loop: a curriculum proposes a task, the library retrieves similar skills, the agent composes and runs, and environment feedback folds back into the next version.',
     whyItMatters:
