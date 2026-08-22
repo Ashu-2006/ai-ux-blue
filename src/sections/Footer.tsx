@@ -10,12 +10,15 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
           <div className="max-w-[46ch]">
             <div className="flex items-center gap-2.5">
-              <span
-                className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)]"
-                style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
-              >
-                <span className="t-caption font-semibold" style={{ letterSpacing: 0 }}>A</span>
-              </span>
+              <img
+                src="/favicon.svg"
+                alt=""
+                aria-hidden
+                width={24}
+                height={24}
+                className="rounded-[var(--r-md)]"
+                decoding="async"
+              />
               <span className="t-lg font-semibold text-ink" style={{ letterSpacing: '-0.01em' }}>
                 AI UX
               </span>

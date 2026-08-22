@@ -57,12 +57,7 @@ export function Hero({ onSearch, onExplore }: Props) {
           className="relative z-10 mt-8 inline-flex items-center gap-2.5 rounded-[var(--r-pill)] px-3 py-1.5"
           style={{ border: '0.5px solid var(--hairline)', background: 'var(--surface)' }}
         >
-          <span
-            className="flex h-5 w-5 items-center justify-center rounded-full t-caption font-semibold"
-            style={{ background: 'var(--accent)', color: 'var(--accent-ink)', letterSpacing: 0 }}
-          >
-            A
-          </span>
+          <img src="/favicon.svg" alt="" aria-hidden width={20} height={20} className="rounded-full" decoding="async" />
           <span className="t-sm text-ink-2">AI UX, by Ashutosh</span>
         </motion.div>
 
