@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronRight, Search, FolderOpen, ArrowLeft, Home as HomeIcon } from 'lucide-react';
+import { ChevronRight, Search, FolderOpen, ArrowLeft, Home as HomeIcon, ListOrdered, ArrowDownAZ } from 'lucide-react';
 import {
   ancestorsOfFolder,
   collectLeaves,
@@ -212,18 +212,25 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
             className="flex shrink-0 items-center gap-1 rounded-full p-1 sm:ml-auto"
             style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
           >
-            {(['curriculum', 'a-z'] as const).map((m) => (
+            {(
+              [
+                { key: 'curriculum' as const, Icon: ListOrdered, label: 'Curriculum order' },
+                { key: 'a-z' as const, Icon: ArrowDownAZ, label: 'Sort A to Z' },
+              ]
+            ).map(({ key, Icon, label }) => (
               <button
-                key={m}
-                onClick={() => setSort(m)}
-                aria-pressed={sort === m}
-                className="pressable rounded-full px-3 py-1 t-caption t-mono uppercase"
+                key={key}
+                onClick={() => setSort(key)}
+                aria-pressed={sort === key}
+                aria-label={label}
+                title={label}
+                className="pressable flex h-7 w-7 items-center justify-center rounded-full"
                 style={{
-                  background: sort === m ? 'var(--ink)' : 'transparent',
-                  color: sort === m ? 'var(--bg)' : 'var(--ink-3)',
+                  background: sort === key ? 'var(--ink)' : 'transparent',
+                  color: sort === key ? 'var(--bg)' : 'var(--ink-3)',
                 }}
               >
-                {m === 'curriculum' ? 'Curriculum' : 'A-Z'}
+                <Icon size={14} strokeWidth={1.9} />
               </button>
             ))}
           </div>

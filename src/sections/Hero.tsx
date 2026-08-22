@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Search } from 'lucide-react';
-import { roadmap } from '@/lib/data';
 
 interface Props {
   onSearch: () => void;
@@ -83,29 +82,29 @@ export function Hero({ onSearch, onExplore }: Props) {
 
         {/* ══ floating annotation layer (hidden on small screens) ══ */}
         <div className="pointer-events-none absolute inset-0 z-20 hidden lg:block" aria-hidden>
-          {/* token value tag, top-left over "Designing" */}
-          <Annotation i={0} x="-2%" y="-14%" line={{ toX: '6%', toY: '2%' }} swatch>
-            oklch(0.173 0 0)
+          {/* accent-color swatch, top-left, points at the underline on Designing */}
+          <Annotation i={0} x="-4%" y="-10%" line={{ toX: '4%', toY: '4%' }} swatch>
+            #12b0ff
           </Annotation>
 
-          {/* metric tag, top-right */}
-          <Annotation i={1} x="60%" y="-16%" line={{ toX: '52%', toY: '6%' }}>
+          {/* headline metric, top-right of the wordmark column */}
+          <Annotation i={1} x="72%" y="-14%" line={{ toX: '62%', toY: '6%' }}>
             12 folders · 150 lessons
           </Annotation>
 
-          {/* font tag pointing at the serif accent word */}
-          <Annotation i={2} x="48%" y="52%" line={{ toX: '38%', toY: '54%' }}>
-            font-libre-baskerville
+          {/* concept label pointing at the serif accent word */}
+          <Annotation i={2} x="58%" y="46%" line={{ toX: '46%', toY: '48%' }}>
+            the seam you render
           </Annotation>
 
-          {/* pink measurement tag in the gap between byline and CTA */}
-          <Annotation i={3} x="60%" y="70%" measure line={{ toX: '52%', toY: '72%' }}>
-            32px
+          {/* measurement in the gap between byline and CTA */}
+          <Annotation i={3} x="72%" y="66%" measure line={{ toX: '62%', toY: '68%' }}>
+            ~8 min per lesson
           </Annotation>
 
-          {/* "Call To Action" tag pointing at the primary button, off to the right */}
-          <Annotation i={4} x="62%" y="88%" line={{ toX: '54%', toY: '90%' }}>
-            Call To Action
+          {/* Call To Action tag pointing at the primary button, off to the right */}
+          <Annotation i={4} x="72%" y="84%" line={{ toX: '62%', toY: '86%' }}>
+            Start here
           </Annotation>
         </div>
       </div>

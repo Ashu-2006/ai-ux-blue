@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background: near-black, same canvas as the app -->
+  <rect width="1200" height="630" fill="#171717"/>
+
+  <!-- Subtle grid, low opacity, hints at "folders / structure" -->
+  <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Wordmark: favicon glyph, scaled to og size, top-left -->
+  <g transform="translate(80, 80)">
+    <rect width="64" height="64" rx="12" fill="#0077FF"/>
+    <path transform="translate(0,0) scale(0.366)"
+      d="M90.8092 32L132.487 142.138H117.749L80.8255 44.2023C78.3956 47.3717 76.0185 50.8053 73.6943 54.5029C71.4757 58.2006 69.7853 61.7926 68.6232 65.279C67.4611 68.7653 67.0913 71.9876 67.5139 74.9457C68.0421 77.9038 69.8381 80.2809 72.9019 82.0769C76.2826 83.9786 78.7653 86.4085 80.35 89.3666C82.0404 92.3247 83.0441 95.5998 83.361 99.1918C83.6779 102.678 83.361 106.376 82.4102 110.285C81.4593 114.088 80.0859 117.891 78.2899 121.695C76.5996 125.498 74.5394 129.196 72.1095 132.788C69.6796 136.274 67.0913 139.391 64.3444 142.138H42C46.2259 139.708 50.2933 136.802 54.2023 133.422C58.2169 129.935 61.8089 126.29 64.9783 122.487C68.2534 118.578 71.0002 114.669 73.2188 110.76C75.5431 106.746 77.1278 102.942 77.973 99.3503C78.8182 95.7583 78.8182 92.536 77.973 89.6835C77.2334 86.8311 75.4374 84.5596 72.585 82.8693C69.3099 80.9676 67.3554 78.4321 66.7215 75.2627C66.1933 72.0932 66.5102 68.7125 67.6723 65.1205C68.8345 61.4228 70.5777 57.6723 72.9019 53.869C75.3318 50.0657 77.8145 46.5265 80.35 43.2515L76.0713 32H90.8092Z"
+      fill="white"/>
+    <text x="84" y="42" font-family="Inter, -apple-system, sans-serif" font-size="26" font-weight="600" fill="#fafafa" letter-spacing="-0.5">AI UX</text>
+  </g>
+
+  <!-- Eyebrow -->
+  <text x="80" y="240" font-family="Geist Mono, ui-monospace, monospace" font-size="18" font-weight="500" letter-spacing="2" fill="#12b0ff">A LIBRARY FOR DESIGN ENGINEERS</text>
+
+  <!-- Big headline. Mixed weight/style to echo the Hero. -->
+  <text x="80" y="330" font-family="Inter, -apple-system, sans-serif" font-size="80" font-weight="560" fill="#fafafa" letter-spacing="-2.5">
+    <tspan text-decoration="underline" text-decoration-color="#12b0ff" text-decoration-thickness="4" text-underline-offset="10">Designing</tspan>
+  </text>
+  <text x="80" y="420" font-family="Inter, -apple-system, sans-serif" font-size="80" font-weight="560" fill="#fafafa" letter-spacing="-2.5">on top of AI models,</text>
+  <text x="80" y="510" font-family="Libre Baskerville, Georgia, serif" font-style="italic" font-size="80" font-weight="500" fill="#fafafa" letter-spacing="-2">interfaces.</text>
+
+  <!-- Meta strip at the bottom -->
+  <g transform="translate(80, 570)">
+    <text x="0" y="0" font-family="Geist Mono, ui-monospace, monospace" font-size="18" font-weight="500" fill="#8f8f8f">
+      12 folders  ·  150 lessons  ·  by Ashutosh Rana
+    </text>
+  </g>
+
+  <!-- URL, right-bottom -->
+  <text x="1120" y="570" text-anchor="end" font-family="Geist Mono, ui-monospace, monospace" font-size="18" font-weight="500" fill="#8f8f8f">
+    ai-ux-blue.vercel.app
+  </text>
+</svg>
