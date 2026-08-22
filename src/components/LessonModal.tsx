@@ -61,37 +61,50 @@ export function LessonModal({ id, onClose }: Props) {
           {/* This wrapper sits above the scrim and would otherwise swallow
               outside clicks, so it forwards clicks that land on itself (not on
               the modal panel) to onClose. */}
+          {/* Mobile: bottom sheet pinned to the bottom, 92dvh tall, rounded
+              top corners, drag handle. sm: and up: centered dialog with the
+              earlier scale+blur enter. One JSX branch, two responsive layouts. */}
           <div
-            className="fixed inset-0 z-[61] flex items-center justify-center p-4 sm:p-8"
+            className="fixed inset-0 z-[61] flex items-end justify-center sm:items-center sm:p-8"
             onClick={(e) => {
               if (e.target === e.currentTarget) onClose();
             }}
           >
             <motion.div
-              className="material-strong relative flex max-h-[90vh] w-full max-w-[1080px] flex-col overflow-hidden rounded-[var(--r-xl)]"
+              className="material-strong relative flex h-[92dvh] w-full max-w-[1080px] flex-col overflow-hidden rounded-t-[var(--r-xl)] sm:h-auto sm:max-h-[90vh] sm:rounded-[var(--r-xl)]"
               style={{ boxShadow: 'var(--shadow-float)', border: '0.5px solid var(--hairline)', transformOrigin: 'center' }}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10, filter: 'blur(8px)' }}
-              animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 8, filter: 'blur(6px)' }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
               transition={panelEnter}
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-label={lesson.title}
             >
-              {/* Close button is the only thing pinned to the modal frame; the
-                  header (badge, title, tabs) now scrolls with the body. */}
+              {/* Drag handle: mobile-only visual affordance that this is a sheet */}
+              <div className="flex shrink-0 justify-center py-2 sm:hidden">
+                <span
+                  aria-hidden
+                  className="h-1 w-10 rounded-full"
+                  style={{ background: 'var(--ink-4)', opacity: 0.4 }}
+                />
+              </div>
+
+              {/* Close button */}
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="pressable absolute right-6 top-6 z-20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink-3"
+                className="pressable absolute right-4 top-3 z-20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink-3 sm:right-6 sm:top-6"
                 style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
               >
                 <X size={15} strokeWidth={2.2} />
               </button>
 
-              {/* body: header + tabs + tab content in one scroll container */}
-              <div className="scroll min-h-0 flex-1 overflow-y-auto px-9 pb-9 pt-7">
+              {/* body: header + tabs + tab content in one scroll container.
+                  Tighter side padding on mobile so long lesson titles do not
+                  wrap into a wall of text. */}
+              <div className="scroll min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-4 sm:px-9 sm:pb-9 sm:pt-7">
                 <div className="mx-auto w-full max-w-[640px]">
                   {/* header, scrolls with the body */}
                   <span

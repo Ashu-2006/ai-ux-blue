@@ -22,7 +22,7 @@ const anno = {
 // to parts of the composition. Annotations are relevant to OUR content.
 export function Hero({ onSearch, onExplore }: Props) {
   return (
-    <section className="relative mx-auto max-w-[1180px] px-8 sm:px-14 lg:px-20 pb-24 pt-36 sm:pt-44">
+    <section className="relative mx-auto max-w-[1180px] px-6 pb-16 pt-28 sm:px-14 sm:pt-44 sm:pb-24 lg:px-20">
       {/* the annotated composition, left-anchored like the reference */}
       <div className="relative mx-auto max-w-[880px]">
         {/* ── the layered headline ── */}

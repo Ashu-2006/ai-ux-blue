@@ -110,7 +110,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
   };
 
   return (
-    <section id="library" className="mx-auto max-w-[1180px] px-8 pb-32 pt-8 sm:px-14 lg:px-20">
+    <section id="library" className="mx-auto max-w-[1180px] px-6 pb-24 pt-8 sm:px-14 sm:pb-32 lg:px-20">
       <SectionHeader
         eyebrow="The library"
         title="Everything, one shelf"
@@ -160,7 +160,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
           takes one line of vertical space instead of three. From sm: up it
           returns to the wrap layout with the sort pushed to the far right. */}
       <div
-        className="material sticky top-[60px] z-30 -mx-8 mt-6 px-8 py-3 sm:-mx-14 sm:px-14 lg:-mx-20 lg:px-20"
+        className="material sticky top-[60px] z-30 -mx-6 mt-6 px-6 py-2.5 sm:-mx-14 sm:px-14 sm:py-3 lg:-mx-20 lg:px-20"
         style={{ borderBottom: '0.5px solid var(--hairline)' }}
       >
         <div className="flex items-center gap-2 overflow-x-auto sm:flex-wrap sm:gap-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -250,7 +250,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
           transition={{ duration: 0.28, ease }}
-          className="mt-10 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-14 lg:grid-cols-3"
         >
           {contents.length === 0 && (
             <p className="t-body col-span-full max-w-[52ch] text-ink-3">
