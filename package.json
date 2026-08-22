@@ -1,15 +1,19 @@
 {
-  "name": "learning-roadmap",
+  "name": "ai-ux",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Interactive UX-for-AI/crypto learning roadmap. 8 topics, 256 sub-topics, ArmorIQ design system.",
+  "description": "AI UX: 150 lessons for design engineers building on top of AI models. Twelve topic folders, interactive demos, posts.",
+  "author": "Ashutosh Rana",
+  "homepage": "https://github.com/Ashu-2006/learning-roadmap",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview --port 4319"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@xyflow/react": "^12.11.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",

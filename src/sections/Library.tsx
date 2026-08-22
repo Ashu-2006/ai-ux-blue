@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronRight, Search, FolderOpen, ArrowLeft, Home as HomeIcon } from 'lucide-react';
+import { ChevronRight, Search, FolderOpen, ArrowLeft, Home as HomeIcon, ListOrdered, ArrowDownAZ } from 'lucide-react';
 import {
   ancestorsOfFolder,
   collectLeaves,
@@ -155,33 +155,40 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
       {/* sticky filter rail: pinned to the top on scroll so search stays
           reachable without a long scroll back up. The material class carries
           the frosted-glass tint from the design system. */}
+      {/* On mobile the rail collapses to a single horizontal row that scrolls
+          if it overflows, so the whole control set (search + kind chips + sort)
+          takes one line of vertical space instead of three. From sm: up it
+          returns to the wrap layout with the sort pushed to the far right. */}
       <div
-        className="material sticky top-[60px] z-30 -mx-8 mt-6 flex flex-wrap items-center gap-3 px-8 py-3 sm:-mx-14 sm:px-14 lg:-mx-20 lg:px-20"
+        className="material sticky top-[60px] z-30 -mx-8 mt-6 px-8 py-3 sm:-mx-14 sm:px-14 lg:-mx-20 lg:px-20"
         style={{ borderBottom: '0.5px solid var(--hairline)' }}
       >
-        <label
-          className="inline-flex items-center gap-2 rounded-full px-3 py-2 t-sm flex-1 min-w-[220px] max-w-[380px]"
-          style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
-        >
-          <Search size={14} strokeWidth={1.8} className="text-ink-4 shrink-0" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${currentFolder.title.toLowerCase()}...`}
-            className="w-full bg-transparent outline-none placeholder:text-ink-4"
-          />
-          {query && (
-            <button
-              onClick={() => setQuery('')}
-              aria-label="Clear search"
-              className="t-caption t-mono uppercase text-ink-4 hover:text-ink-2"
-            >
-              clear
-            </button>
-          )}
-        </label>
+        <div className="flex items-center gap-2 overflow-x-auto sm:flex-wrap sm:gap-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <label
+            className="inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 t-sm sm:flex-1 sm:min-w-[220px] sm:max-w-[380px]"
+            style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+          >
+            <Search size={14} strokeWidth={1.8} className="text-ink-4 shrink-0" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search"
+              // longer placeholder on wider screens; keep it compact on mobile
+              onFocus={(e) => (e.currentTarget.placeholder = `Search ${currentFolder.title.toLowerCase()}...`)}
+              onBlur={(e) => (e.currentTarget.placeholder = 'Search')}
+              className="w-32 bg-transparent outline-none placeholder:text-ink-4 sm:w-full"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="t-caption t-mono uppercase text-ink-4 hover:text-ink-2"
+              >
+                clear
+              </button>
+            )}
+          </label>
 
-        <div className="flex flex-wrap gap-1.5">
           {KIND_CHIPS.map((c) => {
             const active = kind === c.key;
             return (
@@ -189,7 +196,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
                 key={c.key}
                 onClick={() => setKind(c.key)}
                 aria-pressed={active}
-                className="pressable rounded-full px-3 py-1.5 t-sm"
+                className="pressable shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 t-sm"
                 style={{
                   background: active ? 'var(--ink)' : 'var(--surface-2)',
                   color: active ? 'var(--bg)' : 'var(--ink-3)',
@@ -200,26 +207,33 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
               </button>
             );
           })}
-        </div>
 
-        <div
-          className="ml-auto flex items-center gap-1 rounded-full p-1"
-          style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
-        >
-          {(['curriculum', 'a-z'] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => setSort(m)}
-              aria-pressed={sort === m}
-              className="pressable rounded-full px-3 py-1 t-caption t-mono uppercase"
-              style={{
-                background: sort === m ? 'var(--ink)' : 'transparent',
-                color: sort === m ? 'var(--bg)' : 'var(--ink-3)',
-              }}
-            >
-              {m === 'curriculum' ? 'Curriculum' : 'A-Z'}
-            </button>
-          ))}
+          <div
+            className="flex shrink-0 items-center gap-1 rounded-full p-1 sm:ml-auto"
+            style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+          >
+            {(
+              [
+                { key: 'curriculum' as const, Icon: ListOrdered, label: 'Curriculum order' },
+                { key: 'a-z' as const, Icon: ArrowDownAZ, label: 'Sort A to Z' },
+              ]
+            ).map(({ key, Icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setSort(key)}
+                aria-pressed={sort === key}
+                aria-label={label}
+                title={label}
+                className="pressable flex h-7 w-7 items-center justify-center rounded-full"
+                style={{
+                  background: sort === key ? 'var(--ink)' : 'transparent',
+                  color: sort === key ? 'var(--bg)' : 'var(--ink-3)',
+                }}
+              >
+                <Icon size={14} strokeWidth={1.9} />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

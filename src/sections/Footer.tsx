@@ -10,17 +10,22 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
           <div className="max-w-[46ch]">
             <div className="flex items-center gap-2.5">
-              <span
-                className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)]"
-                style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
-              >
-                <span className="t-caption font-semibold" style={{ letterSpacing: 0 }}>L</span>
-              </span>
+              <img
+                src="/favicon.svg"
+                alt=""
+                aria-hidden
+                width={24}
+                height={24}
+                className="rounded-[var(--r-md)]"
+                decoding="async"
+              />
               <span className="t-lg font-semibold text-ink" style={{ letterSpacing: '-0.01em' }}>
-                Learning Roadmap
+                AI UX
               </span>
             </div>
-            <p className="t-body mt-4 text-ink-3">{roadmap.meta.title}. {roadmap.meta.subtitle}.</p>
+            <p className="t-body mt-4 text-ink-3">
+              A library for design engineers. 150 lessons on designing interfaces on top of AI models.
+            </p>
           </div>
 
           <a href="#top" className="btn btn-secondary pressable self-start !px-4 !py-2 t-sm sm:self-end">
@@ -34,10 +39,18 @@ export function Footer() {
           style={{ borderColor: 'var(--hairline)' }}
         >
           <span>
-            {roadmap.meta.topicCount} topics · {roadmap.meta.subTopicCount} ideas
+            12 folders · 150 lessons · by{' '}
+            <a
+              href="https://github.com/Ashu-2006"
+              target="_blank"
+              rel="noreferrer"
+              className="text-ink-3 hover:text-ink"
+            >
+              Ashutosh Rana
+            </a>
           </span>
           <span className="t-mono t-caption">
-            Design language extracted from interfaces.dev
+            Curriculum adapted from AI Engineering from Scratch (MIT)
           </span>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Search } from 'lucide-react';
-import { roadmap } from '@/lib/data';
 
 interface Props {
   onSearch: () => void;
@@ -38,12 +37,12 @@ export function Hero({ onSearch, onExplore }: Props) {
           </motion.div>
 
           <motion.h1 custom={1} variants={rise} initial="hidden" animate="show" className="t-hero text-ink">
-            trustworthy AI &amp; crypto
+            on top of AI models,
           </motion.h1>
 
           <motion.div custom={2} variants={rise} initial="hidden" animate="show">
             <span className="t-hero t-serif" style={{ color: 'var(--ink)', fontWeight: 500 }}>
-              interfaces
+              interfaces.
             </span>
           </motion.div>
         </div>
@@ -57,13 +56,8 @@ export function Hero({ onSearch, onExplore }: Props) {
           className="relative z-10 mt-8 inline-flex items-center gap-2.5 rounded-[var(--r-pill)] px-3 py-1.5"
           style={{ border: '0.5px solid var(--hairline)', background: 'var(--surface)' }}
         >
-          <span
-            className="flex h-5 w-5 items-center justify-center rounded-full t-caption font-semibold"
-            style={{ background: 'var(--accent)', color: 'var(--accent-ink)', letterSpacing: 0 }}
-          >
-            A
-          </span>
-          <span className="t-sm text-ink-2">a roadmap by Ashutosh</span>
+          <img src="/favicon.svg" alt="" aria-hidden width={20} height={20} className="rounded-full" decoding="async" />
+          <span className="t-sm text-ink-2">AI UX, by Ashutosh</span>
         </motion.div>
 
         {/* ── CTAs (the cyan pill is the "Call To Action") ── */}
@@ -88,29 +82,29 @@ export function Hero({ onSearch, onExplore }: Props) {
 
         {/* ══ floating annotation layer (hidden on small screens) ══ */}
         <div className="pointer-events-none absolute inset-0 z-20 hidden lg:block" aria-hidden>
-          {/* token value tag, top-left over "Designing" */}
-          <Annotation i={0} x="-2%" y="-14%" line={{ toX: '6%', toY: '2%' }} swatch>
-            oklch(0.173 0 0)
+          {/* accent-color swatch, top-left, points at the underline on Designing */}
+          <Annotation i={0} x="-4%" y="-10%" line={{ toX: '4%', toY: '4%' }} swatch>
+            #12b0ff
           </Annotation>
 
-          {/* metric tag, top-right (the roadmap facts) */}
-          <Annotation i={1} x="60%" y="-16%" line={{ toX: '52%', toY: '6%' }}>
-            {roadmap.meta.topicCount} topics · {roadmap.meta.subTopicCount} ideas
+          {/* headline metric, top-right of the wordmark column */}
+          <Annotation i={1} x="72%" y="-14%" line={{ toX: '62%', toY: '6%' }}>
+            12 folders · 150 lessons
           </Annotation>
 
-          {/* font tag pointing at the serif accent word */}
-          <Annotation i={2} x="48%" y="52%" line={{ toX: '38%', toY: '54%' }}>
-            font-libre-baskerville
+          {/* concept label pointing at the serif accent word */}
+          <Annotation i={2} x="58%" y="46%" line={{ toX: '46%', toY: '48%' }}>
+            the seam you render
           </Annotation>
 
-          {/* pink measurement tag in the gap between byline and CTA */}
-          <Annotation i={3} x="60%" y="70%" measure line={{ toX: '52%', toY: '72%' }}>
-            32px
+          {/* measurement in the gap between byline and CTA */}
+          <Annotation i={3} x="72%" y="66%" measure line={{ toX: '62%', toY: '68%' }}>
+            ~8 min per lesson
           </Annotation>
 
-          {/* "Call To Action" tag pointing at the primary button, off to the right */}
-          <Annotation i={4} x="62%" y="88%" line={{ toX: '54%', toY: '90%' }}>
-            Call To Action
+          {/* Call To Action tag pointing at the primary button, off to the right */}
+          <Annotation i={4} x="72%" y="84%" line={{ toX: '62%', toY: '86%' }}>
+            Start here
           </Annotation>
         </div>
       </div>

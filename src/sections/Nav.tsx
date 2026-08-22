@@ -16,14 +16,16 @@ export function Nav({ onSearch }: Props) {
       style={{ borderBottom: '0.5px solid var(--hairline)' }}
     >
       <a href="#top" className="flex items-center gap-2.5">
-        <span
-          className="flex h-6 w-6 items-center justify-center rounded-[var(--r-md)]"
-          style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
-        >
-          <span className="t-caption font-semibold" style={{ letterSpacing: 0 }}>L</span>
-        </span>
+        <img
+          src="/favicon.svg"
+          alt="AI UX"
+          width={24}
+          height={24}
+          className="rounded-[var(--r-md)]"
+          decoding="async"
+        />
         <span className="t-sm font-semibold text-ink" style={{ letterSpacing: '-0.01em' }}>
-          Learning Roadmap
+          AI UX
         </span>
       </a>
 

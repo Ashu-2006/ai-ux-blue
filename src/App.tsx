@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Nav } from '@/sections/Nav';
 import { Hero } from '@/sections/Hero';
-import { DemoCard } from '@/sections/DemoCard';
 import { Library } from '@/sections/Library';
 import { Footer } from '@/sections/Footer';
 
@@ -16,6 +15,8 @@ import { CommandK } from '@/components/CommandK';
 import { getDeep } from '@/lib/deep';
 import { useLibraryRoute } from '@/lib/useLibraryRoute';
 import { leafBySlug } from '@/lib/library';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export default function App() {
   const [cmdkOpen, setCmdkOpen] = useState(false);
@@ -66,7 +67,6 @@ export default function App() {
 
       <main>
         <Hero onSearch={() => setCmdkOpen(true)} onExplore={scrollToLibrary} />
-        <DemoCard />
         <Library onOpenLesson={(id) => setLeaf(id)} onOpenIdea={({ subId }) => setLeaf(subId)} />
       </main>
 
@@ -79,6 +79,12 @@ export default function App() {
         onClose={() => setCmdkOpen(false)}
         onPick={({ subId }) => subId && setLeaf(subId)}
       />
+
+      {/* Vercel Analytics + Web Vitals. Both no-op in dev, so the dashboard
+          only shows real visitor data. Available at:
+          vercel.com/dashboard/ashutosh-projects/ai-ux/analytics */}
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }

@@ -190,7 +190,10 @@ function PeekCard({ node, tilt }: { node: Node; tilt: number }) {
     <div className="peek-frame h-full w-full" style={{ rotate: `${tilt}deg` }}>
       {node.kind === 'lesson' && node.lesson.diagram ? (
         <figure className="peek-photo">
-          <img src={node.lesson.diagram} alt="" loading="lazy" />
+          {/* Peek diagrams are visible whenever the folder is on-screen (they
+              stick out above the flap). Eager decode is fine; lazy caused a
+              hover -> visible latency of a second or more on cold edge cache. */}
+          <img src={node.lesson.diagram} alt="" decoding="async" />
         </figure>
       ) : node.kind === 'lesson' ? (
         <div className="peek-note">

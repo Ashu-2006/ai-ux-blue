@@ -19,7 +19,9 @@ export function LessonCard({ lesson, index, onOpen }: Props) {
       alt=""
       aria-hidden
       className="absolute inset-0 h-full w-full object-cover object-top p-2.5 transition-transform duration-300 group-hover:scale-[1.02]"
-      loading="lazy"
+      // Cards inside an opened folder are visible immediately; lazy waits for
+      // scroll into view, which reads as slow on Vercel's cold edge cache.
+      decoding="async"
     />
   ) : lesson.demo ? (
     <div className="absolute inset-0 p-3 pt-11">

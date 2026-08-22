@@ -1,4 +1,6 @@
-# Learning Roadmap
+# AI UX
+
+A library for design engineers building on top of AI models. By [Ashutosh Rana](https://github.com/Ashu-2006).
 
 A single File Explorer for designing AI products. 12 topic folders, ~150 lessons distilled from the AI Engineering from Scratch curriculum, plus an idea library on trust and deceptive-pattern UX. Every lesson has a diagram, an interactive demo, and 3 copy-ready X posts.
 
