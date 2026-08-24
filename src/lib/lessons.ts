@@ -20,6 +20,12 @@ import { phase16Part1 } from '@/data/lessons/phase16-part1';
 import { phase16Part3 } from '@/data/lessons/phase16-part3';
 import { phase16Part2 } from '@/data/lessons/phase16-part2';
 import { phase16Part4 } from '@/data/lessons/phase16-part4';
+import { deCraftVisual } from '@/data/lessons/de/craft-visual';
+import { deCraftMotion } from '@/data/lessons/de/craft-motion';
+import { deCraftInteraction } from '@/data/lessons/de/craft-interaction';
+import { deAiUxPatterns } from '@/data/lessons/de/ai-ux-patterns';
+import { deAgenticUi } from '@/data/lessons/de/agentic-ui';
+import { dePractice } from '@/data/lessons/de/practice';
 import { phase12Part1 } from '@/data/lessons/phase12-part1';
 import { phase12Part2 } from '@/data/lessons/phase12-part2';
 import { phase12Part3 } from '@/data/lessons/phase12-part3';
@@ -81,6 +87,12 @@ export interface Lesson {
 }
 
 export const LESSONS: Lesson[] = [
+  ...deCraftVisual,
+  ...deCraftMotion,
+  ...deCraftInteraction,
+  ...deAiUxPatterns,
+  ...deAgenticUi,
+  ...dePractice,
   ...phase11Part1,
   ...phase11Part2,
   ...phase11Part3,
@@ -110,6 +122,48 @@ export const LESSONS: Lesson[] = [
 ];
 
 export const LESSON_FOLDERS: LessonFolder[] = [
+  {
+    key: 'de-craft-visual',
+    title: 'Craft · Visual',
+    part: 'Design engineering · Visual craft',
+    blurb: 'The visual craft of a design engineer: OKLCH, corner radii, optical alignment, type scale, clamp, semantic tokens, grids, contrast, iconography.',
+    lessonIds: deCraftVisual.map((l) => l.id),
+  },
+  {
+    key: 'de-craft-motion',
+    title: 'Craft · Motion',
+    part: 'Design engineering · Motion craft',
+    blurb: 'Motion tokens, perceived-performance thresholds, spring vs tween, motion for state, reduced-motion, stagger, Framer Motion primitives.',
+    lessonIds: deCraftMotion.map((l) => l.id),
+  },
+  {
+    key: 'de-craft-interaction',
+    title: 'Craft · Interaction',
+    part: 'Design engineering · Interaction craft',
+    blurb: 'Progressive disclosure, overlay taxonomy, master-detail, keyboard-first, the four required states, optimistic UI, a z-index budget.',
+    lessonIds: deCraftInteraction.map((l) => l.id),
+  },
+  {
+    key: 'de-ai-ux-patterns',
+    title: 'AI UX patterns',
+    part: 'Design engineering · AI UX patterns',
+    blurb: 'Non-determinism, TTFT latency, streaming shapes, generative UI, grounding spans, confidence UX, prompt-as-microcopy, composer and reply.',
+    lessonIds: deAiUxPatterns.map((l) => l.id),
+  },
+  {
+    key: 'de-agentic-ui',
+    title: 'Agentic UI',
+    part: 'Design engineering · Agentic UI',
+    blurb: 'The agentic loop as UX, action schema as permission surface, trace UI, interrupt design, handoff attribution, agentic UI libraries.',
+    lessonIds: deAgenticUi.map((l) => l.id),
+  },
+  {
+    key: 'de-practice',
+    title: 'Practice',
+    part: 'Design engineering · Practice',
+    blurb: 'Design engineering cultures and people: Linear, Vercel/Geist, Emil Kowalski, Paco Coursey, Anthropic, token theory from Comeau/Curtis/Hupé.',
+    lessonIds: dePractice.map((l) => l.id),
+  },
   {
     key: 'p11-part1',
     title: 'Prompting and context',
