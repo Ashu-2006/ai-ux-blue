@@ -106,7 +106,7 @@ export function LessonFolder({ title, meta, blurb, items, count, index, onOpenFo
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.5, ease, delay: Math.min(index, 6) * 0.05 }}
-      className="flex max-w-[320px] flex-col"
+      className="mx-auto flex w-full max-w-[240px] flex-col sm:max-w-[320px]"
     >
       <div
         ref={ref}

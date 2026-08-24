@@ -80,23 +80,32 @@ export function DeepModal({ id, onClose }: Props) {
             onClick={onClose}
           />
           <div
-            className="fixed inset-0 z-[61] flex items-center justify-center p-4 sm:p-8"
+            className="fixed inset-0 z-[61] flex items-end justify-center sm:items-center sm:p-8"
             onClick={(e) => {
               if (e.target === e.currentTarget) onClose();
             }}
           >
             <motion.div
-              className="material-strong relative flex max-h-[90vh] w-full max-w-[1080px] flex-col overflow-hidden rounded-[var(--r-xl)]"
+              className="material-strong relative flex h-[92dvh] w-full max-w-[1080px] flex-col overflow-hidden rounded-t-[var(--r-xl)] sm:h-auto sm:max-h-[90vh] sm:rounded-[var(--r-xl)]"
               style={{ boxShadow: 'var(--shadow-float)', border: '0.5px solid var(--hairline)', transformOrigin: 'center' }}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10, filter: 'blur(8px)' }}
-              animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 8, filter: 'blur(6px)' }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
               transition={panelEnter}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Drag handle: mobile-only affordance that this is a sheet */}
+              <div className="flex shrink-0 justify-center py-2 sm:hidden">
+                <span
+                  aria-hidden
+                  className="h-1 w-10 rounded-full"
+                  style={{ background: 'var(--ink-4)', opacity: 0.4 }}
+                />
+              </div>
+
               {/* header: title block spans the full content column so its left
                   edge matches the body; close button floats top-right of the modal */}
-              <div className="relative mx-auto w-full max-w-[640px] px-9 pt-7">
+              <div className="relative mx-auto w-full max-w-[640px] px-5 pt-2 sm:px-9 sm:pt-7">
                 <span
                   className="inline-flex items-center rounded-[var(--r-sm)] px-2.5 py-1 t-caption t-mono font-semibold uppercase"
                   style={{ color: tone.fg, background: tone.tint }}

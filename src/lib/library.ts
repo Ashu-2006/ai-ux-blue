@@ -28,6 +28,26 @@ export interface FolderSpec {
 
 const TAXONOMY: FolderSpec[] = [
   {
+    slug: 'design-engineering',
+    title: 'Design engineering',
+    blurb:
+      'The craft of a design engineer building on top of models: visual and motion tokens, interaction patterns, AI UX, agentic UI, and the cultures that ship the reference.',
+    children: [
+      { slug: 'de-craft-visual', title: 'Craft · Visual', blurb: 'OKLCH, corner radii, optical alignment, type scale, clamp, semantic tokens, grids, contrast, iconography.',
+        includeLessonIds: ['de-cv-oklch', 'de-cv-corner-radius', 'de-cv-optical-alignment', 'de-cv-type-scale', 'de-cv-clamp', 'de-cv-semantic-tokens', 'de-cv-grid', 'de-cv-contrast', 'de-cv-icon-system'] },
+      { slug: 'de-craft-motion', title: 'Craft · Motion', blurb: 'Motion tokens, perceived-performance thresholds, spring vs tween, motion for state, reduced-motion, stagger, Framer Motion.',
+        includeLessonIds: ['de-cm-motion-tokens', 'de-cm-perceived-performance', 'de-cm-spring-vs-tween', 'de-cm-motion-for-state', 'de-cm-reduced-motion', 'de-cm-stagger', 'de-cm-framer-motion'] },
+      { slug: 'de-craft-interaction', title: 'Craft · Interaction', blurb: 'Progressive disclosure, overlay taxonomy, master-detail, keyboard-first, the four required states, optimistic UI, a z-index budget.',
+        includeLessonIds: ['de-ci-progressive-disclosure', 'de-ci-overlay-choice', 'de-ci-master-detail', 'de-ci-keyboard-first', 'de-ci-four-states', 'de-ci-optimistic-ui', 'de-ci-z-index-budget'] },
+      { slug: 'de-ai-ux-patterns', title: 'AI UX patterns', blurb: 'Non-determinism, TTFT latency, streaming shapes, generative UI, grounding spans, confidence UX, prompt-as-microcopy, composer and reply.',
+        includeLessonIds: ['de-ai-non-determinism', 'de-ai-ttft-latency', 'de-ai-streaming-shapes', 'de-ai-generative-ui', 'de-ai-grounding-spans', 'de-ai-confidence-ux', 'de-ai-system-prompt-microcopy', 'de-ai-composer', 'de-ai-reply-block'] },
+      { slug: 'de-agentic-ui', title: 'Agentic UI', blurb: 'The agentic loop as UX, action schema as permission surface, trace UI, interrupt design, handoff attribution, agentic UI libraries.',
+        includeLessonIds: ['de-au-agentic-loop', 'de-au-action-schema', 'de-au-trace-ui', 'de-au-interrupt-design', 'de-au-handoff-attribution', 'de-au-dia-browser', 'de-au-agentic-libraries'] },
+      { slug: 'de-practice', title: 'Practice', blurb: 'Design engineering cultures and people: Linear, Vercel/Geist, Emil Kowalski, Paco Coursey, Anthropic, token theory.',
+        includeLessonIds: ['de-pr-linear', 'de-pr-vercel-geist', 'de-pr-emil-kowalski', 'de-pr-paco-coursey', 'de-pr-anthropic-design', 'de-pr-token-theory'] },
+    ],
+  },
+  {
     slug: 'talking-to-a-model',
     title: 'Talking to a model',
     blurb:
