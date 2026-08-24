@@ -52,12 +52,6 @@ export function LessonCard({ lesson, index, onOpen }: Props) {
       }
       title={lesson.title}
       oneLiner={lesson.oneLiner}
-      meta={
-        <span className="t-caption t-mono flex items-center justify-between uppercase text-ink-4">
-          <span>{lesson.readTime}</span>
-          <span>read · interactive · post</span>
-        </span>
-      }
     />
   );
 }
