@@ -1,4 +1,4 @@
-import { Sparkles, BookOpen } from 'lucide-react';
+import { Sparkles, BookOpen, Clock } from 'lucide-react';
 import type { Lesson } from '@/lib/lessons';
 import { HeroCard, HeroBadge } from '@/components/HeroCard';
 import { DemoSpecimen, TypeSpecimen, type SpecimenKind } from '@/components/specimens';
@@ -53,9 +53,8 @@ export function LessonCard({ lesson, index, onOpen }: Props) {
       title={lesson.title}
       oneLiner={lesson.oneLiner}
       meta={
-        <span className="t-caption t-mono flex items-center justify-between uppercase text-ink-4">
-          <span>{lesson.readTime}</span>
-          <span>read · interactive · post</span>
+        <span className="inline-flex items-center gap-1.5 t-caption text-ink-4">
+          <Clock size={11} strokeWidth={1.8} /> {lesson.readTime}
         </span>
       }
     />

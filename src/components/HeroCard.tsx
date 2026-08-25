@@ -31,10 +31,19 @@ export function HeroCard({ onOpen, index, hero, heroBg, badge, title, oneLiner, 
         <span className="absolute left-3 top-3">{badge}</span>
       </div>
       <div className="flex flex-1 flex-col p-4" style={{ borderTop: '0.5px solid var(--hairline)' }}>
-        <h4 className="t-body font-semibold leading-snug text-ink" style={{ letterSpacing: '-0.01em' }}>
+        {/* Title: bigger than body, truncated after 2 lines with tighter leading
+            so a 3-line title reads as one clean block instead of tumbling. */}
+        <h4
+          className="line-clamp-2 font-semibold text-ink"
+          style={{
+            fontSize: '1.125rem',
+            lineHeight: 1.2,
+            letterSpacing: '-0.018em',
+          }}
+        >
           {title}
         </h4>
-        {oneLiner && <p className="t-sm mt-1.5 line-clamp-2 text-ink-3">{oneLiner}</p>}
+        {oneLiner && <p className="t-sm mt-2 line-clamp-2 text-ink-3">{oneLiner}</p>}
         {meta && <div className="mt-auto pt-3">{meta}</div>}
       </div>
     </motion.button>
@@ -45,7 +54,7 @@ export function HeroCard({ onOpen, index, hero, heroBg, badge, title, oneLiner, 
 export function HeroBadge({ children, color }: { children: React.ReactNode; color?: string }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 t-caption t-mono font-semibold uppercase"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 t-caption font-semibold uppercase"
       style={{
         background: 'color-mix(in oklab, var(--surface) 88%, transparent)',
         border: '0.5px solid var(--hairline)',

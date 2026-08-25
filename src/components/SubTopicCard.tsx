@@ -46,12 +46,6 @@ export function SubTopicCard({ sub, index, onOpen }: Props) {
       }
       title={sub.label}
       oneLiner={sub.oneLiner}
-      meta={
-        <span className="t-caption t-mono flex items-center justify-between uppercase text-ink-4">
-          <span>Idea {String(index + 1).padStart(2, '0')}</span>
-          <span>{specimen ? 'interactive inside' : 'read inside'}</span>
-        </span>
-      }
     />
   );
 }

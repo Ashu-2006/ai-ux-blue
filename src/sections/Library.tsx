@@ -110,7 +110,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
   };
 
   return (
-    <section id="library" className="mx-auto max-w-[1180px] px-6 pb-24 pt-8 sm:px-14 sm:pb-32 lg:px-20">
+    <section id="library" className="mx-auto max-w-[1180px] px-6 pb-24 pt-8 sm:px-16 sm:pb-32 lg:px-28">
       <SectionHeader
         eyebrow="The library"
         title="Everything, one shelf"
@@ -160,7 +160,7 @@ export function Library({ onOpenLesson, onOpenIdea }: Props) {
           takes one line of vertical space instead of three. From sm: up it
           returns to the wrap layout with the sort pushed to the far right. */}
       <div
-        className="material sticky top-[60px] z-30 -mx-6 mt-6 px-6 py-2.5 sm:-mx-14 sm:px-14 sm:py-3 lg:-mx-20 lg:px-20"
+        className="material sticky top-[60px] z-30 -mx-6 mt-6 px-6 py-2.5 sm:-mx-16 sm:px-16 sm:py-3 lg:-mx-28 lg:px-28"
         style={{ borderBottom: '0.5px solid var(--hairline)' }}
       >
         <div className="flex items-center gap-2 overflow-x-auto sm:flex-wrap sm:gap-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

@@ -60,6 +60,10 @@ export function DeepModal({ id, onClose }: Props) {
     ? { type: 'tween' as const, duration: 0.2 }
     : { type: 'spring' as const, bounce: 0.16, duration: 0.5 };
 
+  // Same mobile-sheet vs desktop-centered split as LessonModal.
+  const isDesktop =
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches;
+
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'learn', label: 'Learn', icon: <BookOpen size={14} /> },
     ...(Demo ? [{ key: 'interactive' as Tab, label: 'Interactive', icon: <PlayCircle size={14} /> }] : []),
@@ -88,9 +92,21 @@ export function DeepModal({ id, onClose }: Props) {
             <motion.div
               className="material-strong relative flex h-[92dvh] w-full max-w-[1080px] flex-col overflow-hidden rounded-t-[var(--r-xl)] sm:h-auto sm:max-h-[90vh] sm:rounded-[var(--r-xl)]"
               style={{ boxShadow: 'var(--shadow-float)', border: '0.5px solid var(--hairline)', transformOrigin: 'center' }}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
-              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: '100%' }}
+              initial={
+                reduce
+                  ? { opacity: 0 }
+                  : isDesktop
+                    ? { opacity: 0, scale: 0.96, y: 10 }
+                    : { opacity: 0, y: '100%' }
+              }
+              animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={
+                reduce
+                  ? { opacity: 0 }
+                  : isDesktop
+                    ? { opacity: 0, scale: 0.97, y: 8 }
+                    : { opacity: 0, y: '100%' }
+              }
               transition={panelEnter}
               onClick={(e) => e.stopPropagation()}
             >
