@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
-// Self-contained learning-roadmap app. Themed by the ArmorIQ design system
+// Self-contained ai-ux-blue app. Themed by the ArmorIQ design system
 // (tokens.css + globals.css were copied into src/styles). No resolution into
 // the parent design-system repo, so this folder is portable.
 export default defineConfig({

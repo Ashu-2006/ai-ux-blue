@@ -5,7 +5,7 @@
   "type": "module",
   "description": "AI UX: 150 lessons for design engineers building on top of AI models. Twelve topic folders, interactive demos, posts.",
   "author": "Ashutosh Rana",
-  "homepage": "https://github.com/Ashu-2006/learning-roadmap",
+  "homepage": "https://github.com/Ashu-2006/ai-ux-blue",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
