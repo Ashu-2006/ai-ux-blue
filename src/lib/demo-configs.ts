@@ -1,8 +1,7 @@
 import type { DemoConfig } from '@/components/demos/archetypes';
 
 // Config-driven interactive demos, keyed by sub-topic id. Each demo dramatizes
-// the SAME product + scenario as its Learn-tab example (the #1 rule in the
-// learning-deep-page skill). Authored + validated by the demo-config workflow.
+// the SAME product + scenario as its Learn-tab example (see docs/adding-a-lesson.md).
 // Bespoke/hand-mapped sub-topics are handled in DeepModal and omitted here.
 export const DEMO_CONFIGS: Record<string, DemoConfig> = {
   "ai-agent-legibility-mm-0": { archetype: 'slider-map', sliderLabel: "UI trust signal strength (grey inline styling)", outputLabel: "Developer acceptance rate", badCaption: "Acceptance tracks the identical grey styling, not the real accuracy. A hallucinated API renders with the same visual weight as a well-worn idiom, so developers accept the bug at the same rate as the correct line and ship it as vetted code.", goodCaption: "Tie the visual weight to real accuracy. When the suggestion's confidence drops, the styling weakens or flags, so acceptance falls with accuracy and the error zone closes." },
