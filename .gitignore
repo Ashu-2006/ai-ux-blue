@@ -10,4 +10,9 @@ tsconfig.tsbuildinfo
 .vercel
 REDESIGN-PLAN.md
 
-.vercel
+# Claude Code local plumbing (design experiments, skill lockfiles).
+# Nothing here is needed to run or extend the app.
+.claude/
+.agents/
+skills-lock.json
+components.json
