@@ -1,65 +1,91 @@
 # AI UX
 
-A library for design engineers building on top of AI models. By [Ashutosh Rana](https://github.com/Ashu-2006).
+A library for designers building on top of AI models. Made by [Ashutosh Rana](https://github.com/Ashu-2006).
 
-Live: **[ai-ux-blue.vercel.app](https://ai-ux-blue.vercel.app)**
-
-A File Explorer for designing AI products. Twelve topic folders, ~195 lessons (150 from the AI Engineering from Scratch curriculum plus 45 design-engineering craft notes), and an idea library on trust and deceptive-pattern UX. Every lesson has a diagram, an interactive demo, and 3 copy-ready X posts.
+**Live: [ai-ux-blue.vercel.app](https://ai-ux-blue.vercel.app)**
 
 ## What it is
 
-- **File Explorer navigation.** Twelve topic folders, nesting up to three deep where the material earns it. Everything is a deep link: folders route through `?f=<folder-slug>`, lessons through `?f=<folder-slug>&l=<lesson-id>`. Back and forward walk the tree.
-- **Real folders, not tiles.** An SVG-silhouette folder with a tab, a frosted flap, and peek cards fanning on hover. Clicking the flap descends; clicking a peek card opens that item.
-- **Lesson modal**, three tabs: Learn (the read), Interactive (one of six demo archetypes: slider-map, toggle-fix, sequence, reveal, before-after, meter), Post (three drafted X posts covering the mechanism, the design angle, and the one-liner).
-- **Search, kind filter, and sort**, scoped to whatever subtree you're in.
-- **Responsive.** Desktop opens a centered modal; mobile slides a bottom sheet.
+A single website with about 195 short lessons on designing AI products. Every lesson is one card. Click a card and a modal opens with three tabs:
 
-## Tech
+- **Learn** the concept, written short.
+- **Interactive** a small demo you can click to feel the idea.
+- **Post** three ready-to-copy tweets in a designer voice.
 
-Vite 7, React 19, TypeScript, Tailwind 4, Framer Motion. Static SPA, deploys anywhere. Configured for Vercel via `vercel.json`.
+Lessons are grouped into 12 topic folders (visual craft, motion, AI patterns, agentic UI, and so on). Folders look and behave like folders on your Mac: an SVG shape with a tab, a flap, and preview cards fanning out on hover.
 
-## Run it
+## Who it is for
+
+- **Designers** who want to understand what a token, an agent, or a streaming response actually is, and how to design for it.
+- **Design engineers** shipping AI features who need short, opinionated references instead of dense papers.
+- **Anyone** curious about how AI products get built and where they go wrong.
+
+You do not need to know how to code to use the site. You do need Node.js if you want to run it locally.
+
+## Try it locally
+
+You need [Node.js](https://nodejs.org/) 20 or newer. Then, in a terminal:
 
 ```bash
+git clone https://github.com/Ashu-2006/ai-ux-blue.git
+cd ai-ux-blue
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # outputs dist/
-npm run preview  # serve the built app
+npm run dev
 ```
 
-## Structure
+The last line prints a URL like `http://localhost:5173`. Open it in a browser and the app runs on your machine.
 
-- `src/lib/library.ts` the taxonomy tree. Twelve root folders plus nesting rules, mapping every lesson id and roadmap idea to a path.
-- `src/lib/lessons.ts` the `Lesson` type and the full lesson array.
-- `src/lib/deep.ts` the deep-modal content records (`DEEP[id]`) for the idea library sub-topics.
-- `src/lib/useLibraryRoute.ts` URL routing via `?f=` and `?l=`.
-- `src/sections/Library.tsx` the Explorer shell: breadcrumb, search + filter + sort rail, grid.
-- `src/components/LessonFolder.tsx` the generic folder component (accepts any mix of sub-folders, lessons, ideas).
-- `src/components/LessonCard.tsx`, `LessonModal.tsx` lesson leaf tile and modal.
-- `src/components/demos/archetypes.tsx` the six config-driven interactive-demo archetypes.
-- `src/data/lessons/phase<N>-part<M>.ts` one file per curriculum part.
-- `src/data/lessons/de/*.ts` the design-engineering craft notes.
-- `public/lessons/*` lesson diagrams (SVG and PNG).
+Other useful commands:
+
+- `npm run build` builds the site into a `dist/` folder.
+- `npm run preview` serves the built site so you can check the production version before shipping.
+
+## What is under the hood
+
+Nothing exotic. If you have used a modern frontend before, this stack will feel familiar.
+
+- **Vite 7** for the dev server and build.
+- **React 19** for the UI.
+- **TypeScript** for types.
+- **Tailwind CSS 4** for styling.
+- **Framer Motion** for animations.
+
+It is a static single-page app. No backend, no database, no auth. It deploys to Vercel out of the box (`vercel.json` handles the config), and it works fine on Netlify, Cloudflare Pages, or any static host.
+
+## How the files are laid out
+
+Just the parts you will touch:
+
+```
+src/
+  lib/
+    library.ts        the taxonomy: which folder holds which lessons
+    lessons.ts        the Lesson type and the full lessons array
+    deep.ts           content for the "deep" idea-library modals
+    useLibraryRoute.ts URL routing (?f= for a folder, ?l= for a lesson)
+  sections/
+    Library.tsx       the file-explorer shell
+  components/
+    LessonFolder.tsx  the folder shape and its peek cards
+    LessonCard.tsx    the card grid tile
+    LessonModal.tsx   the modal that opens on click
+    demos/
+      archetypes.tsx  the six reusable demo shapes
+  data/
+    lessons/          one file per curriculum part
+      de/             design-engineering craft notes
+public/
+  lessons/            diagrams referenced by lessons (SVG and PNG)
+```
 
 ## Contributing
 
-Adding a lesson, a demo, or a design-engineering note: read [CONTRIBUTING.md](./CONTRIBUTING.md) and the authoring guide at [docs/adding-a-lesson.md](./docs/adding-a-lesson.md).
-
-## Deploy
-
-Any static host works. For Vercel:
-
-```bash
-npx vercel               # first-time link
-npx vercel --prod        # deploy to production
-```
-
-Or import the GitHub repo in the Vercel dashboard. Framework detects as Vite; `vercel.json` sets build command, output dir, cache headers, and SPA rewrite.
+The best way to help is to add or improve a lesson. Full walkthrough is in [CONTRIBUTING.md](./CONTRIBUTING.md), and the authoring guide (what a lesson looks like, how to write the posts, how to build a demo) is in [docs/adding-a-lesson.md](./docs/adding-a-lesson.md).
 
 ## Credits
 
-Curriculum content adapted from [rohitg00/ai-engineering-from-scratch](https://github.com/rohitg00/ai-engineering-from-scratch). App, taxonomy, demos, and design-engineering notes by Ashutosh Rana.
+Curriculum content adapted from [rohitg00/ai-engineering-from-scratch](https://github.com/rohitg00/ai-engineering-from-scratch). The app, the taxonomy, the demos, and the design-engineering craft notes were built by [Ashutosh Rana](https://github.com/Ashu-2006).
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE). Use it, fork it, learn from it.
