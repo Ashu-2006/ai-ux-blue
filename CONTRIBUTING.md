@@ -1,49 +1,100 @@
 # Contributing
 
-Thanks for taking a look. This repo runs as a static SPA and welcomes new lessons, new demos, and copy fixes.
+Thanks for taking the time. This guide is written for a designer with a bit of terminal comfort but no assumption that you have shipped a React app before.
 
-## Prereqs
+If you have contributed to a Node project on GitHub before, you can skim past the setup and jump to [Making a change](#making-a-change).
 
-- Node 20 or newer
-- npm (pnpm/yarn both work; commands below use npm)
+## What you need
 
-## Local setup
+Before you start, install these once:
+
+1. **[Node.js 20 or newer](https://nodejs.org/)**. Node runs the dev server and installs libraries. Grab the LTS installer for your OS. To check it worked, open a terminal and run `node --version`. You should see something like `v20.11.0`.
+2. **[Git](https://git-scm.com/downloads)**. Version control. Same drill: `git --version` should print a version.
+3. **A GitHub account**. Fork the repo (top-right button on GitHub).
+4. **A code editor**. [VS Code](https://code.visualstudio.com/) is fine if you do not have a favorite.
+
+That is the whole shopping list.
+
+## Get the code on your machine
+
+In your terminal, run these three lines. Replace `your-username` with your GitHub handle.
 
 ```bash
-git clone https://github.com/Ashu-2006/ai-ux-blue.git
+git clone https://github.com/your-username/ai-ux-blue.git
 cd ai-ux-blue
 npm install
+```
+
+- `git clone` copies the repo down.
+- `cd ai-ux-blue` moves you into the folder.
+- `npm install` reads `package.json`, downloads every library the app depends on into a `node_modules/` folder, and locks the versions. This takes a minute the first time and is instant afterwards.
+
+## Run it
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:5173. Hot reload is on.
+You will see a URL in the terminal, usually `http://localhost:5173`. Open it in a browser. The site now runs locally on your machine. Any file you save reloads the tab automatically.
 
-## Workflow
+To stop the server, press `Ctrl+C` in the terminal.
 
-1. Fork, branch off `master`. Name the branch after what it does: `add/lesson-foo`, `fix/modal-scroll`, `docs/adding-a-lesson`.
-2. Keep the change scoped. One feature, one fix, or one lesson batch per PR.
-3. Run `npm run build` before pushing. TypeScript catches the loud stuff; the build catches broken imports and bad asset paths.
-4. Open a PR against `master`. Describe what changed and, if the change is visible, drop in a screenshot or a short screen recording.
+## Making a change
+
+The flow for every contribution is the same:
+
+1. **Make a branch.** Do not work on `master` directly.
+   ```bash
+   git checkout -b add/lesson-name-here
+   ```
+   Name it after what it does: `add/lesson-color-tokens`, `fix/modal-scroll-bug`, `docs/typo`.
+2. **Edit files** in your editor.
+3. **See it in the browser.** Because `npm run dev` is running, saves reload the tab.
+4. **Check the production build.** Before you push, run:
+   ```bash
+   npm run build
+   ```
+   This is the same build Vercel runs. If it errors, fix it here (much faster than finding out after a push).
+5. **Commit and push.**
+   ```bash
+   git add .
+   git commit -m "Short summary of what changed"
+   git push -u origin your-branch-name
+   ```
+6. **Open a pull request** on GitHub. Describe what changed. If the change is visible (a new lesson, a UI tweak), drop in a screenshot or a short screen recording. This makes review 10x faster.
 
 ## Adding content
 
-The interesting contribution is content. Two shapes:
+The most useful contribution is content. There are two shapes:
 
-- **A lesson** (Learn tab, diagram, one X-post row, roles in the taxonomy). See [docs/adding-a-lesson.md](./docs/adding-a-lesson.md) for the file layout and the fields.
-- **A deep sub-topic** (Learn / Interactive / Post modal, a hand-built or config-driven demo, three X posts). Same doc, "Deep sub-topics" section.
+- **A lesson.** One card in the file explorer. Has a title, a one-liner, a diagram, a "read time", and a modal with sections.
+- **A deep sub-topic.** A richer page with an interactive demo and three tweets. Used for anti-patterns and mental models where the demo is the point.
 
-Both flows end at the same checklist: build passes, the page opens, all tabs render, no console errors.
+Both live in the same taxonomy but use slightly different files. The full walkthrough (fields, examples, voice rules) is in [docs/adding-a-lesson.md](./docs/adding-a-lesson.md). Read it once before starting; then keep it open in a tab while you work.
 
-## Style, briefly
+## Style rules
 
-- No em dashes (—) or en dashes (–) anywhere in prose, comments, or lesson text. Hyphens for ranges, sentences for pauses.
-- Component code follows the surrounding file. Don't reformat existing files as part of a content PR.
-- Prose gets to the point. Cut every word you don't need.
+Small rules, but every contributor follows them.
 
-## What's out of scope
-
-Design-token overhauls, dependency bumps, and rewrites of the routing layer are best raised as an issue first. Small fixes go straight in.
+- **No em dashes (—) or en dashes (–)** in prose, lesson text, comments, or commit messages. Use a period, a comma, a colon, or parentheses instead. Hyphens are fine for ranges.
+- **Don't reformat files** you are not changing. A content PR should not also touch component code.
+- **Keep prose tight.** If a sentence can be cut, cut it. If a word is filler, drop it.
+- **Match the tone of the app.** Read a few existing lessons before writing a new one; the voice is confident, specific, and mechanism-first.
 
 ## Reporting bugs
 
-Open an issue with: what you did, what you expected, what happened, browser + OS. A screen recording beats a long description.
+Open an issue with:
+
+- What you did (steps).
+- What you expected.
+- What happened.
+- Your browser and OS.
+- A screen recording if it is visual (Loom, macOS Cmd+Shift+5, Windows Snipping Tool).
+
+A recording beats a paragraph.
+
+## Where to ask for help
+
+- **Confused by the code?** Open a draft PR early. Reviewers can point at lines instead of guessing.
+- **Not sure if an idea fits?** Open an issue with the pitch before writing. Saves both of us time.
+- **Design-tokens overhaul or a big refactor?** Open an issue first. Small fixes go straight to PR.
