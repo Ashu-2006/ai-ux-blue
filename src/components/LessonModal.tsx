@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { X, Copy, Check, Lightbulb, BookOpen, PlayCircle, Send, ArrowUpRight } from 'lucide-react';
+import { X, Copy, Check, Lightbulb, BookOpen, PlayCircle, Send, ArrowUpRight, Target, Dumbbell, Package, Link2 } from 'lucide-react';
 import { getLesson, type Lesson, type LessonPost } from '@/lib/lessons';
 import { LESSON_DEMOS } from '@/components/demos/lessonDemos';
 import { ArchetypeDemo } from '@/components/demos/archetypes';
@@ -199,9 +199,31 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 }
 
 function LearnTab({ lesson }: { lesson: Lesson }) {
+  const hasGloss = lesson.terms.some((t) => t.gloss);
   return (
     <div>
       <p className="t-lg text-ink-2">{lesson.oneLiner}</p>
+
+      {/* learning objectives: verb-led measurable bullets at the top */}
+      {lesson.learningObjectives && lesson.learningObjectives.length > 0 && (
+        <div
+          className="mt-6 rounded-[var(--r-lg)] p-4"
+          style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+        >
+          <div className="flex items-center gap-1.5 text-ink">
+            <Target size={14} />
+            <span className="t-sm font-semibold">What you'll be able to do</span>
+          </div>
+          <ul className="mt-2 flex flex-col gap-1.5">
+            {lesson.learningObjectives.map((o, i) => (
+              <li key={i} className="t-sm flex gap-2.5 text-ink-2">
+                <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full" style={{ background: 'var(--ink-3)' }} />
+                {o}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* diagram on paper (the curriculum SVGs are ink-on-cream) */}
       {lesson.diagram && (
@@ -238,6 +260,42 @@ function LearnTab({ lesson }: { lesson: Lesson }) {
         </Section>
       ))}
 
+      {/* inline images: supporting visuals rendered as figures after sections.
+          If diagramBrief is present the image path may be a stub; render a
+          placeholder card that shows the brief so authors can see what to draw. */}
+      {lesson.inlineImages && lesson.inlineImages.length > 0 && (
+        <Section label="Figures">
+          <div className="flex flex-col gap-6">
+            {lesson.inlineImages.map((img, i) => (
+              <figure key={i}>
+                <div
+                  className="overflow-x-auto rounded-[var(--r-lg)] p-4"
+                  style={{ background: '#faf6ef', border: '0.5px solid var(--hairline)' }}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="mx-auto w-full"
+                    loading="lazy"
+                    onError={(e) => {
+                      // If SVG missing, hide the img and let the brief show instead
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  {img.diagramBrief && (
+                    <div className="t-sm mt-1 rounded-[var(--r-md)] bg-white/60 p-3 text-ink-3">
+                      <span className="t-caption font-semibold uppercase text-ink-4">Diagram brief</span>
+                      <p className="mt-1 whitespace-pre-line">{img.diagramBrief}</p>
+                    </div>
+                  )}
+                </div>
+                <figcaption className="t-sm mt-2 text-ink-3">{img.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </Section>
+      )}
+
       <Section label="Key takeaways">
         <ul className="flex flex-col gap-2.5">
           {lesson.takeaways.map((t, i) => (
@@ -249,20 +307,96 @@ function LearnTab({ lesson }: { lesson: Lesson }) {
         </ul>
       </Section>
 
+      {/* exercises: easy -> hard, with a level pill */}
+      {lesson.exercises && lesson.exercises.length > 0 && (
+        <Section label="Exercises">
+          <ol className="flex flex-col gap-3">
+            {lesson.exercises.map((ex, i) => (
+              <li
+                key={i}
+                className="rounded-[var(--r-md)] p-3"
+                style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+              >
+                <div className="mb-1 flex items-center gap-2">
+                  <Dumbbell size={12} className="text-ink-4" />
+                  <span
+                    className="rounded-full px-2 py-0.5 t-caption font-semibold uppercase"
+                    style={{
+                      background: ex.level === 'design' ? 'var(--accent-tint)' : 'var(--surface)',
+                      color: ex.level === 'design' ? 'var(--accent)' : 'var(--ink-3)',
+                      border: '0.5px solid var(--hairline)',
+                    }}
+                  >
+                    {ex.level}
+                  </span>
+                </div>
+                <p className="t-body text-ink-2">{ex.prompt}</p>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      )}
+
+      {/* terms: 3-column when any term has a gloss, 2-column otherwise */}
       <Section label="Terms, precisely">
+        {hasGloss && (
+          <div
+            className="mb-2 grid gap-3 px-3 t-caption font-semibold uppercase text-ink-4"
+            style={{ gridTemplateColumns: '130px 1fr 1.4fr' }}
+          >
+            <span>Term</span>
+            <span>What people say</span>
+            <span>What it actually means</span>
+          </div>
+        )}
         <dl className="flex flex-col gap-1">
           {lesson.terms.map((t, i) => (
             <div
               key={i}
-              className="grid grid-cols-[130px_1fr] gap-3 rounded-[var(--r-md)] px-3 py-2"
-              style={{ background: i % 2 ? 'transparent' : 'var(--surface-2)' }}
+              className="grid gap-3 rounded-[var(--r-md)] px-3 py-2"
+              style={{
+                background: i % 2 ? 'transparent' : 'var(--surface-2)',
+                gridTemplateColumns: hasGloss ? '130px 1fr 1.4fr' : '130px 1fr',
+              }}
             >
               <dt className="t-sm t-mono text-ink">{t.term}</dt>
+              {hasGloss && <dd className="t-sm italic text-ink-3">{t.gloss ?? ''}</dd>}
               <dd className="t-sm text-ink-2">{t.meaning}</dd>
             </div>
           ))}
         </dl>
       </Section>
+
+      {/* ship it: the reusable artifact */}
+      {lesson.shipIt && (
+        <Section label="Take this with you">
+          <ShipItCard shipIt={lesson.shipIt} />
+        </Section>
+      )}
+
+      {/* further reading: primary sources */}
+      {lesson.furtherReading && lesson.furtherReading.length > 0 && (
+        <Section label="Further reading">
+          <ul className="flex flex-col gap-2.5">
+            {lesson.furtherReading.map((r, i) => (
+              <li key={i} className="t-body flex gap-2 text-ink-2">
+                <Link2 size={13} className="mt-[6px] shrink-0 text-ink-4" />
+                <span>
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-ink underline-offset-2 hover:underline"
+                  >
+                    {r.label}
+                  </a>
+                  <span className="t-sm text-ink-3"> {r.why}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       <a
         href={lesson.source.url}
@@ -273,6 +407,43 @@ function LearnTab({ lesson }: { lesson: Lesson }) {
         {lesson.source.label}
         <ArrowUpRight size={14} strokeWidth={1.8} />
       </a>
+    </div>
+  );
+}
+
+function ShipItCard({ shipIt }: { shipIt: NonNullable<Lesson['shipIt']> }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    void navigator.clipboard?.writeText(shipIt.body);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1400);
+  };
+  return (
+    <div
+      className="rounded-[var(--r-lg)] p-4"
+      style={{ background: 'var(--surface-2)', border: '0.5px solid var(--hairline)' }}
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Package size={14} className="text-ink-3" />
+          <span
+            className="rounded-[var(--r-sm)] px-2 py-0.5 t-caption font-semibold uppercase"
+            style={{ background: 'var(--accent-tint)', color: 'var(--accent)' }}
+          >
+            {shipIt.kind}
+          </span>
+          <span className="t-sm font-semibold text-ink">{shipIt.name}</span>
+        </div>
+        <button
+          onClick={copy}
+          className="pressable flex items-center gap-1.5 rounded-[var(--r-md)] px-2.5 py-1.5 t-sm font-medium text-ink-2"
+          style={{ background: 'var(--surface)', border: '0.5px solid var(--hairline)' }}
+        >
+          {copied ? <Check size={13} style={{ color: 'var(--pattern)' }} /> : <Copy size={13} />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <pre className="t-sm whitespace-pre-wrap font-sans text-ink-2">{shipIt.body}</pre>
     </div>
   );
 }

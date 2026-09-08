@@ -46,13 +46,41 @@ export interface LessonSection {
 
 export interface LessonTerm {
   term: string;
-  meaning: string;
+  gloss?: string; // what people usually say (often imprecise)
+  meaning: string; // what it actually is
 }
 
 export interface LessonPost {
   kind: string; // "X · mechanism" | "X · one-liner" | "X · design angle"
   hook: string;
   body: string; // full copy-ready text
+}
+
+// A supporting visual inside the body. `diagramBrief` is a written spec for a
+// diagram that has not been produced yet; when the SVG lands, drop the brief.
+export interface LessonInlineImage {
+  src: string; // path under public/ (planned or actual)
+  alt: string;
+  caption: string;
+  diagramBrief?: string; // spec for the designer who will draw this
+}
+
+export interface LessonExercise {
+  level: 'easy' | 'medium' | 'hard' | 'design';
+  prompt: string;
+}
+
+export interface LessonFurtherReading {
+  label: string;
+  url: string;
+  why: string; // one line, why this link earns its place
+}
+
+// The reusable artifact a reader takes away from the lesson.
+export interface LessonShipIt {
+  kind: 'prompt' | 'checklist' | 'snippet' | 'rubric';
+  name: string;
+  body: string; // markdown / plain text, ready to copy
 }
 
 // A folder groups related lessons (one folder per phase part / theme).
@@ -75,9 +103,14 @@ export interface Lesson {
   diagram?: string; // path under public/
   diagramCaption?: string;
   whyItMatters: string; // the design / product / engineering lens
+  learningObjectives?: string[]; // verb-led measurable bullets (4-6)
   sections: LessonSection[];
+  inlineImages?: LessonInlineImage[]; // supporting visuals inside the body
   takeaways: string[];
   terms: LessonTerm[];
+  exercises?: LessonExercise[]; // easy -> hard, at least one designer-facing
+  furtherReading?: LessonFurtherReading[]; // 3-6 real primary links
+  shipIt?: LessonShipIt; // the reusable artifact the reader takes away
   demoCaption?: string; // shown above the interactive demo
   // config-driven interactive (ArchetypeDemo); bespoke demos override via
   // LESSON_DEMOS in components/demos/lessonDemos.tsx
