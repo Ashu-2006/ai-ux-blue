@@ -10,29 +10,58 @@ export const phase16Part2: Lesson[] = [
     title: 'Four protocols, four different problems',
     oneLiner:
       'MCP connects an agent to tools. A2A connects an agent to other agents. ACP adds a trajectory audit trail. ANP adds cryptographic identity for agents you do not control. They are layers, not competitors.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     whyItMatters:
       'Each protocol hands your UI a different schema, and that is the real reason to know which one you are on. A2A gives you an 8-state task lifecycle with 4 terminal states, so your run component is a state machine with two non-obvious mid-run states, INPUT_REQUIRED and AUTH_REQUIRED, that both mean the run is waiting on the human and neither of which is an error. ACP\'s TrajectoryMetadata is the payload behind a "show the reasoning" disclosure. ANP\'s DID document carries humanAuthorization keys, which is a permission gate with a biometric affordance. Same word, four contracts.',
+    learningObjectives: [
+      'Trace a request through MCP, A2A, ACP, and ANP and name which layer owns which problem.',
+      'Read an A2A task through its 8 states and identify the 2 that mean "waiting on a human," not "broken."',
+      'Explain why ACP\'s TrajectoryMetadata is the payload behind a reasoning-disclosure UI, not a logging afterthought.',
+      'Decide, given a cross-org agent call, whether Agent Card auth, mTLS, or ANP\'s humanAuthorization gate is the right fit.',
+      'Diagnose schema drift versus a state machine violation from the same symptom: garbage output or a dropped update.',
+    ],
     sections: [
       {
         heading: 'The problem: just pass strings works until it does not',
-        body: 'You split the system into a researcher, a coder, and a reviewer. Each is good at its job. Now they have to talk. The first attempt is obvious: pass blobs of text and let the receiver parse however it can.\n\nIt works until the coder misinterprets a research summary, or two agents deadlock waiting on each other, or you need agents built by different teams to collaborate. Without a shared contract for exchange, multi-agent systems are fragile, unauditable, and impossible to scale past the handful you personally wrote.',
+        body: 'You split the system into a researcher, a coder, and a reviewer. Each is good at its job. Now they have to talk. The first attempt is obvious: pass blobs of text and let the receiver parse however it can.\n\nIt works until the coder misinterprets a research summary, two agents deadlock waiting on each other, or you need agents built by different teams to collaborate. Without a shared contract for exchange, multi-agent systems are fragile, unauditable, and impossible to scale past the handful you personally wrote.\n\nThe industry answered with four protocols, each solving a different slice: MCP for tool access, A2A for peer collaboration, ACP for audit trails, ANP for cross-organization trust. FIPA\'s Agent Communication Language tried this in the 1990s and never left academia. The 2024-2026 wave shipped because the underlying model, tool-calling, was already production-grade.',
       },
       {
-        heading: 'The layers',
-        body: 'MCP (Anthropic) is agent to tool. Client-server, JSON-RPC, the agent discovers and calls tools a server exposes. It does not help agents talk to each other at all.\n\nA2A (Google, now Linux Foundation as lf.a2a.v1, spec 1.0.0) is peer to peer. Each agent publishes an Agent Card at GET /.well-known/agent-card.json, and other agents discover it, check its skills, and delegate tasks. A card lists skills with IDs, tags, and supported input and output MIME types, plus supportedInterfaces (one agent can speak JSON-RPC, REST, and gRPC at once) and its security schemes, so the client knows what auth it needs before the first request.\n\nACP (IBM/BeeAI, OpenAPI 3.1.1, merging into A2A) is the enterprise layer. ANP is the decentralized identity layer.',
+        heading: 'MCP and A2A: tool access versus peer collaboration',
+        body: 'MCP (Anthropic, covered in Phase 13) is agent to tool: client-server, JSON-RPC, the agent discovers and calls whatever a server exposes. It does not help two agents talk to each other at all.\n\nA2A (Google, April 2025, now Linux Foundation as lf.a2a.v1, spec 1.0.0) is peer to peer. Each agent publishes an Agent Card at GET /.well-known/agent-card.json, and other agents read it, check its skills, and delegate. A card lists skills with IDs, tags, and supported input and output MIME types, plus supportedInterfaces, since one agent can speak JSON-RPC, REST, and gRPC at once, and its security schemes, so the client knows what auth it needs before the first request.\n\nMCP is vertical. A2A is horizontal. Production systems run both: an A2A peer calls its own MCP tools on its side of the boundary, and you never see its tool calls.',
       },
       {
         heading: 'The A2A task lifecycle is a state machine you have to render',
-        body: 'Tasks are the unit of work and they move through defined states. SUBMITTED (acknowledged, not processing), WORKING, INPUT_REQUIRED (the agent needs more from the client), AUTH_REQUIRED, then four terminal ones: COMPLETED, FAILED, CANCELED, REJECTED.\n\nOnce a task reaches a terminal state it is immutable. No further messages. Follow-ups create a new task inside the same contextId, which is exactly how a threaded conversation maps onto it. Streaming is SSE. The two states worth designing carefully are INPUT_REQUIRED and AUTH_REQUIRED: both stall the run pending a human, and neither is a failure, so rendering them as errors is a mistake users will read as broken.',
+        body: 'Tasks are the unit of work and they move through defined states. SUBMITTED (acknowledged, not processing yet), WORKING, INPUT_REQUIRED (the agent needs more from the client), AUTH_REQUIRED, then four terminal ones: COMPLETED, FAILED, CANCELED, REJECTED. Eight states total.\n\nOnce a task reaches a terminal state it is immutable, no further messages. A follow-up creates a new task inside the same contextId, which is exactly how a threaded conversation maps onto the protocol. Streaming runs over SSE, with statusUpdate and artifactUpdate events. The two states worth designing carefully are INPUT_REQUIRED and AUTH_REQUIRED: both stall the run pending a human, and neither is a failure, so rendering them as errors is a mistake users will read as broken.',
       },
       {
-        heading: 'ACP trajectories and ANP identity',
-        body: 'ACP is not JSON-LD, despite common summaries. It is a REST/JSON API defined via OpenAPI, and its differentiator is TrajectoryMetadata: every message part can carry a detailed log of the reasoning steps and tool calls that produced it. For regulated industries that is the whole value, a provable chain from answer back to inputs. It also supports CitationMetadata for source attribution, and it uses Runs rather than Tasks with three modes: sync (blocking), async (202 then poll), and stream (SSE).\n\nANP uses W3C DIDs under a custom did:wba method, so did:wba:example.com:user:alice resolves to a document at that domain. Key separation is enforced: signing keys (secp256k1) are separate from encryption keys (X25519, used for HPKE per RFC 9180). Its unique field is humanAuthorization: keys that require explicit human approval, biometric or password or HSM, before use. High-risk operations like fund transfers route through that path. Trust is bilateral and per-interaction, verified through domain TLS plus DID signature plus least privilege. There is no web of trust and no reputation score.',
+        heading: 'ACP: trajectories as an audit trail',
+        body: 'ACP (IBM/BeeAI, OpenAPI 3.1.1, merging into A2A) is the enterprise layer, and despite what most summaries claim, it is not JSON-LD. It is a REST/JSON API, and its differentiator is TrajectoryMetadata: every message part can carry a log of the reasoning steps and tool calls that produced it. For regulated industries that is the whole value, a provable chain from answer back to inputs. It also supports CitationMetadata for source attribution.\n\nACP uses Runs rather than Tasks, with three modes: sync (blocking), async (202 then poll), and stream (SSE). Discovery has four methods: a runtime GET /agents, an open .well-known/agent.yml, a centralized registry, or embedded container labels. The AgentManifest is simpler than an A2A Agent Card: name, description, input and output content types, and a metadata block naming the framework and recommended model.',
+      },
+      {
+        heading: 'ANP: decentralized identity for agents you do not control',
+        body: 'ANP (community, founded by GaoWei Chang) uses W3C DIDs under a custom did:wba method, so did:wba:example.com:user:alice resolves to a document at that domain. Key separation is enforced: signing keys (secp256k1) sit apart from encryption keys (X25519, used for HPKE per RFC 9180). Its unique field is humanAuthorization: keys that require explicit human approval, biometric, password, or HSM, before use. High-risk operations like fund transfers route through that path.\n\nTrust is bilateral and per-interaction, verified through domain TLS plus DID signature plus least privilege. There is no web of trust and no reputation score. ANP\'s most novel feature is meta-protocol negotiation: two agents that have never met exchange candidate formats in natural language, agree within 10 rounds, and generate code to handle the result.',
+      },
+      {
+        heading: 'Four protocols, side by side',
+        body: 'Line the four up and the differences are concrete, not philosophical.\n\n| Protocol | Creator | Wire format | Discovery | Unique feature |\n|---|---|---|---|---|\n| MCP | Anthropic | JSON-RPC | Tool listing | Tool schemas |\n| A2A | Google / Linux Foundation | JSON-RPC, REST, gRPC | Agent Card | Skills plus 8-state task lifecycle |\n| ACP | IBM / BeeAI | OpenAPI 3.1 REST | GET /agents, agent.yml | TrajectoryMetadata |\n| ANP | Community | JSON-RPC over DIDs | DID service endpoints | humanAuthorization, meta-protocol negotiation |\n\nA realistic enterprise system runs MCP inside each agent, A2A between agents in the same org, ACP-style trajectory logging wrapped around every response for compliance, and ANP where an agent needs to trust an organization it does not control.',
       },
       {
         heading: 'What actually breaks',
-        body: 'Schema drift: agent A advertises application/json output, the schema changes between versions, agent B parses the old shape and gets garbage. Version your skills and output schemas; A2A puts version on the Agent Card for exactly this.\n\nState machine violations: a handler yields completed and then tries to yield more artifacts. The task is immutable, so updates get dropped or throw. Check terminal state before yielding.\n\nTrust resolution failures: B\'s domain is down, so its DID document cannot be fetched. Fail open and accept unverified agents, or fail closed? ANP recommends fail closed with least trust. Trajectory bloat: a 200-tool-call run produces a massive audit entry, so log at configurable verbosity. Discovery thundering herd: 50 agents hitting GET /agents at startup, fixed with TTL caching, staggered intervals, or push registration.',
+        body: 'Schema drift: agent A advertises application/json output, the schema changes between versions, agent B parses the old shape and gets garbage. Version your skills and output schemas; A2A puts version on the Agent Card for exactly this reason.\n\nState machine violations: a handler yields completed and then tries to yield more artifacts. The task is immutable, so updates get dropped or throw. Check terminal state before yielding.\n\nTrust resolution failures: B\'s domain is down, so its DID document cannot be fetched. Fail open and accept unverified agents, or fail closed? ANP recommends fail closed with least privilege.\n\nTrajectory bloat: a 200-tool-call run produces a massive audit entry, so log at configurable verbosity, full detail for regulated workloads, tool names only otherwise. Discovery thundering herd: 50 agents hitting GET /agents at startup, fixed with TTL caching, staggered intervals, or push registration.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-03-inline-protocol-stack.svg',
+        alt: 'The four protocols as layers',
+        caption: 'MCP sits under the agent, A2A between agents, ACP wraps every response, ANP verifies identity at the edge.',
+        diagramBrief: 'ASCII stack diagram, four horizontal bands top to bottom: ANP (identity, edge), A2A (agent to agent), ACP (audit wrapper, dashed border around A2A to show it wraps), MCP (agent to tool, bottom). Right side, small icon of two agent boxes connected by an arrow labeled Agent Card. Style: cream paper background, black ink, one accent color (blue) on the A2A band.',
+      },
+      {
+        src: '/lessons/p16-03-inline-lifecycle.svg',
+        alt: 'The A2A 8-state task lifecycle',
+        caption: 'Two mid-run states, INPUT_REQUIRED and AUTH_REQUIRED, both mean waiting on a person, not a failure.',
+        diagramBrief: 'State diagram: SUBMITTED into WORKING into a branch to INPUT_REQUIRED and AUTH_REQUIRED, both looping back to WORKING, then into four terminal boxes in a row: COMPLETED, FAILED, CANCELED, REJECTED, each with a small lock icon indicating immutable. Style: cream paper, black ink, orange highlight on INPUT_REQUIRED and AUTH_REQUIRED boxes to mark them as the two non-error mid-run states.',
       },
     ],
     takeaways: [
@@ -42,13 +71,36 @@ export const phase16Part2: Lesson[] = [
       'ANP\'s humanAuthorization keys are a permission gate in the protocol itself: high-risk actions cannot proceed without explicit human approval.',
     ],
     terms: [
-      { term: 'Agent Card', meaning: 'A2A\'s JSON descriptor at /.well-known/agent-card.json listing skills, interfaces, and security schemes.' },
-      { term: 'contextId', meaning: 'The A2A identifier that groups follow-up tasks into one continuing conversation.' },
-      { term: 'TrajectoryMetadata', meaning: 'ACP\'s per-message log of the reasoning steps and tool calls that produced an answer.' },
-      { term: 'did:wba', meaning: 'ANP\'s web-based DID method resolving an agent identity to a document on its own domain.' },
-      { term: 'humanAuthorization', meaning: 'ANP keys requiring explicit human approval (biometric, password, HSM) before a high-risk action.' },
-      { term: 'Schema drift', meaning: 'An advertised output schema changing between versions while callers still parse the old shape.' },
+      { term: 'Agent Card', gloss: '"the agent\'s business card"', meaning: 'A2A\'s JSON descriptor at /.well-known/agent-card.json listing skills, interfaces, and security schemes.' },
+      { term: 'contextId', gloss: '"the conversation id"', meaning: 'The A2A identifier that groups follow-up tasks into one continuing conversation.' },
+      { term: 'TrajectoryMetadata', gloss: '"the audit log"', meaning: 'ACP\'s per-message record of the reasoning steps and tool calls that produced an answer.' },
+      { term: 'did:wba', gloss: '"a decentralized ID"', meaning: 'ANP\'s web-based DID method resolving an agent identity to a document on its own domain.' },
+      { term: 'humanAuthorization', gloss: '"a permission check"', meaning: 'ANP keys requiring explicit human approval (biometric, password, HSM) before a high-risk action.' },
+      { term: 'Schema drift', gloss: '"a breaking change"', meaning: 'An advertised output schema changing between versions while callers still parse the old shape.' },
+      { term: 'Run', gloss: '"a task, basically"', meaning: 'ACP\'s unit of work, with three modes: sync, async with polling, or an SSE stream.' },
+      { term: 'Meta-protocol negotiation', gloss: '"agents figuring it out"', meaning: 'ANP agents exchanging natural-language proposals for a shared format, bounded to 10 rounds before timeout.' },
+      { term: 'Opaque lifecycle', gloss: '"a black box"', meaning: 'A2A\'s deliberate choice to expose task state and artifacts but never the remote agent\'s internal steps.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A remote A2A task sits in INPUT_REQUIRED for six minutes. Write the one-line status a user should see, and the one it should never see.' },
+      { level: 'medium', prompt: 'An agent card advertises output mode application/json v1, then the server ships v2 with a renamed field. Name the two places, client and card, where this should have been caught before it shipped.' },
+      { level: 'medium', prompt: 'Sketch the ACP TrajectoryMetadata payload for a three-tool-call research answer. What fields does your UI need to render a "show reasoning" disclosure without a follow-up API call?' },
+      { level: 'design', prompt: 'Design the review screen for a fund-transfer action gated by ANP\'s humanAuthorization. What does the user see before they approve: the DID, the requesting agent\'s name, the amount, all three?' },
+      { level: 'hard', prompt: 'A partner org\'s DID document fails to resolve mid-task. Decide fail-open versus fail-closed for your product, and write the one-sentence error copy that follows from your choice.' },
+    ],
+    furtherReading: [
+      { label: 'Google A2A specification', url: 'https://github.com/google/A2A', why: 'The canonical spec and SDKs, v1.0.0 under the Linux Foundation.' },
+      { label: 'IBM/BeeAI ACP specification', url: 'https://github.com/i-am-bee/acp', why: 'The OpenAPI 3.1 source for Runs, TrajectoryMetadata, and CitationMetadata.' },
+      { label: 'Agent Network Protocol repository', url: 'https://github.com/agent-network-protocol/AgentNetworkProtocol', why: 'The did:wba spec and the meta-protocol negotiation walkthrough.' },
+      { label: 'W3C Decentralized Identifiers (DID) Core', url: 'https://www.w3.org/TR/did-core/', why: 'The identity standard ANP builds did:wba on top of.' },
+      { label: 'RFC 9180, Hybrid Public Key Encryption', url: 'https://www.rfc-editor.org/rfc/rfc9180', why: 'The encryption scheme behind ANP\'s keyAgreement keys.' },
+      { label: 'FIPA Agent Communication Language specification', url: 'http://www.fipa.org/specs/fipa00061/SC00061G.html', why: 'The 1990s academic precursor these protocols quietly rebuilt.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Cross-protocol integration checklist',
+      body: '- Which protocol owns this call: MCP (tool), A2A (peer), ACP (audit), or ANP (trust)?\n- Does the Agent Card declare a version? Does your client check it?\n- Are INPUT_REQUIRED and AUTH_REQUIRED rendered as prompts, never as errors?\n- Does every response destined for a regulated workflow carry TrajectoryMetadata or an equivalent?\n- Is there a fail-open or fail-closed decision written down for identity resolution failures?\n- Is discovery cached with a TTL so a cold start does not become a thundering herd?',
+    },
     demoCaption:
       'The A2A task lifecycle as your run component sees it. Four terminal states, and two mid-run states that mean "waiting on a person". Treating those two as failures is the difference between a paused run and a broken product.',
     demo: {
@@ -108,24 +160,39 @@ export const phase16Part2: Lesson[] = [
     title: 'Group chat: the selector is the whole design',
     oneLiner:
       'Put N agents in one conversation and a selector function decides who speaks next. Round-robin is deterministic and context-blind. LLM-selected is context-aware and adds a model call per turn. That one choice sets everything else.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-10.svg',
     diagramCaption:
       'N agents on one shared message pool with a selector invoked between turns to pick the next speaker.',
     whyItMatters:
       'Group chat is the only pattern where the routing decision itself is user-visible content. Every turn, something chose a speaker, and if you do not render why, the transcript reads as arbitrary. That is a selector trace row between messages, not a hidden field. Two failure modes are pure UI: a hot speaker dominating means your turn distribution needs to be visible as a count per agent, and context bloat means every agent reading every message, so the token cost per turn climbs with transcript length and your budget display has to be per-turn, not per-run.',
+    learningObjectives: [
+      'Name the three selector flavors, round-robin, LLM-selected, custom, and what each trades off in determinism, latency, and cost.',
+      'Read a GroupChat transcript and identify whether the routing came from a fixed cycle or a context-aware call.',
+      'Trace the AutoGen to AG2 to Microsoft Agent Framework lineage and say which one to build against today.',
+      'Design a turn-distribution display that surfaces a hot speaker before a user has to notice it themselves.',
+      'Pick at least two termination conditions for a given group chat and explain why one alone is not enough.',
+    ],
     sections: [
       {
         heading: 'The problem: static graphs cannot express a real conversation',
-        body: 'LangGraph-style static graphs are great when the workflow is known. Real conversations are not static. Sometimes the coder asks the reviewer, sometimes the researcher, sometimes the writer. Hardcoding every possible handoff produces an edge explosion, and most of those edges fire once.\n\nWhat you want instead is agents reacting to a shared pool, with some function deciding who talks next. That is exactly what AutoGen GroupChat does: every agent sees every message, and a selector is invoked at each turn to pick the next speaker.',
+        body: 'LangGraph-style static graphs are great when the workflow is known. Real conversations are not static. Sometimes the coder asks the reviewer, sometimes the researcher, sometimes the writer. Hardcoding every possible handoff produces an edge explosion, and most of those edges fire once.\n\nWhat you want instead is agents reacting to a shared pool, with some function deciding who talks next. That is exactly what AutoGen GroupChat does: every agent sees every message, and a selector is invoked at each turn to pick the next speaker. The shape is one shared pool feeding N agents plus a selector, not an edge wired between every possible pair.',
       },
       {
         heading: 'The three selector flavors',
         body: 'Round-robin: a fixed cycle. Deterministic, scales linearly in N, and completely ignores context, so the coder gets a turn even when the topic is legal review.\n\nLLM-selected: a model call reads the recent pool and returns the best next speaker. Context-aware and slow, because every turn now costs an extra call. This is AutoGen\'s default.\n\nCustom: a Python function with whatever logic you like. The typical shape is LLM-selected with fallback rules, such as always giving the verifier the turn after the coder. That hybrid is usually the right answer in production, because it pins the handoffs you actually care about and leaves the rest adaptive.',
       },
       {
+        heading: 'Wiring it: ConversableAgent, GroupChat, GroupChatManager',
+        body: 'AutoGen\'s API surface is three objects. A ConversableAgent takes a name, a system_message, and an llm_config, the same shape as any single agent. A GroupChat wraps a list of agents plus an empty messages array. A GroupChatManager wraps the GroupChat with its own llm_config, and that manager is what actually holds the selector.\n\nWhen an agent finishes a turn, the manager calls the selector, the selector returns the next agent, and the loop continues until a termination condition fires. Nothing about the topology is declared up front; it emerges from however the selector reads the pool on a given turn. That is the tradeoff stated plainly: no graph to draw, but also no graph to audit before the first run.',
+      },
+      {
         heading: 'Manager, termination, and the loop',
         body: 'A GroupChatManager holds the selector. When an agent completes a turn, the manager calls the selector, which returns the next agent, and the loop continues until a termination condition fires.\n\nThree termination patterns dominate. Max rounds: a hard cap on total turns, which is the one that saves you from bill surprises. A TERMINATE token: agents emit a sentinel and the manager stops when it appears. A goal-reached check: a lightweight verifier runs each turn and stops the chat when the work is done. Pick at least two, because a token-only termination fails silently when no agent ever emits it.',
+      },
+      {
+        heading: 'Group chat versus supervisor',
+        body: 'Group chat fits emergent conversations where you do not want to pre-wire every next speaker: role-mixing tasks where the coder asks the researcher who asks the archivist who asks the coder back, flow that is not a DAG. Think brainstorm meeting, not assembly line.\n\nSupervisor and group chat share the same primitives, agent, message, tool, selector; they just default differently. Supervisor: one agent plans and the rest execute, so the selector is effectively "ask the planner what to do." Group chat: all agents are peers, and the selector is a function over the shared pool rather than a single agent\'s judgment. Reach for supervisor when one role should own the plan; reach for group chat when no single agent should.',
       },
       {
         heading: 'The lineage, because the names moved',
@@ -136,6 +203,20 @@ export const phase16Part2: Lesson[] = [
         body: 'Strict determinism: the LLM selector is inconsistent, so the same prompt across runs picks different next speakers. If audit and replay matter, this pattern is wrong.\n\nSycophancy cascades: agents defer to whoever spoke most confidently. Counter-prompt this explicitly, because it does not self-correct.\n\nContext bloat: every agent reads every message, so after 10 turns the context is enormous. Projections that scope each agent\'s view are the fix. Hot speakers: the selector favors one agent\'s specialties and it dominates the conversation, which needs speaker balance built into the selector itself. Compared with supervisor, the primitives are identical; group chat just defaults to LLM-selected orchestration over a full pool.',
       },
     ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-10-inline-selector-flavors.svg',
+        alt: 'Three selector flavors compared',
+        caption: 'Round-robin is free and blind. LLM-selected costs a call and reads the room. Custom pins the handoffs that matter.',
+        diagramBrief: 'Three-column comparison diagram. Column 1 "Round-robin": a circular arrow cycling through three agent icons labeled A, B, C, tag "0 extra calls, deterministic". Column 2 "LLM-selected": the three agent icons with a small magnifying-glass icon reading the pool, arrow to a highlighted agent, tag "plus 1 call per turn, context-aware". Column 3 "Custom": the LLM-selected icon plus a padlock icon on one fixed arrow (verifier-after-coder), tag "hybrid". Style: cream paper, black ink, one accent color per column.',
+      },
+      {
+        src: '/lessons/p16-10-inline-lineage.svg',
+        alt: 'AutoGen to AG2 to Microsoft Agent Framework',
+        caption: 'The GroupChat primitive survived three renames in about 18 months.',
+        diagramBrief: 'Horizontal timeline from early 2025 to February 2026. Nodes: "AutoGen v0.2 GroupChat" branching into two arrows, one labeled "forked as AG2, preserves v0.2 API" and one labeled "AutoGen v0.4, event-driven actor model". Both arrows converge into a final node "Feb 2026: AutoGen to maintenance mode, actor model merges into Microsoft Agent Framework, with Semantic Kernel". Style: cream paper, black ink, one accent color marking the surviving primitive across all nodes.',
+      },
+    ],
     takeaways: [
       'The selector is the design. Round-robin, LLM-selected, or custom sets determinism, latency, and cost in one choice.',
       'LLM-selected orchestration is non-reproducible across runs, so it is the wrong pattern anywhere audit or exact replay matters.',
@@ -143,13 +224,34 @@ export const phase16Part2: Lesson[] = [
       'Full pool means token cost per turn grows with transcript length, so the budget display has to be per-turn, not per-run.',
     ],
     terms: [
-      { term: 'GroupChat', meaning: 'N agents sharing one message pool with a selector picking the next speaker each turn.' },
-      { term: 'Selector', meaning: 'The function deciding who speaks next: round-robin, an LLM call, or custom logic.' },
-      { term: 'GroupChatManager', meaning: 'The component that holds the selector and drives the turn loop until termination.' },
-      { term: 'TERMINATE token', meaning: 'A sentinel message an agent emits to end the chat.' },
-      { term: 'Sycophancy cascade', meaning: 'Agents deferring to whoever spoke most confidently rather than reasoning independently.' },
-      { term: 'Hot speaker', meaning: 'One agent dominating the conversation because the selector keeps favoring its specialties.' },
+      { term: 'GroupChat', gloss: '"agents in one chat room"', meaning: 'N agents sharing one message pool with a selector picking the next speaker each turn.' },
+      { term: 'Selector', gloss: '"who goes next"', meaning: 'The function deciding who speaks next: round-robin, an LLM call, or custom logic.' },
+      { term: 'GroupChatManager', gloss: '"the meeting host"', meaning: 'The component that holds the selector and drives the turn loop until termination.' },
+      { term: 'ConversableAgent', gloss: '"the base agent class"', meaning: 'AutoGen\'s base agent type: a name, a system_message, and an llm_config, nothing more.' },
+      { term: 'TERMINATE token', gloss: '"the stop word"', meaning: 'A sentinel message an agent emits to end the chat.' },
+      { term: 'Sycophancy cascade', gloss: '"agreeableness"', meaning: 'Agents deferring to whoever spoke most confidently rather than reasoning independently.' },
+      { term: 'Hot speaker', gloss: '"the chatty one"', meaning: 'One agent dominating the conversation because the selector keeps favoring its specialties.' },
+      { term: 'Projection', gloss: '"a scoped view"', meaning: 'A per-agent slice of shared state, used to stop context bloat once a chat runs long.' },
+      { term: 'AG2', gloss: '"the AutoGen fork"', meaning: 'The community continuation of AutoGen v0.2\'s GroupChat API after Microsoft rewrote v0.4 around an actor model.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A three-agent round-robin chat runs 12 turns. Compute how many turns each agent gets and whether that distribution matches who should be talking.' },
+      { level: 'medium', prompt: 'An LLM-selected chat produces a different next speaker on two runs with an identical prompt. List two product surfaces this breaks (replay, support ticket review) and one it does not.' },
+      { level: 'medium', prompt: 'Design a custom selector: LLM-selected with one pinned rule, verifier always follows coder. Write the rule in plain language a teammate could implement without seeing your code.' },
+      { level: 'design', prompt: 'Sketch the selector-trace row that renders between two chat messages. What three pieces of information does it need to make "why this agent spoke" legible at a glance?' },
+      { level: 'hard', prompt: 'A hot speaker has taken 60 percent of turns in a 20-turn chat. Propose a selector change that rebalances without hardcoding a fixed cycle.' },
+    ],
+    furtherReading: [
+      { label: 'AutoGen GroupChat design pattern docs', url: 'https://microsoft.github.io/autogen/stable/user-guide/core-user-guide/design-patterns/group-chat.html', why: 'The reference implementation and its default selector behavior.' },
+      { label: 'AG2 repository', url: 'https://github.com/ag2ai/ag2', why: 'The community continuation of AutoGen v0.2\'s GroupChat API.' },
+      { label: 'Microsoft Agent Framework documentation', url: 'https://learn.microsoft.com/en-us/agent-framework/', why: 'The merged successor, RC February 2026, now folded in with Semantic Kernel.' },
+      { label: 'AutoGen v0.4 release notes', url: 'https://microsoft.github.io/autogen/stable/', why: 'The event-driven actor model rewrite that triggered the AG2 fork.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'GroupChat selector checklist',
+      body: '- Max rounds cap set (10-20 for typical tasks)?\n- Turn count per agent tracked and an imbalance threshold set to alert on?\n- A termination token or dedicated verifier agent wired, not just a token nobody emits?\n- A projection or scoped memory plan for chats past roughly 10 messages?\n- Selector input and output logged for every LLM-selected turn, so a wrong route is debuggable?',
+    },
     demoCaption:
       'The same three-agent chat under round-robin and LLM-selected. Watch turn 2. Round-robin hands the coder the floor during a legal question because the cycle says so; the LLM selector reads the pool and costs you a call to do it.',
     demo: {
@@ -209,12 +311,19 @@ export const phase16Part2: Lesson[] = [
     title: 'Handoffs and routines: two primitives, and memory is your problem',
     oneLiner:
       'OpenAI Swarm reduced multi-agent orchestration to a routine (a prompt plus tools) and a handoff (a tool that returns another agent). No DSL, no state machine. It is stateless, which is why "the second agent forgot what I said" is a structural outcome, not a bug.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-11.svg',
     diagramCaption:
       'A triage agent calling handoff tools that return refund, sales, or support agents, each with its own tools.',
     whyItMatters:
       'This is the pattern where the user feels the seam. A handoff resets the conversation to the new agent\'s prompt plus whatever history transferred, so continuity of context is a decision you make explicitly or lose. The user does not experience a handoff, they experience "I already told you my order number". Two surfaces follow: a visible transfer moment naming who is now handling the request, and a carried-context summary the user can see and correct. The Agents SDK added handoff filters precisely because "what context transfers" is a control you need, and a dropped field must be re-suppliable once, not force a repeat.',
+    learningObjectives: [
+      'Define a routine and a handoff in one sentence each, and say which object the runtime watches for to switch agents.',
+      'Trace what a handoff resets versus what a handoff filter can preserve, and name the user-facing symptom of getting it wrong.',
+      'Compare Swarm\'s agent-decides-next model to GroupChat\'s manager-decides-next model and say where you would look first when a route is wrong.',
+      'Design a carried-context summary surface a user can review and correct after a handoff.',
+      'List three limits that follow directly from Swarm being stateless, and which of them the OpenAI Agents SDK actually fixes.',
+    ],
     sections: [
       {
         heading: 'The problem: every framework wants you to learn its DSL',
@@ -225,6 +334,10 @@ export const phase16Part2: Lesson[] = [
         body: 'Routine: a system prompt defining an agent\'s role and its available tools. A scoped set of instructions, such as "you are a triage agent; if the user asks about refunds, hand off to the refund agent."\n\nHandoff: a tool the agent can call that returns a new Agent object. The runtime detects the Agent return value and switches the active agent for the next turn.\n\nThat is it. The triage agent\'s prompt makes it choose the right handoff based on the user message, and the model\'s tool-calling does the routing. Swarm\'s entire source fits in a few hundred lines, which is why it remains the cleanest conceptual reference even though the OpenAI Agents SDK (March 2025) is the production successor.',
       },
       {
+        heading: 'The triage pattern, spelled out',
+        body: 'The reference shape is a triage agent with three handoff tools: transfer_to_refunds, transfer_to_sales, transfer_to_support. Each function\'s entire body is return refund_agent, or its peer, nothing else. Swarm\'s runtime watches for a function call that returns an Agent object, and when it sees one, it swaps the active agent for the next turn.\n\nThe triage agent\'s system prompt is the only place routing logic lives: "you are a triage agent, if the user asks about refunds hand off to the refund agent." There is no router class, no rules engine. The model reads the user message, matches it against the prompt\'s routing instructions, and calls the matching tool. A few lines of Python per handoff function is the entire mechanism.',
+      },
+      {
         heading: 'Why it went viral',
         body: 'Small API: two concepts to learn, and both map to things you already understand. It uses what the model already does, since tool calling is production-grade across every major provider. And there is no state-machine burden: you never describe the graph, because the agents\' prompts describe who they hand off to.\n\nThe cost of that elegance is that the routing logic is now distributed across prompts rather than centralized in a graph. Nothing in the codebase shows you the full topology. You reconstruct it by reading every agent\'s instructions, which is fine at four agents and unpleasant at fourteen.',
       },
@@ -233,8 +346,26 @@ export const phase16Part2: Lesson[] = [
         body: 'Swarm is explicitly stateless between runs. The framework keeps a message history during a run and persists nothing after. Memory, continuity, and long-running tasks are all the caller\'s problem.\n\nThat surfaces as three concrete limits. Long sessions with shared memory: a handoff resets conversation state to the new agent\'s prompt plus history, so there is no persistent state across agents unless you manage it. Parallel execution: handoff is one-at-a-time because the active agent switches, so parallelism means orchestrating multiple runs yourself. Audit and replay: stateless runs are hard to replay exactly, because the handoff choice is not deterministic.',
       },
       {
+        heading: 'Where it fits and where it struggles',
+        body: 'Triage patterns fit best: a front-line agent routing to a refund, sales, or support specialist, each scoped to its own tools. Skill-based handoffs work the same way for short, bounded conversations, an FAQ that escalates to a ticket, a simple workflow with three or four stops.\n\nIt struggles at the edges Swarm never hid. Long sessions needing shared memory: nothing persists by default. Parallel execution: handoff is one-at-a-time, since only one agent is active, so parallelism means orchestrating multiple runs yourself. Audit and replay: a stateless run\'s handoff choice is not deterministic, so replaying an exact transcript is not guaranteed even with the same input.',
+      },
+      {
         heading: 'What the SDK added, and Swarm versus GroupChat',
         body: 'The OpenAI Agents SDK (March 2025) keeps the handoff primitive and adds the production ergonomics: session state persisting a thread across runs, guardrails as input and output validation hooks, tracing on every tool call and handoff, and handoff filters that control what context transfers. That last one is the important addition, because "what the next agent knows" was previously implicit.\n\nSwarm and GroupChat both use LLM-driven routing and differ on who picks next. GroupChat: a selector outside the agents picks the next speaker. Swarm: the current agent picks its successor by calling a handoff tool. Swarm is "agent decides what is next", GroupChat is "manager decides what is next". The decision lives in the active agent\'s tool call versus in the GroupChatManager.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-11-inline-handoff-shape.svg',
+        alt: 'A handoff as a function returning an Agent',
+        caption: 'transfer_to_refunds() does nothing but return an Agent object. The runtime sees that and switches who is active.',
+        diagramBrief: 'Simple flow diagram: a chat bubble "user asks about a refund" arrow into a box "triage_agent (routine: prompt + 3 handoff tools)". From that box, an arrow labeled "calls transfer_to_refunds()" pointing at a small function icon that outputs "return refund_agent". That output feeds into a new box "refund_agent (active for next turn)". Style: cream paper, black ink, one accent color highlighting the function-returns-Agent moment.',
+      },
+      {
+        src: '/lessons/p16-11-inline-context-transfer.svg',
+        alt: 'What crosses a handoff, filtered versus unfiltered',
+        caption: 'Full history is expensive, nothing is silent, a filtered summary is the usual answer.',
+        diagramBrief: 'Three-lane comparison. Lane 1 "No transfer": triage box, arrow to refund box with an empty envelope icon, label "asks for order number again". Lane 2 "Full history": arrow with a large stack-of-papers icon, label "expensive, most of it irrelevant". Lane 3 "Filtered handoff": arrow with a small labeled card icon reading "order id, reason, sentiment", label "the OpenAI Agents SDK default pattern". Style: cream paper, black ink, one accent color on lane 3.',
       },
     ],
     takeaways: [
@@ -244,13 +375,33 @@ export const phase16Part2: Lesson[] = [
       'Swarm is agent-decides-next, GroupChat is manager-decides-next. Same LLM routing, different place to look when the route is wrong.',
     ],
     terms: [
-      { term: 'Routine', meaning: 'A system prompt plus tool list defining one agent\'s scoped role.' },
-      { term: 'Handoff', meaning: 'A tool call that returns another Agent, switching who holds the conversation.' },
-      { term: 'Stateless run', meaning: 'A run that keeps message history in memory and persists nothing after it ends.' },
-      { term: 'Handoff filter', meaning: 'An Agents SDK control over which context transfers to the receiving agent.' },
-      { term: 'Session state', meaning: 'Persistent thread state across runs, added by the Agents SDK on top of the handoff primitive.' },
-      { term: 'Triage pattern', meaning: 'A front-line agent that routes a user to the right specialist by handoff.' },
+      { term: 'Routine', gloss: '"the agent prompt"', meaning: 'A system prompt plus tool list defining one agent\'s scoped role.' },
+      { term: 'Handoff', gloss: '"transfer to another agent"', meaning: 'A tool call that returns another Agent, switching who holds the conversation.' },
+      { term: 'Stateless run', gloss: '"no memory between runs"', meaning: 'A run that keeps message history in memory during execution and persists nothing after it ends.' },
+      { term: 'Handoff filter', gloss: '"a gate on transfer"', meaning: 'An Agents SDK control over which context transfers to the receiving agent.' },
+      { term: 'Session state', gloss: '"remembering the thread"', meaning: 'Persistent thread state across runs, added by the Agents SDK on top of the handoff primitive.' },
+      { term: 'Triage pattern', gloss: '"the router agent"', meaning: 'A front-line agent that routes a user to the right specialist by handoff.' },
+      { term: 'Active agent', gloss: '"who\'s speaking now"', meaning: 'The agent currently holding the conversation; a handoff is the only thing that changes it.' },
+      { term: 'Handoff loop', gloss: '"ping-pong"', meaning: 'A failure mode where two agents keep handing the conversation back to each other.' },
+      { term: 'OpenAI Agents SDK', gloss: '"production Swarm"', meaning: 'The March 2025 successor adding session state, guardrails, and tracing on top of the same handoff primitive.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A user gives their order number to triage, then triage hands off to refund with no filter. Write the line the refund agent says first, and why it repeats the question.' },
+      { level: 'medium', prompt: 'Design a handoff filter for a support-to-billing transfer. List exactly three fields it carries and one it deliberately drops.' },
+      { level: 'medium', prompt: 'Two agents hand off to each other three times in a row on the same user turn. Write the loop-detection rule and the fallback it should trigger.' },
+      { level: 'design', prompt: 'Sketch the transfer moment in a chat transcript: what tells the user the voice just changed, without a paragraph of explanation?' },
+      { level: 'hard', prompt: 'Compare a Swarm handoff to a GroupChatManager selector for which one makes prompt injection worse. State your answer and the one sentence of reasoning behind it.' },
+    ],
+    furtherReading: [
+      { label: 'OpenAI cookbook, Orchestrating Agents: Routines and Handoffs', url: 'https://developers.openai.com/cookbook/examples/orchestrating_agents', why: 'The original articulation of the two-primitive model, with a plain code walkthrough.' },
+      { label: 'OpenAI Swarm repository', url: 'https://github.com/openai/swarm', why: 'The reference implementation, still the cleanest read even though it is not the production path.' },
+      { label: 'OpenAI Agents SDK documentation', url: 'https://openai.github.io/openai-agents-python/', why: 'The production successor: sessions, guardrails, tracing, and handoff filters.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Handoff design checklist',
+      body: '- Does every handoff write a trace event: from-agent, to-agent, context snapshot?\n- Is the context transfer rule explicit: full history, last N messages, or a summary?\n- Is a handoff to a specialist with different tool permissions authenticated, not just routed?\n- Is there a loop-detection rule for repeat handoffs between the same two agents?\n- Is there a fallback agent if a handoff target does not exist?',
+    },
     demoCaption:
       'Same refund request, same three agents. The difference is what crossed the handoff. In the first, the specialist restarts from its own prompt and asks for the order number again. In the second, a carried summary arrives with it and the user is asked for nothing twice.',
     demo: {
@@ -310,32 +461,61 @@ export const phase16Part2: Lesson[] = [
     title: 'A2A: HTTP for agents, with an opaque lifecycle',
     oneLiner:
       'Google announced A2A in April 2025; by April 2026 it has 150 plus backing organizations. Agent Cards for discovery, tasks with typed artifacts, and a deliberately opaque lifecycle: you see state transitions and results, never how the remote agent got there.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-12.svg',
     diagramCaption:
       'Discovery, task submission, polling or SSE, and a typed artifact returned across an organizational boundary.',
     whyItMatters:
       'Opaque lifecycle is the design constraint, not a footnote. Across an A2A boundary you cannot show a step trace, because the remote agent does not owe you one. All you have is a state, an elapsed time, and eventually a typed artifact, so the surface is a delegation card with a status and an owner, not a reasoning stream. Artifacts being typed is the good news: text, structured JSON, image, audio, and video are first-class, so your renderer switches on artifact type rather than parsing prose. And hours-long tasks are normal here, which means the run has to survive a page reload by task id.',
+    learningObjectives: [
+      'Explain what an Agent Card declares and why discovery is a single GET request rather than a handshake.',
+      'Trace the A2A task lifecycle from submitted to a terminal state and say what the opaque lifecycle deliberately hides.',
+      'Decide when to use A2A versus a direct RPC call, based on latency and organizational boundary, not habit.',
+      'Compare A2A to ACP, ANP, and NLIP well enough to say which one a partner org is likely already running.',
+      'Design a delegation card UI for a task that could run for hours, built only from what the protocol actually gives you.',
+    ],
     sections: [
       {
         heading: 'The problem: every agent pair becomes a custom integration',
         body: 'Your agent needs to call another agent on another system. You expose an HTTP endpoint, define a bespoke JSON schema, and hope the other side speaks it. Do that across five partners and you have five integrations with five failure modes and no shared vocabulary for "the task is still running".\n\nA2A is the universal wire protocol for that call: standard discovery, standard task model, standard transport, standard artifacts. HTTP and REST did this for documents. A2A does it for agents as first-class citizens.',
       },
       {
-        heading: 'The four elements',
-        body: 'Agent Card: a JSON document at /.well-known/agent.json describing the agent, its name, skills, endpoints, supported modalities, and auth requirements. Discovery is reading the card.\n\nTask: the unit of work. Async and stateful, with a lifecycle from submitted to working to completed, failed, or canceled. A client sends a task and then polls or subscribes.\n\nArtifact: the typed result. Text, structured JSON, image, video, audio, all first-class rather than stuffed into a string.\n\nOpaque lifecycle: A2A does not prescribe how the remote agent solves the task. The client sees state transitions and artifacts; the implementation is free to use any framework internally.',
+        heading: 'Agent Card and Task: discovery plus the unit of work',
+        body: 'Agent Card: a JSON document at /.well-known/agent.json describing the agent, its name, skills, endpoints, supported modalities, and auth requirements. Discovery is reading the card, a single GET request before anything else happens.\n\nTask: the unit of work. Async and stateful, with a lifecycle from submitted to working to completed, failed, or canceled. A client sends a task and then polls GET /tasks/{id} or subscribes to /tasks/{id}/events over SSE. A four-minute remote task and a hung one look identical without a state and an elapsed time to show.',
+      },
+      {
+        heading: 'Artifact and opaque lifecycle: what crosses the boundary',
+        body: 'Artifact: the typed result. Text, structured JSON, image, video, audio, all first-class rather than stuffed into a string. A code-review skill can return structured findings as JSON; a video-summarize skill can return an mp4 plus a JSON transcript in the same task.\n\nOpaque lifecycle: A2A does not prescribe how the remote agent solves the task. The client sees state transitions and artifacts; the implementation is free to use any framework internally, LangGraph, CrewAI, or hand-rolled Python. That is deliberate. The boundary is where the abstraction changes from "what tools did it use" to "what task did it accept and what did it return," and the client has no way to ask for more.',
       },
       {
         heading: 'The MCP split, and why you run both',
-        body: 'MCP is vertical: agent to tool, JSON-RPC to a tool server, stateless by default. A2A is horizontal: agent to agent, a peer protocol where both sides are agents with their own reasoning.\n\nProduction multi-agent systems run both, and the division is clean. An A2A peer calls MCP tools on its own side of the boundary. You never see its tool calls, and it never sees yours. That is the point: the boundary is where the abstraction changes from "what tools did it use" to "what task did it accept and what did it return".',
+        body: 'MCP is vertical: agent to tool, JSON-RPC to a tool server, stateless by default. A2A is horizontal: agent to agent, a peer protocol where both sides are agents with their own reasoning.\n\nProduction multi-agent systems run both, and the division is clean. An A2A peer calls MCP tools on its own side of the boundary. You never see its tool calls, and it never sees yours. That is the point: the boundary is where the question changes from "what tools did it use" to "what task did it accept and what did it return".',
       },
       {
         heading: 'Discovery, auth, and adoption',
         body: 'The flow is: fetch the Agent Card, check the skills match, submit a task, then either poll for state or subscribe to SSE at the events endpoint for push updates.\n\nAuth supports three common patterns: bearer token (OAuth2 or opaque), mTLS where both organizations prove identity, and signed requests using HMAC over the payload. Auth is declared in the Agent Card, so clients discover the requirement and comply rather than guessing.\n\nEnterprise adoption drove the scale. By April 2026 the spec sits at a2a-protocol.org with 150 plus backing organizations, and A2A has become the way enterprise agent systems cross trust boundaries. Google Cloud shipped A2A support in Vertex AI Agent Builder, Microsoft Agent Framework supports it, and LangGraph, CrewAI, and AutoGen all ship adapters.',
       },
       {
+        heading: 'Sibling specs: ACP, ANP, and NLIP',
+        body: 'Three related specs share the neighborhood. ACP (IBM, Linux Foundation) came first and is narrower in scope, now merging its trajectory-metadata idea into A2A rather than competing with it. ANP (Agent Network Protocol) is peer-discovery-heavy and decentralized-first, built on W3C DIDs rather than a hosted Agent Card. NLIP (Ecma\'s Natural Language Interaction Protocol, standardized December 2025) defines a natural-language content type rather than a full task model.\n\nA2A is the most adopted peer protocol as of April 2026; arXiv:2505.02279 (Liu et al., "A Survey of Agent Interoperability Protocols") is the paper that lines all four up side by side. Knowing the neighbors matters less than knowing which one your partner org already speaks, since the choice is rarely yours alone.',
+      },
+      {
         heading: 'Where it wins and where it is overhead',
-        body: 'It wins on cross-organization calls, where without it every pair is a bespoke contract. On heterogeneous frameworks, since a LangGraph agent calling a CrewAI agent calling custom Python normalizes through one protocol. On typed artifacts, where a video or structured JSON result does not need encoding into text. And on long-running tasks, because the opaque lifecycle plus polling makes hours-long work straightforward instead of exotic.\n\nIt is overhead for latency-sensitive micro-calls, since the lifecycle is async and sub-millisecond does not fit; use direct RPC. It is overhead for tightly coupled in-process agents, where an HTTP round-trip is absurd. And it is overhead for small internal-only teams, where the spec formality costs more than the interoperability buys. Related specs are worth knowing: ACP (IBM, narrower, the predecessor), ANP (decentralized-first, peer-discovery-heavy), and NLIP (Ecma, standardized December 2025, a natural-language content type). A2A is the most adopted peer protocol as of April 2026; arXiv:2505.02279 surveys the comparison.',
+        body: 'It wins on cross-organization calls, where without it every pair is a bespoke contract. On heterogeneous frameworks, since a LangGraph agent calling a CrewAI agent calling custom Python normalizes through one protocol. On typed artifacts, where a video or structured JSON result does not need encoding into text. And on long-running tasks, because the opaque lifecycle plus polling makes hours-long work straightforward instead of exotic.\n\nIt is overhead for latency-sensitive micro-calls, since the lifecycle is async and sub-millisecond does not fit; use direct RPC. It is overhead for tightly coupled in-process agents, where an HTTP round-trip is absurd. And it is overhead for small internal-only teams, where the spec formality costs more than the interoperability buys.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-12-inline-discovery-flow.svg',
+        alt: 'A2A discovery, submit, poll, artifact',
+        caption: 'Four steps: read the card, submit a task, poll or subscribe, receive a typed artifact.',
+        diagramBrief: 'Sequence diagram, client on left, agent server on right. Four arrows down: 1) GET /.well-known/agent.json, 2) POST /tasks returns task_id and state=submitted, 3) GET /tasks/{id} returns state=working with a percent, 4) GET /tasks/{id} returns state=completed plus an artifact icon (a small labeled box: text / json / video). Style: cream paper, black ink, one accent color on the artifact box.',
+      },
+      {
+        src: '/lessons/p16-12-inline-boundary.svg',
+        alt: 'The MCP to A2A boundary',
+        caption: 'MCP is vertical inside each agent. A2A is horizontal between agents. Neither side sees the other\'s internals.',
+        diagramBrief: 'Two boxes labeled "Agent A" and "Agent B" side by side, connected by a horizontal double-arrow labeled "A2A: task + artifact, opaque lifecycle". Inside each box, a small vertical arrow labeled "MCP: agent to its own tools" pointing down to a row of tool icons. A dashed vertical line between the two boxes representing the org boundary. Style: cream paper, black ink, one accent color on the A2A arrow.',
       },
     ],
     takeaways: [
@@ -345,13 +525,34 @@ export const phase16Part2: Lesson[] = [
       'Hours-long tasks are the normal case here, so the run must survive a reload by task id, not live in component state.',
     ],
     terms: [
-      { term: 'A2A', meaning: 'The agent-to-agent peer protocol: cards for discovery, tasks for work, typed artifacts for results.' },
-      { term: 'Agent Card', meaning: 'JSON at /.well-known/agent.json declaring skills, endpoints, modalities, and auth.' },
-      { term: 'Artifact', meaning: 'A typed task result: text, structured JSON, image, audio, or video as a first-class value.' },
-      { term: 'Opaque lifecycle', meaning: 'The client sees state transitions and results but never how the remote agent solved the task.' },
-      { term: 'mTLS', meaning: 'Mutual TLS auth where both organizations prove identity to each other.' },
-      { term: 'NLIP', meaning: 'Ecma\'s Natural Language Interaction Protocol, standardized December 2025, defining a natural-language content type.' },
+      { term: 'A2A', gloss: '"agent to agent"', meaning: 'The peer protocol for agents to call other agents across systems: cards for discovery, tasks for work, typed artifacts for results.' },
+      { term: 'Agent Card', gloss: '"the agent\'s business card"', meaning: 'JSON at /.well-known/agent.json declaring skills, endpoints, modalities, and auth.' },
+      { term: 'Task', gloss: '"the unit of work"', meaning: 'An async, stateful object with a lifecycle from submitted to a terminal state, artifacts produced on completion.' },
+      { term: 'Artifact', gloss: '"the result"', meaning: 'A typed task result: text, structured JSON, image, audio, or video as a first-class value.' },
+      { term: 'Opaque lifecycle', gloss: '"a black box"', meaning: 'The client sees state transitions and results but never how the remote agent solved the task.' },
+      { term: 'mTLS', gloss: '"mutual auth"', meaning: 'Mutual TLS where both organizations prove identity to each other before a task is accepted.' },
+      { term: 'NLIP', gloss: '"natural-language HTTP"', meaning: 'Ecma\'s Natural Language Interaction Protocol, standardized December 2025, defining a natural-language content type.' },
+      { term: 'Discovery', gloss: '"finding the agent"', meaning: 'A single GET on a well-known path that returns the Agent Card, no handshake required.' },
+      { term: 'Idempotent task creation', gloss: '"no duplicate work"', meaning: 'A retry of the same task submission should produce one task, not two, under network retries.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A remote task has been in state working for four minutes with no elapsed-time display. Name the one field that would tell a user whether it is stuck.' },
+      { level: 'medium', prompt: 'An Agent Card advertises modalities text and structured. Your client needs a video result. Write the one-line error the client should show before submitting the task.' },
+      { level: 'medium', prompt: 'Design an Agent Card auth section for a partner integration that needs mTLS. What does the card need to declare so the client never guesses?' },
+      { level: 'design', prompt: 'Design the delegation card for an hours-long A2A task: task id, elapsed time, declared skill, auth method, expected artifact type. Which of these five does a user actually need to see first?' },
+      { level: 'hard', prompt: 'Two orgs both claim to speak A2A, but one is actually running ACP under the hood. What symptom in the wire format gives it away?' },
+    ],
+    furtherReading: [
+      { label: 'A2A specification', url: 'https://a2a-protocol.org/latest/specification/', why: 'The canonical spec, kept current as the primary reference.' },
+      { label: 'Google Developers Blog, A2A announcement', url: 'https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/', why: 'The April 2025 launch post and the original framing of the protocol\'s scope.' },
+      { label: 'A2A GitHub repository', url: 'https://github.com/a2aproject/A2A', why: 'Reference implementations and SDKs across languages.' },
+      { label: 'Liu et al., A Survey of Agent Interoperability Protocols', url: 'https://arxiv.org/html/2505.02279v1', why: 'The paper comparing MCP, ACP, A2A, and ANP head to head.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'A2A integration checklist',
+      body: '- Does the Agent Card declare a protocol version your client checks?\n- Is task creation idempotent against network retries?\n- Are artifact schemas declared and validated by consumers, not assumed?\n- Is auth (bearer, mTLS, signed requests) declared in the card rather than negotiated ad hoc?\n- Is there a dead-letter path for tasks that fail, so recurring failure types are visible over time?',
+    },
     demoCaption:
       'What a delegated A2A task actually gives you versus what a local agent run gives you. The remote side owes you a state and an artifact and nothing else, so the component that renders it is a delegation card, not a transcript.',
     demo: {
@@ -404,12 +605,19 @@ export const phase16Part2: Lesson[] = [
     title: 'Shared memory: where a hallucination becomes a fact',
     oneLiner:
       'Message pool or blackboard, shared state is the only stateful part of a multi-agent system, so it is where every interesting bug lives. The reference failure is memory poisoning: one agent writes 42 percent when the source said 4.2 percent, and every downstream agent adopts it as verified.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-13.svg',
     diagramCaption:
       'A full message pool where everyone reads everything, beside a topic-subscribed blackboard that routes only relevant writes.',
     whyItMatters:
       'Provenance is a rendering requirement, not a logging nicety. If shared state records who wrote each entry, when, under what prompt, and which source it cited, then a claim in the final answer can carry its origin and a confidence treatment. If it does not, your UI presents a laundered hallucination in the same typography as a verified fact, and the user has no affordance to tell them apart. Poisoning also fails silently: nothing crashes, no test goes red, accuracy just decays, so the surface has to include a flagged state and a retraction path, because "correct" and "corrected" are different states a reader must be able to see.',
+    learningObjectives: [
+      'Explain why memory poisoning fails silently, no crash and no red test, and what that implies for how you monitor it.',
+      'Compare a full message pool to a topic-subscribed blackboard and say which one a 6-agent team versus a 40-agent swarm should use.',
+      'Design a provenance record for a shared-state write that a UI could actually render as a source attribution.',
+      'State the one rule that keeps a read-only verifier from becoming a second point of poisoning.',
+      'Trace the difference between an in-place correction and an append-only supersession, and why only one preserves an audit trail.',
+    ],
     sections: [
       {
         heading: 'The problem: shared facts need somewhere to live',
@@ -425,11 +633,33 @@ export const phase16Part2: Lesson[] = [
       },
       {
         heading: 'Three mitigations that actually work',
-        body: 'Attribute provenance on every write. Every entry records who wrote it, when, under what prompt, and what source the agent cited. Downstream agents read with skepticism keyed to provenance, and your UI gets something to attribute against.\n\nVersion writes and treat them as append-only. A correction is a new entry superseding the old, never an in-place update, so the audit trail survives.\n\nKeep at least one agent that cannot write to shared state. A read-only verifier samples entries, re-fetches sources, and flags inconsistencies. Because it cannot write to the pool, it cannot be poisoned by the pool. The implementation rules matter: it reads the pool, has no write handle to it, independently fetches cited sources, and routes its own output to a human or a separate decision agent, never back into the pool. Skip that last separation and a poisoned pool poisons the verifier, whose verifications then poison everything.',
+        body: 'Attribute provenance on every write. Every entry records who wrote it, when, under what prompt, and what source the agent cited. Downstream agents read with skepticism keyed to provenance, and your UI gets something to attribute against.\n\nVersion writes and treat them as append-only. A correction is a new entry superseding the old, never an in-place update, so the audit trail survives.\n\nKeep at least one agent that cannot write to shared state. A read-only verifier samples entries, re-fetches sources, and flags inconsistencies. Because it cannot write to the pool, it cannot be poisoned by the pool.',
+      },
+      {
+        heading: 'The unwritable verifier, implementation rules',
+        body: 'The read-only verifier is the load-bearing mitigation, and its wiring matters as much as its existence. It reads the pool or the blackboard like anyone else. It has no write handle to shared state, only to a separate verification channel. It independently fetches the sources cited in a write rather than trusting the citation. And its own output routes to a human or to a separate decision agent, never back into the pool it is checking.\n\nSkip that last rule and a poisoned pool poisons the verifier too, whose verifications then poison everything downstream of them. The verifier catching an error is only useful if the error\'s correction cannot itself become a new hallucination laundered through the same channel it was meant to guard.',
       },
       {
         heading: 'Older than LLMs, and the contention patterns to reuse',
-        body: 'The blackboard pattern predates LLM agents by four decades. Hayes-Roth (1985, "A Blackboard Architecture for Control") described specialist Knowledge Sources observing a global blackboard, contributing partial solutions, and triggering other sources. The 2026 version is the same pattern with LLM agents as Knowledge Sources and JSON blobs as partial solutions, which means the old literature already solved write contention, opportunistic control, and consistency.\n\nThree write-contention patterns work. Sequential writer: all writes go through one coordinator, simple and a bottleneck. Optimistic concurrency with versioning: writers fail on version mismatch and retry, the classic database technique. Topic partitioning: different agents own different topics, no cross-topic contention, requires designed boundaries. Most 2026 frameworks default to sequential writer, because LLM calls are slow enough that contention is rare and the bottleneck does not hurt. Beyond topic-scoped projection there is per-agent projection, and LangGraph state reducers are the canonical 2026 implementation: a reducer folds global state into a role-specific slice.',
+        body: 'The blackboard pattern predates LLM agents by four decades. Hayes-Roth (1985, "A Blackboard Architecture for Control") described specialist Knowledge Sources observing a global blackboard, contributing partial solutions, and triggering other sources. The 2026 version is the same pattern with LLM agents as Knowledge Sources and JSON blobs as partial solutions, which means the old literature already solved write contention, opportunistic control, and consistency.\n\nThree contention patterns work today. Sequential writer: all writes go through one coordinator, simple and a bottleneck. Optimistic concurrency with versioning: writers fail on a version mismatch and retry, the classic database technique. Topic partitioning: different agents own different topics, no cross-topic contention, but it requires designed boundaries up front. Most 2026 frameworks default to sequential writer, because LLM calls are slow enough that contention is rare and the bottleneck does not hurt.',
+      },
+      {
+        heading: 'Per-agent projection versus full view',
+        body: 'Beyond a topic-scoped blackboard sits per-agent projection: each agent gets a view customized to its own role rather than a shared topic feed. LangGraph state reducers are the canonical 2026 implementation, a reducer function folds global state into a role-specific slice before the agent ever sees it.\n\nProjection scales further than either full pool or plain blackboard, but it needs a schema up front. Skip the schema and every agent rebuilds an ad-hoc version of the same filtering inside its own prompt, which is exactly the kind of implicit logic that made static graphs painful in the first place. The design tradeoff repeats across this whole lesson: more structure up front buys more scale later, and nothing is free.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-13-inline-topologies.svg',
+        alt: 'Full message pool versus topic-subscribed blackboard',
+        caption: 'A full pool scales to about 10 agents. A blackboard routes by topic and scales further, for a schema cost.',
+        diagramBrief: 'Two-panel diagram. Left panel "Full pool": three agent icons (A, B, C) with arrows both into and out of a single central box labeled "shared pool, everyone reads everything". Right panel "Blackboard": three agent icons publishing into three separate labeled topic lanes (prices, orders, alerts), each lane routing only to the one or two agents subscribed. Style: cream paper, black ink, one accent color on the blackboard\'s topic lanes.',
+      },
+      {
+        src: '/lessons/p16-13-inline-poisoning.svg',
+        alt: 'A hallucinated decimal laundered into fact across five writes',
+        caption: 'No agent crashed. No test failed. A 4.2 percent finding became a 42 percent recommendation.',
+        diagramBrief: 'Five-step vertical sequence. Step 1: agent A writes "42% improvement" (small red flag icon: source actually said 4.2%). Step 2: agent B writes "large 42% gain (source: A)". Step 3: agent C writes "recommend adoption, 42% is transformative". Step 4: final report box quoting 42%. Step 5, shown as an alternate branch: a verifier icon intercepting after step 1, re-fetching the source, appending a correction entry instead of overwriting. Style: cream paper, black ink, red accent on the bad number, green accent on the verifier\'s correction branch.',
       },
     ],
     takeaways: [
@@ -439,13 +669,34 @@ export const phase16Part2: Lesson[] = [
       'The read-only verifier is the load-bearing mitigation, and its output must never re-enter the pool it is checking.',
     ],
     terms: [
-      { term: 'Message pool', meaning: 'Shared state where every agent reads every message; simple and capped around 10 agents.' },
-      { term: 'Blackboard', meaning: 'Topic-subscribed shared state that routes only relevant writes to interested agents.' },
-      { term: 'Memory poisoning', meaning: 'One agent\'s hallucination entering shared state and being adopted as fact downstream.' },
-      { term: 'Provenance', meaning: 'A per-write record of who wrote it, when, under what prompt, and from which source.' },
-      { term: 'Unwritable verifier', meaning: 'A read-only agent that re-fetches cited sources and flags inconsistencies without write access to the pool.' },
-      { term: 'Per-agent projection', meaning: 'Folding global state into a role-specific slice, as LangGraph reducers do.' },
+      { term: 'Message pool', gloss: '"shared chat history"', meaning: 'Shared state where every agent reads every message; simple and capped around 10 agents.' },
+      { term: 'Blackboard', gloss: '"a shared workspace"', meaning: 'Topic-subscribed shared state that routes only relevant writes to interested agents.' },
+      { term: 'Memory poisoning', gloss: '"hallucinations spreading"', meaning: 'One agent\'s hallucination entering shared state and being adopted as fact downstream.' },
+      { term: 'Provenance', gloss: '"who wrote what"', meaning: 'A per-write record of who wrote it, when, under what prompt, and from which source.' },
+      { term: 'Unwritable verifier', gloss: '"an independent auditor"', meaning: 'A read-only agent that re-fetches cited sources and flags inconsistencies without write access to the pool.' },
+      { term: 'Per-agent projection', gloss: '"a scoped view"', meaning: 'Folding global state into a role-specific slice, as LangGraph reducers do.' },
+      { term: 'Append-only', gloss: '"no overwriting"', meaning: 'Corrections are new entries that supersede the old one; the original is never edited in place.' },
+      { term: 'Knowledge Source', gloss: '"a specialist agent"', meaning: 'Hayes-Roth\'s 1985 term for a blackboard participant that contributes partial solutions.' },
+      { term: 'Topic partitioning', gloss: '"lane ownership"', meaning: 'Different agents own different topics so writes never contend across topic boundaries.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A shared pool has 14 agents in it and every agent\'s context keeps filling up. Name the topology that fixes this and the cost it adds.' },
+      { level: 'medium', prompt: 'An agent writes a claim with no provenance attached. Write the three fields a minimal provenance record needs before that claim can be attributed in a UI.' },
+      { level: 'medium', prompt: 'A verifier flags a hallucinated number after two downstream agents already cited it. Design the correction: what gets appended, and what stays visible from the original chain.' },
+      { level: 'design', prompt: 'Sketch how a final report renders a claim that was later flagged and corrected. What visually distinguishes "verified" from "corrected" without a legend the user has to learn?' },
+      { level: 'hard', prompt: 'A verifier\'s own flag gets written back into the same pool it audits. Explain the failure this creates and the one architectural rule that prevents it.' },
+    ],
+    furtherReading: [
+      { label: 'Cemri et al., Why Do Multi-Agent LLM Systems Fail?', url: 'https://arxiv.org/abs/2503.13657', why: 'The MAST taxonomy; memory poisoning sits in its coordination-failure family.' },
+      { label: 'CA-MCP, Context-Aware Multi-Server MCP', url: 'https://arxiv.org/abs/2601.11595', why: 'A production-shaped Shared Context Store built on the blackboard pattern.' },
+      { label: 'LangGraph state and reducers', url: 'https://docs.langchain.com/oss/python/langgraph/workflows-agents', why: 'The per-agent projection pattern as it actually ships.' },
+      { label: 'Anthropic, How we built our multi-agent research system', url: 'https://www.anthropic.com/engineering/multi-agent-research-system', why: 'Provenance and verification notes from a real production deployment.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Shared-memory provenance checklist',
+      body: '- Does every write record writer, timestamp, prompt hash, and cited source?\n- Is the log append-only, with corrections as new entries that reference the superseded one?\n- Is there at least one read-only verifier with independent source access?\n- Does the verifier\'s output route to a human or a separate channel, never back into the pool it checks?\n- Is the ratio of supersession writes to total writes tracked as an early hallucination signal?',
+    },
     demoCaption:
       'The 42 percent that never existed, in five writes. Then the same run with provenance on every entry and a read-only verifier that re-fetches the source. The second run does not prevent the bad write, it makes it visible and retractable.',
     demo: {
@@ -505,12 +756,19 @@ export const phase16Part2: Lesson[] = [
     title: 'Consensus and BFT: agreement is not correctness',
     oneLiner:
       'Classical BFT assumes independent faults, honest honest nodes, and a ground truth. LLM agents violate all three: same base model means correlated hallucinations, so a majority can be confidently, unanimously wrong.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-14.svg',
     diagramCaption:
       'Three attack shapes against a vote: a byzantine lie, a sycophantic copy, and a correlated-error monoculture.',
     whyItMatters:
       'A consensus result is a distribution, and rendering it as a single answer throws away the only trust signal you had. The honest schema is the winning answer plus the vote spread plus the aggregator that produced it, because 5 to 0 and 3 to 2 mean completely different things to a reader. Sub-threshold is a first-class state, not an error: below roughly 0.5 to 0.67 for n of 5 to 7 the correct behavior is escalate to a human, which means a review queue and an explicit "no agreement reached" state. And on ambiguous questions the result is an opinion, so label it as one.',
+    learningObjectives: [
+      'State the three assumptions classical BFT makes and name which one LLM agents violate in each of three attack shapes.',
+      'Distinguish a byzantine lie from sycophantic conformity from correlated-error monoculture, and say which one classical PBFT actually handles.',
+      'Explain why semantic clustering, not string equality, is the one step in a BFT round with no classical precedent.',
+      'Design a vote-result display that shows the spread and the aggregator, not just a winning answer.',
+      'Decide the escalation behavior for a sub-threshold consensus round instead of shipping the weak majority.',
+    ],
     sections: [
       {
         heading: 'The problem: a false majority',
@@ -525,12 +783,34 @@ export const phase16Part2: Lesson[] = [
         body: 'Byzantine lie: one agent outputs a deliberately wrong answer. Classical BFT handles this cleanly if f is under n over 3.\n\nSycophantic conformity: one agent reads others before voting and aligns with whoever spoke last. Not malicious, but it correlates with the loudest voice. BFT does not prevent it because the agent passes every signature check.\n\nCorrelated-error monoculture: three agents share a base model and hallucinate the same wrong answer. The majority is wrong and BFT does not help, because all three honestly agree. This is the failure mode that makes model diversity an architectural requirement rather than a nice-to-have.',
       },
       {
-        heading: 'The 2025 and 2026 responses',
-        body: 'CP-WBFT (arXiv:2511.10400), Confidence-Probed Weighted BFT: each voter attaches a confidence probe, either a self-reported probability or a separate calibration model\'s prediction, and vote weights scale with confidence. Reported plus 85.71 percent BFT improvement on complete graphs. It mitigates sycophancy, because conforming agents tend to have low confidence in the position they borrowed.\n\nDecentLLMs (arXiv:2507.14928): leaderless. Worker agents propose in parallel, evaluator agents score the proposals, and the final answer is the geometric median of scored positions. Robust when f is under n over 2. It mitigates byzantine lies and correlated errors, because a geometric median is robust to outliers and pulls toward the dense cluster rather than the model-biased average.\n\nWBFT (arXiv:2505.05103): weighted voting plus Hierarchical Structure Clustering. Weights come from response quality plus a trust score learned from history, and agents split into Core and Edge, where Core must reach consensus first and Edge follows. That buys scalability (Core consensus is small and fast) and partially addresses monoculture, since Core can be chosen for diversity.',
+        heading: 'CP-WBFT and DecentLLMs: confidence and geometric medians',
+        body: 'CP-WBFT (arXiv:2511.10400), Confidence-Probed Weighted BFT, has each voter attach a confidence probe, either a self-reported probability or a separate calibration model\'s prediction, and vote weights scale with that confidence. Reported plus 85.71 percent BFT improvement on complete graphs. It mitigates sycophancy specifically, because an agent that conformed to someone else\'s position tends to report low confidence in it.\n\nDecentLLMs (arXiv:2507.14928) drops the leader entirely. Worker agents propose in parallel, evaluator agents score the proposals, and the final answer is the geometric median of scored positions, robust when f is under n over 2. A geometric median is robust to outliers and pulls toward the dense cluster rather than the model-biased average, which is exactly what catches both byzantine lies and correlated errors.',
       },
       {
-        heading: 'The uncomfortable empirical result',
-        body: '"Can AI Agents Agree?" (arXiv:2603.01213) measures scalar agreement across frontier models. With no adversaries at all, LLM agents disagree on scalar questions at rates above 30 percent on many benchmarks. A single agent adopting a deceptive persona can pull Mixture-of-Agents consensus 40 plus percentage points off the honest baseline. And disagreement rates correlate with model diversity: heterogeneous ensembles disagree more, which is good because errors are uncorrelated, and drift more slowly, which is bad because time-to-agreement grows.\n\nBFT gives you machinery to align outputs. It does not tell you whether the aligned output is right. Two implementation notes carry weight. Semantic clustering is the LLM-specific twist: "the study reports 4.2 percent" and "4.2 percent improvement" are one cluster, and string equality misses that, so use a cheap embedding model or explicit canonicalization. And threshold tuning is real: empirically 0.5 to 0.67 for n of 5 to 7, higher for smaller n, with sub-threshold escalating to a human or a different ensemble. Consensus does not help on ambiguous questions (it is an opinion, call it that), on compound questions (vote each part separately), or across many adversarial rounds, where agents observing prior rounds start agreeing regardless of truth. Bound rounds to 2 or 3.',
+        heading: 'WBFT: Core and Edge',
+        body: 'WBFT (arXiv:2505.05103) combines weighted voting with Hierarchical Structure Clustering. Weights come from response quality plus a trust score learned from history, and agents split into Core and Edge: Core must reach consensus first, Edge follows Core\'s lead.\n\nThat split buys two things. Scalability, because Core consensus runs over a small group and stays fast even as Edge grows to dozens of agents. And a partial answer to monoculture, since Core can be deliberately chosen for model diversity even if Edge is not. None of the three 2025-2026 responses solves every attack: CP-WBFT targets sycophancy, DecentLLMs targets byzantine lies and correlated errors, WBFT targets scale and partial monoculture. Picking one means picking which attack you are betting against.',
+      },
+      {
+        heading: 'A minimal BFT round, stripped down',
+        body: 'Stripped to its core, a BFT round for LLM agents runs six steps. Each agent produces an answer and attaches a confidence probe between 0 and 1. An aggregator collects every answer-confidence pair and groups them by semantic cluster, not string equality, since "the study reports 4.2 percent" and "4.2 percent improvement" are the same claim in different words. It sums confidence within each cluster, and the cluster with the highest weight wins if that weight clears a threshold; otherwise the round escalates rather than forcing a decision. Minority clusters get logged with their provenance rather than discarded, because a minority cluster today is the early-warning signal for a correlated failure tomorrow. Semantic clustering is the one step with no classical-BFT equivalent, and skipping it is the most common implementation mistake.',
+      },
+      {
+        heading: 'The uncomfortable empirical result, and where consensus does not help',
+        body: '"Can AI Agents Agree?" (arXiv:2603.01213) measures scalar agreement across frontier models. With no adversaries at all, LLM agents disagree on scalar questions at rates above 30 percent on many benchmarks. A single agent adopting a deceptive persona can pull Mixture-of-Agents consensus 40 plus percentage points off the honest baseline. Disagreement rates also correlate with model diversity: heterogeneous ensembles disagree more, which is good because errors are uncorrelated, and drift more slowly toward agreement, which is bad because time-to-agreement grows.\n\nConsensus does not help everywhere. On ambiguous questions the result is an opinion, so label it as one. On compound questions, vote each part separately rather than one blended score. Across many adversarial rounds, agents that observe prior rounds start agreeing regardless of truth, so bound rounds to two or three. BFT gives you machinery to align outputs. It does not tell you whether the aligned output is right.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-14-inline-attacks.svg',
+        alt: 'Three attack shapes against a vote',
+        caption: 'A byzantine lie, a sycophantic copy, and a correlated-error monoculture look identical in a plain vote count.',
+        diagramBrief: 'Three small panels side by side, each showing 5 agent icons voting. Panel 1 "Byzantine lie": 4 icons green (correct), 1 icon red with a small mask icon (lying). Panel 2 "Sycophantic conformity": first icon green, next 3 icons shown copying with a dotted arrow chain from icon 1 to icons 2-4, one icon independent. Panel 3 "Correlated-error monoculture": 3 icons sharing one small "model A" tag, all wrong the same way, 2 icons independent and correct. Style: cream paper, black ink, red accent on the wrong votes in each panel.',
+      },
+      {
+        src: '/lessons/p16-14-inline-vote-spread.svg',
+        alt: 'A vote result rendered as a distribution, not a single answer',
+        caption: '5-0 and 3-2 are different claims. Collapsing them into one string destroys the only trust signal you had.',
+        diagramBrief: 'A horizontal bar split into segments showing vote weight per cluster (for example 60 percent one answer, 40 percent another), labeled with the aggregator name below (CP-WBFT or DecentLLMs) and a small threshold marker line at 0.5 to 0.67. Below it, a second bar showing a below-threshold case routed to an "escalate to human review" icon instead of a winner. Style: cream paper, black ink, one accent color marking the threshold line.',
       },
     ],
     takeaways: [
@@ -540,13 +820,35 @@ export const phase16Part2: Lesson[] = [
       'Semantic clustering before counting, because "4.2 percent improvement" and "the study reports 4.2 percent" are the same vote.',
     ],
     terms: [
-      { term: 'PBFT', meaning: 'Castro and Liskov (1999), the classical protocol tolerating fewer than n/3 Byzantine nodes.' },
-      { term: 'Correlated-error monoculture', meaning: 'Agents on the same base model sharing a hallucination, producing a wrong unanimous majority.' },
-      { term: 'Sycophantic conformity', meaning: 'An agent aligning with whoever spoke last rather than reasoning independently.' },
-      { term: 'CP-WBFT', meaning: 'Confidence-probed weighted BFT, scaling each vote by a self-reported or calibrated confidence.' },
-      { term: 'DecentLLMs', meaning: 'Leaderless consensus using parallel proposals, evaluator scoring, and geometric-median aggregation.' },
-      { term: 'Semantic clustering', meaning: 'Grouping answers by meaning rather than string equality before counting votes.' },
+      { term: 'PBFT', gloss: '"the classic protocol"', meaning: 'Castro and Liskov (1999), tolerating fewer than n over 3 Byzantine nodes across three message phases.' },
+      { term: 'Byzantine lie', gloss: '"a deliberate lie"', meaning: 'One agent outputting a deliberately wrong answer; classical BFT handles this cleanly if f is under n over 3.' },
+      { term: 'Sycophantic conformity', gloss: '"agreeing with the loud voice"', meaning: 'An agent aligning with whoever spoke last rather than reasoning independently, invisible to signature checks.' },
+      { term: 'Correlated-error monoculture', gloss: '"same model, same mistake"', meaning: 'Agents on the same base model sharing a hallucination, producing a wrong unanimous majority.' },
+      { term: 'CP-WBFT', gloss: '"confidence-weighted voting"', meaning: 'Confidence-probed weighted BFT, scaling each vote by a self-reported or calibrated confidence.' },
+      { term: 'DecentLLMs', gloss: '"leaderless consensus"', meaning: 'Parallel proposals scored by evaluator agents, aggregated by geometric median.' },
+      { term: 'Geometric median', gloss: '"a robust average"', meaning: 'The point minimizing total distance to all sample points; resists outliers in a way a mean does not.' },
+      { term: 'Core/Edge', gloss: '"tiered voting"', meaning: 'WBFT\'s split where a small Core reaches consensus first and a larger Edge group follows.' },
+      { term: 'Semantic clustering', gloss: '"same answer, different words"', meaning: 'Grouping votes by meaning, via embeddings or canonicalization, rather than by exact string match.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Five agents vote and three share one base model, all wrong the same way. Compute the plurality result and say why it is wrong despite a clean majority.' },
+      { level: 'medium', prompt: 'Two answers, "4.2 percent improvement" and "the study reports 4.2 percent," are counted as different votes by a naive aggregator. Fix the counting logic in one sentence.' },
+      { level: 'medium', prompt: 'A consensus round lands at weight 0.55 against a threshold of 0.6. Write the one-line product copy for the state the user sees instead of a winning answer.' },
+      { level: 'design', prompt: 'Design the vote-result card for a consensus decision: which three pieces of information does a reader need to trust a 3-2 result more than a bare answer?' },
+      { level: 'hard', prompt: 'An ensemble is diversified to reduce monoculture risk, and it now takes twice as many rounds to reach threshold. Decide whether that tradeoff is worth it and justify the call.' },
+    ],
+    furtherReading: [
+      { label: 'Castro and Liskov, Practical Byzantine Fault Tolerance (OSDI 1999)', url: 'https://pmg.csail.mit.edu/papers/osdi99.pdf', why: 'The foundation every LLM-specific consensus scheme still builds on.' },
+      { label: 'CP-WBFT, Confidence-Probed Weighted BFT', url: 'https://arxiv.org/abs/2511.10400', why: 'The vote-weighting scheme that targets sycophantic conformity specifically.' },
+      { label: 'DecentLLMs', url: 'https://arxiv.org/abs/2507.14928', why: 'Leaderless consensus via geometric-median aggregation over scored proposals.' },
+      { label: 'WBFT, Weighted BFT with Hierarchical Structure Clustering', url: 'https://arxiv.org/abs/2505.05103', why: 'The Core/Edge split that trades some monoculture resistance for scale.' },
+      { label: 'Can AI Agents Agree?', url: 'https://arxiv.org/abs/2603.01213', why: 'The empirical measurement of scalar-agreement fragility and the deceptive-persona attack.' },
+    ],
+    shipIt: {
+      kind: 'rubric',
+      name: 'Consensus result rubric',
+      body: '- Does the UI show the winning answer plus the vote spread plus which aggregator produced it?\n- Is sub-threshold treated as a first-class state (escalate to human review), not silently rounded up?\n- Are minority clusters logged with provenance, not discarded?\n- Is semantic clustering in place before counting, not string equality?\n- Are rounds bounded (2-3) to avoid rewarding sycophancy in multi-round settings?\n- Is the ensemble diversified across base models, not just prompted differently?',
+    },
     demoCaption:
       'Five voters, three of them on the same base model, all wrong the same way. Plurality returns the wrong answer with a clean 3 to 2. The geometric median pulls toward the honest cluster because it is robust to the correlated block.',
     demo: {

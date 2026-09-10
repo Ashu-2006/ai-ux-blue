@@ -10,29 +10,58 @@ export const phase16Part1: Lesson[] = [
     title: 'The single-agent ceiling: three failures, not one',
     oneLiner:
       'One agent stops working for three separate reasons: the context window saturates, the system prompt tries to be four people, and everything runs serially. Each reason has a different fix, and only one of them is "add more agents".',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     whyItMatters:
       'The moment you go from one agent to three, your run surface changes shape. One agent is one transcript, so a single streaming pane covers it. Three agents are three concurrent transcripts with three independent states, and the user now needs to know who is working, who is blocked, and what the whole run is waiting on. That is a per-agent status row plus a roll-up state, not a bigger spinner. It also changes the failure story: every agent boundary is a lossy compression step, so "the coder ignored the research" is now a legible bug you have to render, not a mystery.',
+    learningObjectives: [
+      'Diagnose which of three single-agent failures (context saturation, role confusion, sequential bottleneck) a stalled run is hitting.',
+      'Apply the under-20-tool-calls, under-100k-tokens rule to decide whether a task needs one agent or many.',
+      'Compare the five points on the multi-agent spectrum (single, subagents, pipeline, team, swarm) and name a production system at each.',
+      'Choose one of the four wiring patterns (pipeline, fan-out/fan-in, orchestrator-worker, peer swarm) for a given task shape.',
+      'Design the run-status UI a three-agent job needs: per-agent state rows plus one roll-up.',
+    ],
     sections: [
       {
         heading: 'The problem: the agent does not get dumber, the task gets wider',
-        body: 'Point a working single agent at a real codebase: 200 files, three languages, tests that need infrastructure, and external API docs to read first. It chokes. The model did not degrade. The task exceeded what one loop holds.\n\nBy turn 30 the window carries 150k tokens of file contents, command output, and its own prior reasoning. Details from turn 5 are gone. Reading 50 files blows past 200k tokens outright. This is a capacity wall, and no prompt engineering moves it.',
+        body: 'Point a working single agent at a real codebase: 200 files, three languages, tests that need infrastructure, and external API docs to read first. It chokes. The model did not degrade. The task exceeded what one loop holds.\n\nBy turn 30 the window carries 150k tokens of file contents, command output, and its own prior reasoning. Details from turn 5 are gone. Reading 50 files blows past 200k tokens outright. This is a capacity wall, and no prompt engineering moves it.\n\nThe failure looks like a model problem from the outside: slower answers, missed constraints, code that contradicts a requirement stated three tool calls ago. It is a plumbing problem. One window cannot hold research notes, file contents, test output, and review feedback at once and reason well over all of it.',
       },
       {
         heading: 'Three failures wearing one coat',
-        body: 'Context saturation: tool results pile up until the early turns are effectively deleted. Role confusion: a system prompt that says "you are a researcher, coder, reviewer, and tester" produces an agent that half-researches, half-codes, and never finishes reviewing. Sequential bottleneck: it reads file A, then B, then C, three serial calls where three parallel ones would do.\n\nThey look like one symptom (the agent is bad at this) and they have three different fixes: split the context, split the prompt, or fan out. Knowing which one you have decides the architecture.',
+        body: 'Context saturation: tool results pile up until the early turns are effectively deleted, and by turn 30 the model is reasoning over a window that no longer contains the constraint it agreed to at turn 5. Role confusion: a system prompt that says "you are a researcher, coder, reviewer, and tester" produces an agent that half-researches, half-codes, and never finishes reviewing, because one prompt cannot hold four different quality bars at once. Sequential bottleneck: it reads file A, then B, then C, three serial calls at several seconds each, where three parallel calls would return in the time of one.\n\nThey look like one symptom, "the agent is bad at this", and they have three different fixes: split the context, split the prompt, or fan out. Knowing which one you have decides the architecture, and guessing wrong means you add agents to a problem that was never about agent count.',
       },
       {
         heading: 'The spectrum, not the switch',
-        body: 'Multi-agent is not binary. Single agent: one loop, one prompt. Subagents: a parent spawns children for scoped subtasks and keeps its own context clean, which is what Claude Code does with Task. Pipeline: A\'s output is B\'s input, good for research to code to review to test. Team: parallel agents on a shared message bus with an orchestrator. Swarm: many near-identical agents pulling work off a queue, no fixed orchestrator.\n\nProduction systems sit at specific points on this line. Devin runs a planner, a coder, and a browser agent with separate contexts. ChatGPT Deep Research fans out parallel search agents and synthesizes. Top SWE-bench systems use a researcher, a planner, and a coder; single-agent entries score lower.',
+        body: 'Multi-agent is not binary. Single agent: one loop, one prompt. Subagents: a parent spawns children for scoped subtasks and keeps its own context clean, which is what Claude Code does with its Task tool. Pipeline: agent A\'s output is agent B\'s input, good for research to code to review to test. Team: parallel agents on a shared message bus with an orchestrator. Swarm: many near-identical agents pulling work off a queue, no fixed orchestrator, scaling to hundreds of workers where a supervisor would become the bottleneck.\n\nProduction systems sit at specific points on this line, not at the extremes. Devin runs a planner, a coder, and a browser agent with separate contexts. Top SWE-bench systems use a researcher, a planner, and a coder in a pipeline; single-agent entries score lower on the same benchmark. The position on the spectrum is a decision, not a default.',
+      },
+      {
+        heading: 'Real systems, one line each',
+        body: 'Four production systems make the spectrum concrete. Claude Code spawns a child agent with the Task tool for a scoped subtask; the parent\'s context stays clean and the child returns a summary, not its full transcript. Devin runs three separate contexts: a planner that breaks work into steps, a coder that writes it, and a browser agent that reads documentation, so a slow doc lookup never pollutes the coder\'s window.\n\nTop-performing entries on SWE-bench chain a researcher that reads the codebase, a planner that designs the fix, and a coder that implements it; single-agent entries on the same leaderboard score measurably lower. ChatGPT Deep Research spawns several search agents in parallel, each exploring one angle of a question, then synthesizes their findings into one answer. None of these four systems debate the choice in the abstract. Each picked a point on the spectrum because a specific single-agent failure showed up first.',
       },
       {
         heading: 'The four patterns you will actually wire',
-        body: 'Pipeline: staged transformation, simple to reason about, one broken stage blocks everything downstream. Fan-out and fan-in: split independent subtasks, merge results, good when the work genuinely decomposes. Orchestrator-worker: a smart lead decides, delegates, and synthesizes, and the lead is itself an agent with spawn tools. Peer swarm: no center, decisions emerge from interaction, scales to many agents and is the hardest to debug.\n\nPick by the shape of the task, not by the framework you already installed. Ordering requirement points at pipeline. Independence points at fan-out. Unknown decomposition points at orchestrator.',
+        body: 'Pipeline: staged transformation, simple to reason about, one broken stage blocks everything downstream. Fan-out and fan-in: split independent subtasks, merge results, good when the work genuinely decomposes. Orchestrator-worker: a smart lead decides, delegates, and synthesizes, and the lead is itself an agent with spawn tools. Peer swarm: no center, decisions emerge from interaction, scales to many agents and is the hardest to debug, because there is no single place a bug report can point to.\n\nPick by the shape of the task, not by the framework you already installed. Ordering requirement points at pipeline. Independence points at fan-out. Unknown decomposition points at orchestrator. Reach for peer swarm only once the other three have been ruled out.',
       },
       {
         heading: 'The cost you are actually paying',
         body: 'Every agent boundary is a lossy compression step: agent A\'s full context becomes one summary message for agent B. Coordination logic is its own bug surface. Latency floors at N serial calls and rises if agents talk back and forth. Cost multiplies because each agent burns tokens independently.\n\nThe rule of thumb from the source is blunt and worth keeping: if a task takes fewer than 20 tool calls and fits in 100k tokens, stay single-agent. Debugging goes from reading one conversation to tracing messages across five, and that shift lands on you twice, once in the code and once in the UI you have to build so anyone else can read the run.',
+      },
+      {
+        heading: 'When to stay single-agent, and what it costs when you do not',
+        body: 'The rule of thumb is specific for a reason: under 20 tool calls and under 100k tokens of working data, one agent is faster and cheaper than any split you could design. Multi-agent systems run roughly 15 times the tokens of a single agent doing comparable work, because every agent pays its own prompt and context cost independently, not a shared one.\n\nThat number is not a warning against multi-agent, it is a budget line. A task worth 15 times the tokens is a task where the quality gain or the parallel speedup pays for itself: research questions, large migrations, anything with genuine independent sub-work. A task that does not clear that bar and gets split anyway pays the multiplier for no return: more latency from coordination overhead, more surface area for a message to get lost, and a debugging session that now starts with "which of the five agents said this."',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-01-inline-context.svg',
+        alt: 'Context window fill over 30 turns, one agent versus three',
+        caption: 'At turn 30 the single agent carries 150k tokens across four jobs. Three specialists each hold one clean window scoped to one artifact.',
+        diagramBrief: 'Two stacked horizontal bar charts on cream paper (#faf6ef), black ink, one accent color. Top bar: "Single agent, turn 30" filled to 150k/200k tokens, labeled with four overlapping bands (research, code, review, test) shown as different-shaded stripes inside the same bar to show mixing. Bottom: three short bars labeled Researcher, Coder, Reviewer, each filled to a small, clean, single-shade fraction of the same 200k scale. A caption strip under each bar set shows the token count.',
+      },
+      {
+        src: '/lessons/p16-01-inline-spectrum.svg',
+        alt: 'Five points on the multi-agent spectrum',
+        caption: 'Single agent, subagents, pipeline, team, and swarm are five points on one line, not five separate technologies.',
+        diagramBrief: 'A single horizontal line on cream paper from left (labeled SIMPLE) to right (labeled COMPLEX) with five labeled nodes: Single Agent (one box), Subagents (one box with a smaller child box beneath it), Pipeline (three boxes in a row connected by arrows), Team (three boxes around a small bus line with an orchestrator box above), Swarm (four small identical boxes around a shared queue cylinder, no orchestrator box). Monochrome ink, one accent color highlighting the orchestrator boxes only, since orchestrator presence is the one property that changes left to right.',
       },
     ],
     takeaways: [
@@ -42,13 +71,35 @@ export const phase16Part1: Lesson[] = [
       'Three agents means three concurrent states, so the run surface is per-agent status rows plus one roll-up, not a larger spinner.',
     ],
     terms: [
-      { term: 'Single-agent ceiling', meaning: 'The point where one loop, one window, and one prompt stop covering the task.' },
-      { term: 'Context saturation', meaning: 'Tool results filling the window until early turns are effectively lost.' },
-      { term: 'Role confusion', meaning: 'One system prompt naming several jobs, producing an agent that does all of them shallowly.' },
-      { term: 'Subagent', meaning: 'A child agent spawned for a scoped subtask that reports a summary back to its parent.' },
-      { term: 'Fan-out / fan-in', meaning: 'Splitting independent subtasks across parallel agents, then merging their results.' },
-      { term: 'Lossy boundary', meaning: 'The compression that happens when one agent\'s full context becomes a single message for the next.' },
+      { term: 'Single-agent ceiling', gloss: 'the model just is not good enough', meaning: 'The point where one loop, one window, and one prompt stop covering the task.' },
+      { term: 'Context saturation', gloss: 'the agent forgot', meaning: 'Tool results filling the window until early turns are effectively lost.' },
+      { term: 'Role confusion', gloss: 'the agent got confused', meaning: 'One system prompt naming several jobs, producing an agent that does all of them shallowly.' },
+      { term: 'Subagent', gloss: 'a helper agent', meaning: 'A child agent spawned for a scoped subtask that reports a summary back to its parent.' },
+      { term: 'Fan-out / fan-in', gloss: 'map-reduce for agents', meaning: 'Splitting independent subtasks across parallel agents, then merging their results.' },
+      { term: 'Lossy boundary', gloss: 'information gets lost between agents', meaning: 'The compression that happens when one agent\'s full context becomes a single message for the next.' },
+      { term: 'Swarm', gloss: 'a hive mind of AI agents', meaning: 'A set of peer agents with shared state and no fixed leader; behavior emerges from local interactions.' },
+      { term: 'Orchestrator', gloss: 'the boss agent', meaning: 'An agent whose tools include spawning and managing other agents. It plans and delegates but may not do the actual work.' },
+      { term: 'Coordinator', gloss: 'the traffic cop', meaning: 'A non-agent component, often just code, that routes messages between agents based on rules.' },
+      { term: 'Message passing', gloss: 'agents talk to each other', meaning: 'Structured data sent from one agent to another, replacing a shared context window.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A task needs 15 tool calls and 60k tokens of working data. Single agent or split? Justify with the rule of thumb.' },
+      { level: 'medium', prompt: 'Take the overloaded single-agent prompt ("you are a researcher, coder, reviewer, and tester") and split it into three specialist prompts. What does each one lose access to that it used to have?' },
+      { level: 'medium', prompt: 'A pipeline goes research to code to review. Convert the review step into a fan-out: run a security reviewer and a style reviewer in parallel, then merge. What do you do if they disagree?' },
+      { level: 'design', prompt: 'Sketch the run-status surface for a four-agent job (researcher, coder, reviewer, tester). What does the roll-up state show when one agent is blocked and the others are idle waiting on it?' },
+      { level: 'hard', prompt: 'Devin uses a planner, a coder, and a browser agent with separate contexts. Diagram the handoff messages between all three for a task that fails the first review and needs a second pass.' },
+    ],
+    furtherReading: [
+      { label: 'Kapoor et al., The Landscape of Emerging AI Agent Architectures (arXiv:2409.02977)', url: 'https://arxiv.org/abs/2409.02977', why: 'A survey of the pipeline, fan-out, orchestrator, and swarm patterns this lesson names.' },
+      { label: 'Wu et al., AutoGen: Enabling Next-Gen LLM Applications (arXiv:2308.08155)', url: 'https://arxiv.org/abs/2308.08155', why: 'Microsoft\'s original multi-agent conversation framework, the 2023 starting point for this design space.' },
+      { label: 'Claude Code subagents documentation', url: 'https://docs.anthropic.com/en/docs/claude-code', why: 'How the Task tool spawns a child agent with a clean context and returns a summary.' },
+      { label: 'CrewAI documentation', url: 'https://docs.crewai.com/', why: 'The role-based framework referenced throughout this phase for its Agent(role, goal, backstory) surface.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Single-agent vs multi-agent decision checklist',
+      body: '- Does the task fit under 100k tokens of working data end to end?\n- Does it take fewer than 20 tool calls to finish?\n- Does every stage need the same system prompt, or does one stage need a different quality bar?\n- Does any part of the work not depend on another part finishing first?\n- If you split it: what is the one summary message that crosses each agent boundary, and what does it drop?\n- What per-agent status row and roll-up state does the UI need before you write the first prompt?',
+    },
     demoCaption:
       'Same four-stage job, one agent versus three specialists. Watch what the context window holds at the review step. The single agent is reviewing code while still carrying 50k tokens of documentation it read an hour ago.',
     demo: {
@@ -108,20 +159,35 @@ export const phase16Part1: Lesson[] = [
     title: 'Four primitives read every framework in one paragraph',
     oneLiner:
       'Agent, handoff, shared state, orchestrator. That is the whole design space. AutoGen, LangGraph, CrewAI, the OpenAI Agents SDK, and Microsoft Agent Framework are just different defaults on those four axes.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-04.svg',
     diagramCaption:
       'The four primitives and the axis each one sets: agent, handoff, shared state, orchestrator.',
     whyItMatters:
       'Three of the four primitives are stateless, which tells you exactly where your UI\'s truth lives. Agents are pure functions of prompt and tools. Handoffs are function calls. Orchestrators are schedulers. Shared state is the only thing that persists, so it is the only thing you can render, diff, replay, or attribute a claim to. That makes the orchestrator axis a product decision, not a framework preference: LLM-routed means the next step is unpredictable, so you need a live "deciding who is next" state and a route trace. Pinned in code means you can render the graph up front and show progress against it.',
+    learningObjectives: [
+      'Name the four primitives, agent, handoff, shared state, orchestrator, that every multi-agent framework parameterizes.',
+      'Map any framework (AutoGen, LangGraph, CrewAI, Agents SDK, Agent Framework) onto the four axes in one paragraph.',
+      'Explain why shared state is the only stateful primitive and what bug classes live there.',
+      'Distinguish full-history shared state from projected, role-scoped state and their scaling tradeoffs.',
+      'Decide, given an orchestrator\'s routing method, whether a run\'s path can be drawn before it starts.',
+    ],
     sections: [
       {
         heading: 'The problem: a new framework every six months',
-        body: 'AutoGen in 2023. CrewAI in 2024. LangGraph and OpenAI Swarm in 2024. Google ADK in April 2025. Microsoft Agent Framework hit RC in February 2026. Every release claims to be the right abstraction.\n\nLearning them one at a time burns you out, partly because the vocabulary is deliberately different. One framework calls its shared memory a blackboard, another a message pool, a third a StateGraph. It reads like churn. It is not. Underneath the naming, four primitives have been stable the whole time.',
+        body: 'AutoGen in 2023. CrewAI in 2024. LangGraph and OpenAI Swarm in 2024. Google ADK in April 2025. Microsoft Agent Framework hit RC in February 2026. Every release claims to be the right abstraction.\n\nLearning them one at a time burns you out, partly because the vocabulary is deliberately different. One framework calls its shared memory a blackboard, another a message pool, a third a StateGraph. It reads like churn. It is not. Underneath the naming, four primitives have been stable the whole time. The result is a stack of "getting started" tutorials nobody finishes, each teaching the same four ideas under a new name.',
       },
       {
         heading: 'The four',
         body: 'Agent: a system prompt plus a tool list. Stateless, so every run starts from the prompt and the current message history. Two agents with the same prompt and tools are interchangeable.\n\nHandoff: a structured transfer of control. Mechanically either a tool call that returns a new agent or a graph edge that follows a condition.\n\nShared state: any structure more than one agent can read, and sometimes write. Message pool, blackboard, key-value store, vector memory.\n\nOrchestrator: whoever decides who speaks next. An explicit graph, an LLM speaker-selector, the last speaker\'s handoff call, or a scheduler over a queue.',
+      },
+      {
+        heading: 'Anatomy: agent and handoff',
+        body: 'Written out, an agent is a triple: system prompt, tool list, model, plus an optional name. No memory, no state. Two agents that share a system prompt and tools are interchangeable, which is why swapping one model for another inside the same role rarely breaks the pipeline; everything that looks like per-agent memory is actually sitting in shared state or in the handoff payload.\n\nA handoff is a (from agent, to agent, reason, payload) tuple, and three implementations cover nearly every framework. Function return: the tool call itself returns the next agent, OpenAI Swarm\'s pattern, so routing lives inside the tool schema. Graph edge: LangGraph declares edges up front and a condition selects which one fires. Speaker selection: AutoGen\'s GroupChat runs a selector function, sometimes itself an LLM call, that reads the message pool and names who speaks next.',
+      },
+      {
+        heading: 'Anatomy: shared state and the four orchestrator flavors',
+        body: 'Shared state, at minimum, is a list of messages. Production systems add more: CrewAI\'s structured Task outputs, LangGraph\'s typed reducers, an external memory layer over MCP or a vector database. Two topologies matter. A full pool gives every agent every message, simple to reason about and scales badly past a handful of agents. A projected pool gives each agent a role-scoped view, which scales but costs you upfront schema design.\n\nOrchestrators split into four flavors. Static: the graph is fixed at build time, LangGraph\'s deterministic mode and CrewAI\'s Sequential process. LLM-selected: an LLM reads the pool and names the next speaker, AutoGen and CrewAI Hierarchical. Handoff-driven: the current agent decides by calling a handoff tool, OpenAI Swarm. Queue-driven: workers pull from a shared queue with no explicit next-speaker at all, the swarm architectures covered later in this phase.',
       },
       {
         heading: 'The mapping table is short on purpose',
@@ -136,6 +202,20 @@ export const phase16Part1: Lesson[] = [
         body: 'Does the orchestrator trust the LLM to route (Swarm) or pin routing in code (LangGraph)? Is shared state full-history (GroupChat) or projected (a StateGraph reducer)? Can agents modify each other\'s prompts (a CrewAI manager) or only hand off (Swarm)?\n\nThose three answer roughly 80 percent of the fit question. Everything else, memory strategy, human-in-the-loop approval on a handoff, per-agent token budgets, tracing for replay, is implementable on top of the primitives. None of it is a new primitive, which is why a new release rarely changes your design.',
       },
     ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-04-inline-primitives.svg',
+        alt: 'The four primitives as one small diagram each',
+        caption: 'Agent, handoff, shared state, and orchestrator: three of the four are stateless functions, one is the only thing that persists.',
+        diagramBrief: 'Four-panel grid on cream paper, one primitive per panel. Panel 1 Agent: a box labeled prompt+tools+model with a small "stateless" tag. Panel 2 Handoff: an arrow from box A to box B labeled with the three mechanisms as small sub-labels (function return / graph edge / speaker select). Panel 3 Shared state: a cylinder icon, the only panel with a filled accent color to show it is the one stateful primitive. Panel 4 Orchestrator: a small decision-diamond feeding into the other three panels. Monochrome ink, one accent color reserved for the shared-state cylinder.',
+      },
+      {
+        src: '/lessons/p16-04-inline-mapping.svg',
+        alt: 'Six frameworks mapped onto the same four columns',
+        caption: 'OpenAI Swarm, AutoGen, CrewAI, LangGraph, Microsoft Agent Framework, and Google ADK read as six rows of the same four-column table.',
+        diagramBrief: 'A rendered table diagram, six rows (one per framework name) by four columns (Agent / Handoff / Shared state / Orchestrator), each cell holding one short phrase pulled from the lesson\'s mapping table. Style: cream paper background, thin black rules, no color besides one accent line under the header row.',
+      },
+    ],
     takeaways: [
       'Four primitives, four axes: agent, handoff, shared state, orchestrator. Read any new framework by naming its default on each.',
       'Shared state is the only stateful primitive, so it is the only surface you can render, diff, replay, or attribute a claim to.',
@@ -143,13 +223,35 @@ export const phase16Part1: Lesson[] = [
       'Three questions (who routes, full or projected state, can prompts be edited) settle most framework choices without a bake-off.',
     ],
     terms: [
-      { term: 'Agent', meaning: 'A system prompt plus a tool list, stateless between runs.' },
-      { term: 'Handoff', meaning: 'A structured transfer of control, either a tool returning an agent or a conditional graph edge.' },
-      { term: 'Shared state', meaning: 'Any structure multiple agents can read, and the only stateful part of the system.' },
-      { term: 'Orchestrator', meaning: 'Whatever decides who speaks next: a graph, an LLM selector, a handoff call, or a queue scheduler.' },
-      { term: 'Projected state', meaning: 'A role-scoped view of shared state rather than the full history.' },
-      { term: 'StateGraph reducer', meaning: 'LangGraph\'s function that folds global state into a node-specific slice.' },
+      { term: 'Agent', gloss: 'an LLM with tools', meaning: 'A (system prompt, tools, model) triple, stateless between runs.' },
+      { term: 'Handoff', gloss: 'transfer of control', meaning: 'A structured transfer of control, either a tool returning an agent or a conditional graph edge.' },
+      { term: 'Shared state', gloss: 'memory, or context', meaning: 'Any structure multiple agents can read, and the only stateful part of the system.' },
+      { term: 'Orchestrator', gloss: 'the coordinator', meaning: 'Whatever decides who speaks next: a graph, an LLM selector, a handoff call, or a queue scheduler.' },
+      { term: 'Primitive', gloss: 'an abstraction', meaning: 'One of the four axes every framework parameterizes, not a framework-specific feature.' },
+      { term: 'Message pool', gloss: 'shared chat history', meaning: 'Full-history shared state. Easy to reason about, scales badly.' },
+      { term: 'Projected state', gloss: 'a scoped view', meaning: 'A role-scoped view of shared state rather than the full history.' },
+      { term: 'StateGraph reducer', gloss: 'the state merger', meaning: 'LangGraph\'s function that folds global state into a node-specific slice.' },
+      { term: 'Speaker selection', gloss: 'who talks next', meaning: 'An orchestrator pattern where a function, often an LLM, picks the next agent from a group.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Read OpenAI Swarm\'s cookbook example. Name its default on all four axes: agent, handoff, shared state, orchestrator.' },
+      { level: 'medium', prompt: 'A framework centralizes shared state in a checkpoint you can inspect. What does it cost you in coordination overhead versus a framework that hides shared state entirely?' },
+      { level: 'medium', prompt: 'Given a StateGraph reducer that projects only a role-scoped view to each node, describe one bug this prevents and one bug it can still allow.' },
+      { level: 'design', prompt: 'You are handed a brand-new framework release with unfamiliar vocabulary, its own words for agent, handoff, state, and router. Write the one-paragraph mapping you would produce before writing a line of integration code.' },
+      { level: 'hard', prompt: 'LLM-routed orchestration means the next step is unknown until the handoff call returns. Design the two UI states, an in-progress route trace and a completed path, a product needs to render both cases honestly.' },
+    ],
+    furtherReading: [
+      { label: 'OpenAI cookbook, Orchestrating Agents: Routines and Handoffs', url: 'https://developers.openai.com/cookbook/examples/orchestrating_agents', why: 'The clearest articulation of handoff-driven orchestration.' },
+      { label: 'AutoGen stable docs', url: 'https://microsoft.github.io/autogen/stable/', why: 'GroupChat plus speaker selection is the reference for LLM-selected orchestration.' },
+      { label: 'LangGraph, Workflows and Agents', url: 'https://docs.langchain.com/oss/python/langgraph/workflows-agents', why: 'Graph-edge orchestration and reducer-based shared state, explained by the team that ships it.' },
+      { label: 'CrewAI introduction', url: 'https://docs.crewai.com/en/introduction', why: 'Role-goal-backstory agents plus Sequential and Hierarchical processes.' },
+      { label: 'AG2, the community AutoGen continuation', url: 'https://github.com/ag2ai/ag2', why: 'The live AutoGen v0.2 line after Microsoft moved v0.4 into maintenance.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Framework-primitive mapping checklist',
+      body: '- What is the agent unit: a class, a function, a config file?\n- How is a handoff implemented: function return, graph edge, or speaker selection?\n- Is shared state a full message pool or a projected, role-scoped view?\n- Who orchestrates: a static graph, an LLM selector, the current agent\'s handoff call, or a queue?\n- Write the mapping in one paragraph before reading past the quickstart. If you cannot fill all four blanks, the docs are incomplete or the framework has invented a fifth primitive worth naming.',
+    },
     demoCaption:
       'The same three-agent pipeline under three orchestrators. Agents and shared state are identical across all three runs. Only who picks next changes, and that one axis decides whether you can draw the run before it happens.',
     demo: {
@@ -209,12 +311,19 @@ export const phase16Part1: Lesson[] = [
     title: 'Supervisor pattern: 90 percent of the win is a fresh window',
     oneLiner:
       'One lead plans and delegates, workers execute in their own contexts and report back. Anthropic measured plus 90.2 percent over single-agent Opus 4 on internal research evals, and 80 percent of the BrowseComp variance was explained by token usage alone.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-05.svg',
     diagramCaption:
       'A lead decomposing one query into three sub-questions, workers running in parallel contexts, and one synthesis step.',
     whyItMatters:
       'The supervisor pattern is where multi-agent progress UI stops being optional. Wall-clock time is max of the worker times plus plan plus synthesis, so the run has a shape: a planning phase where nothing is parallel yet, a fan-out where three things move at once, and a synthesis that blocks on the slowest worker. That is three distinct states in one component, and the middle one needs per-worker rows with their own sub-question and status. The synthesis conflict is the schema detail: two workers returning contradictory facts must render as a disagreement, because silently picking one side is the failure the user can never detect.',
+    learningObjectives: [
+      'Explain why fresh context per worker, not smarter prompting, accounts for 80 percent of Anthropic\'s measured research-eval variance.',
+      'Compute wall-clock time for a supervisor run as max(worker times) plus plan plus synthesis.',
+      'Apply the scale-effort-to-complexity rule to decide agent count for a query.',
+      'Identify the three supervisor failure modes, a hallucinated plan, over-exploring workers, and a synthesis conflict, from a run trace.',
+      'Design the three-phase progress UI, plan, fan-out, synthesis, a supervisor run needs.',
+    ],
     sections: [
       {
         heading: 'The problem: research is what single agents fail at',
@@ -233,8 +342,30 @@ export const phase16Part1: Lesson[] = [
         body: 'LangGraph originally shipped a langgraph-supervisor library with a high-level create_supervisor helper. In 2025 LangChain moved the recommendation to implementing the supervisor pattern via tool-calling directly.\n\nThe reason is worth keeping: tool calls give more control over what the supervisor sees. That is context engineering as an explicit API surface. The library still works, but the docs now recommend the tool-calling form, because deciding what enters the lead\'s window is the whole game.',
       },
       {
+        heading: 'Guardrails before you deploy one',
+        body: 'Anthropic\'s production checklist reads like a systems document, not a prompting tip sheet. Pair models by role: the lead runs on a reasoning-tier model, workers run on a faster, cheaper model, because the lead\'s job is judgment and the workers\' job is throughput. Give every worker a timeout at roughly twice the median runtime; past that, the lead either re-spawns it with a narrower scope or proceeds without it and says so in the synthesis.\n\nCap tokens per worker at some multiple of the expected synthesis input, so one runaway worker cannot blow the run\'s budget alone. Trace the lead\'s plan, every worker\'s tool calls, and the synthesis step, because that trace is the only way to debug a run after the fact. None of this is optional once the pattern runs in production; a supervisor with no timeout and no token cap is one slow page away from an unbounded bill.',
+      },
+      {
         heading: 'Three failure modes, and the one that lies to users',
-        body: 'The lead hallucinates the plan: sub-questions that do not decompose the real question, so workers do precise research on the wrong target. Workers over-explore: without explicit scope boundaries they drift past their sub-question and pollute synthesis.\n\nSynthesis conflicts: two workers return contradictory facts. The lead must either re-ask, adding a round, or note the disagreement explicitly. Silently picking one side is the worst failure, because the user never learns disagreement happened. Supervisor is also simply wrong for strictly sequential tasks (parallelism buys nothing), for simple queries (single-agent is faster and cheaper), and where audit and replay matter more than adaptability, since delegation is LLM-selected.',
+        body: 'The lead hallucinates the plan: sub-questions that do not decompose the real question, so workers do precise research on the wrong target. A lead that mis-splits "summarize what changed in multi-agent research since 2023" into three sub-questions about a single 2024 framework will return three confident, well-cited answers to the wrong question, and nothing in synthesis catches that on its own. Workers over-explore: without explicit scope boundaries they drift past their sub-question and pollute synthesis.\n\nSynthesis conflicts: two workers return contradictory facts. The lead must either re-ask, adding a round, or note the disagreement explicitly. Silently picking one side is the worst failure, because the user never learns disagreement happened.',
+      },
+      {
+        heading: 'When supervisor is the wrong pattern',
+        body: 'Supervisor is also simply wrong for strictly sequential tasks, since parallelism buys nothing when step two needs step one\'s finished output. It is wrong for simple queries, where a single agent is faster and cheaper and the lead\'s own scale-effort check should catch this before spawning anyone. And it is wrong where audit and replay matter more than adaptability, because delegation is LLM-selected and the same query can route to a different worker split on a different run.\n\nThe tell is in the question you ask before reaching for the pattern: does this task genuinely decompose into independent sub-questions, or does it just look complicated? A task that is one long sequential chain wearing a research question\'s clothes will cost you the 15 times token multiplier for a result a single agent would have produced in one pass.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-05-inline-wallclock.svg',
+        alt: 'Bar comparison of serial reading versus parallel supervised workers',
+        caption: 'Wall clock is max of the workers plus plan plus synthesis, not the sum of the workers.',
+        diagramBrief: 'Two horizontal timelines on cream paper. Top: "Single agent, serial" showing five stacked segments back to back (reading paper 1 through 5) ending far right. Bottom: "Lead + 3 workers" showing a short plan segment, then three parallel segments stacked vertically starting at the same point (worker 1/2/3, different lengths), then a synthesis segment starting where the longest worker ends. Total length of the bottom timeline is visibly shorter. One accent color marks the synthesis segment on both.',
+      },
+      {
+        src: '/lessons/p16-05-inline-progress.svg',
+        alt: 'Three-phase progress component sketch: plan, fan-out, synthesis',
+        caption: 'The supervisor run has three phases, and the middle one needs a dynamic list, not a fixed layout.',
+        diagramBrief: 'A UI sketch in three horizontal panels labeled Plan, Fan-out, Synthesis. Plan panel: a single spinner row. Fan-out panel: a variable-height stack of worker rows, show 3 as solid and one more as a dashed placeholder row to signal the count is decided at runtime, each with a sub-question label and a status dot. Synthesis panel: one row with a "waiting on slowest worker" label. Wireframe style, cream paper, black ink, one accent color on the active phase.',
       },
     ],
     takeaways: [
@@ -244,13 +375,34 @@ export const phase16Part1: Lesson[] = [
       'Silently resolving a synthesis conflict is the failure the user cannot detect. Render the disagreement instead.',
     ],
     terms: [
-      { term: 'Supervisor pattern', meaning: 'One lead agent plans and delegates, workers execute in separate contexts and report summaries back.' },
-      { term: 'Fresh context', meaning: 'Each worker starting from a clean window scoped to one sub-question.' },
-      { term: 'Scale effort', meaning: 'The lead sizing agent count and tool calls to the complexity of the query.' },
-      { term: 'Broad then narrow', meaning: 'Decomposing into wide sub-questions first, then spawning depth workers where warranted.' },
-      { term: 'Rainbow deployment', meaning: 'Gradual rollout that drains old long-running agent versions instead of cutting over.' },
-      { term: 'Synthesis conflict', meaning: 'Two workers returning contradictory facts that the lead must surface or re-ask, not quietly pick between.' },
+      { term: 'Supervisor', gloss: 'lead agent', meaning: 'An orchestrator agent that plans, delegates, and synthesizes but does not do the work itself.' },
+      { term: 'Worker', gloss: 'subagent', meaning: 'A focused agent invoked by the supervisor with narrow scope and its own context window.' },
+      { term: 'Orchestrator-worker', gloss: 'supervisor pattern', meaning: 'Same thing, different name. Both terms appear in the 2026 literature.' },
+      { term: 'Fresh context', gloss: 'a clean window', meaning: 'A worker\'s context starting from its system prompt and assigned question, not the lead\'s history.' },
+      { term: 'Rainbow deployment', gloss: 'a gradual rollout', meaning: 'Gradual rollout that drains old long-running agent versions instead of cutting over.' },
+      { term: 'Token dominance', gloss: 'context is the variable', meaning: '80 percent of research-eval variance came from total tokens used, not model choice, per Anthropic.' },
+      { term: 'Scale effort', gloss: 'match agent count to complexity', meaning: 'The lead sizing agent count and tool calls to the complexity of the query.' },
+      { term: 'Broad then narrow', gloss: 'search wide before you search deep', meaning: 'Decomposing into wide sub-questions first, then spawning depth workers where warranted.' },
+      { term: 'Synthesis conflict', gloss: 'workers disagree', meaning: 'Two workers returning contradictory facts that the lead must surface or re-ask, not quietly pick between.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Three workers take 0.4s, 0.6s, and 0.3s. Plan takes 0.1s and synthesis takes 0.2s. Compute wall-clock time.' },
+      { level: 'medium', prompt: 'A lead spawns 12 workers for a query a human would call simple. What went wrong, and which rule, scale effort to complexity, should have prevented it?' },
+      { level: 'medium', prompt: 'Two workers return contradictory facts during synthesis. Write the lead\'s decision rule: when does it re-ask, and when does it render the disagreement?' },
+      { level: 'design', prompt: 'Design the three-phase progress component (plan, fan-out, synthesis) for a research job. What does the fan-out phase show when the lead spawns a dynamic number of workers, say 7, decided at runtime?' },
+      { level: 'hard', prompt: 'Anthropic reports multi-agent runs cost roughly 15 times single-agent tokens. Write the one-sentence rule you would put in a product spec for when this cost is justified.' },
+    ],
+    furtherReading: [
+      { label: 'Anthropic engineering, How we built our multi-agent research system', url: 'https://www.anthropic.com/engineering/multi-agent-research-system', why: 'The production reference for the supervisor pattern and its measured numbers.' },
+      { label: 'LangGraph, Workflows and Agents', url: 'https://docs.langchain.com/oss/python/langgraph/workflows-agents', why: 'Why the tool-calling supervisor form is now the recommended pattern.' },
+      { label: 'LangGraph supervisor reference', url: 'https://reference.langchain.com/python/langgraph-supervisor', why: 'The legacy create_supervisor helper, still used in 2026 production.' },
+      { label: 'OpenAI cookbook, Orchestrating Agents: Routines and Handoffs', url: 'https://developers.openai.com/cookbook/examples/orchestrating_agents', why: 'A handoff-based variant of the same supervisor idea.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Supervisor pattern deployment checklist',
+      body: '- Lead on a reasoning-tier model, workers on a faster and cheaper one.\n- Worker timeout at roughly 2x median runtime; the lead re-spawns narrower or proceeds without it.\n- Token cap per worker so one runaway worker cannot blow the budget.\n- Trace the plan, every worker\'s tool calls, and the synthesis step for post-hoc debugging.\n- Rainbow rollout for new lead or worker versions; these are long-running, stateful agents, not stateless services you can blue-green.\n- A synthesis-conflict rule: re-ask and pay a round, or render the disagreement. Never pick silently.',
+    },
     demoCaption:
       'Three workers on three sub-questions, 0.3 seconds each. Serial gives you 0.9 seconds and one saturated window. Parallel gives you roughly 0.35 and three clean ones. The second number is why the pattern exists.',
     demo: {
@@ -310,12 +462,19 @@ export const phase16Part1: Lesson[] = [
     title: 'Hierarchical architecture and the managerial loop',
     oneLiner:
       'Hierarchical is supervisor nested: managers over sub-managers over workers. It is the right shape when the task is a real org chart, and the pattern most likely to collapse into managers reassigning work forever. Sequential often beats it.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-06.svg',
     diagramCaption:
       'A three-level tree where every internal node plans, delegates, and synthesizes, and only leaves do work.',
     whyItMatters:
       'Depth is where attribution breaks. In a flat supervisor, a wrong claim traces back one hop to a named worker. In a three-level tree, the claim passed through two summarization steps, so the trace needs the whole path plus what each level actually said. That is a nested, expandable trace with a diff at each hop, because the recurring bug is meaning drifting one level at a time ("unable to verify X" arriving as "X not confirmed"). Consensus loops make it worse: a step limit is now a hyperparameter your UI has to surface as "reconciliation attempt 3 of 5", or the run just looks hung.',
+    learningObjectives: [
+      'Distinguish hierarchical from flat supervisor by counting who plans, delegates, and synthesizes versus who only executes.',
+      'Diagnose a task-assignment error versus an output-misinterpretation error from where in the tree the failure surfaces.',
+      'Decide, given a task, whether it needs hierarchy or is a linear flow pretending to be a tree.',
+      'Apply the depth-2 ceiling and reconciliation-budget guardrails before shipping a manager tree.',
+      'Design a nested, expandable attribution trace that shows meaning drift at each level.',
+    ],
     sections: [
       {
         heading: 'The problem: LLM managers are not human managers',
@@ -337,6 +496,24 @@ export const phase16Part1: Lesson[] = [
         heading: 'Two implementations, two debugging stories',
         body: 'CrewAI\'s Process.hierarchical wires a manager LLM over specialist crews. The manager receives the top-level task, assigns subtasks, evaluates crew outputs, then decides whether to accept, re-delegate, or iterate. That accept-or-re-delegate decision is the loop risk in one line.\n\nLangGraph nests create_supervisor calls: the inner supervisor has its own graph and the outer treats it as an opaque node. That is cleaner for debugging, since you can step through each graph separately, and harder when you want the tree reshaped dynamically at runtime. Pick by which of those two you will need more often, because retrofitting either is expensive.',
       },
+      {
+        heading: 'Guardrails that make hierarchical shippable',
+        body: 'Four guardrails separate a hierarchy that ships from one that quietly rots. Cap tree depth at two levels; a third level already hides most errors from anyone watching the run, because each level is one more summarization step between the mistake and the person who could catch it. Set an explicit reconciliation budget, usually two rounds, before the top manager must commit to an answer rather than asking sub-managers to keep reconciling.\n\nRequire provenance on every synthesis: each node\'s summary must cite which leaf outputs produced it, so a wrong claim has a path back to its source. And add a canary question, one worker at each sub-manager level that is always asked the original, unmodified user question. When the canary\'s answer disagrees with what the tree eventually synthesizes, that disagreement is the cheapest signal you will ever get that decomposition drifted somewhere above it.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-06-inline-tree.svg',
+        alt: 'Three-level manager tree with a provenance path highlighted',
+        caption: 'A claim in the top synthesis traces back through two summarization steps to the leaf that actually produced it.',
+        diagramBrief: 'A three-level tree diagram on cream paper: one top manager node, two sub-manager nodes beneath it, five worker leaf nodes beneath those. Standard black ink lines for the tree. One accent-colored path highlighted from a single leaf up through its sub-manager to the top node, with small annotation marks at each hop reading "summarized here".',
+      },
+      {
+        src: '/lessons/p16-06-inline-misroute.svg',
+        alt: 'A legal question misrouted to a finance branch',
+        caption: 'Nothing crashes. Every level does competent work on the wrong assignment, and the gap only shows up at the top.',
+        diagramBrief: 'A simple before/after two-column diagram. Left column "Asked": engineering + legal, two labeled boxes. Right column "Delivered": engineering + finance, two labeled boxes, with the legal box from the left crossed out faintly and a finance box added with no connecting line back to the original ask. One accent color on the mismatch, the crossed-out legal box and the unconnected finance box.',
+      },
     ],
     takeaways: [
       'Hierarchical earns its keep only when the task has genuinely independent sub-teams. One linear flow pretending to be a tree should be sequential.',
@@ -345,13 +522,35 @@ export const phase16Part1: Lesson[] = [
       'Consensus loops make the step limit a hyperparameter, which means the UI has to show reconciliation attempt N of M or the run reads as hung.',
     ],
     terms: [
-      { term: 'Hierarchical architecture', meaning: 'Nested supervisors: managers over sub-managers over workers, with only leaves doing work.' },
-      { term: 'Local summarization', meaning: 'A sub-manager condensing its team\'s output before the level above reads it.' },
-      { term: 'Task assignment error', meaning: 'A manager hallucinating a decomposition and delegating precise work on the wrong target.' },
-      { term: 'Output misinterpretation', meaning: 'Meaning shifting as each level rewrites the level below\'s conclusion.' },
-      { term: 'Consensus loop', meaning: 'Sub-managers repeatedly re-delegating a disagreement without converging.' },
-      { term: 'Process.hierarchical', meaning: 'CrewAI\'s manager-LLM mode that assigns, evaluates, and can re-delegate crew work.' },
+      { term: 'Hierarchical architecture', gloss: 'org chart pattern', meaning: 'Nested supervisors, managers over sub-managers over workers, with only leaves doing work.' },
+      { term: 'Local summarization', gloss: 'the sub-manager\'s condensed report', meaning: 'A sub-manager condensing its team\'s output before the level above reads it.' },
+      { term: 'Task assignment error', gloss: 'the boss assigned it wrong', meaning: 'A manager hallucinating a decomposition and delegating precise work on the wrong target.' },
+      { term: 'Output misinterpretation', gloss: 'the message got retold wrong', meaning: 'Meaning shifting as each level rewrites the level below\'s conclusion.' },
+      { term: 'Consensus loop', gloss: 'endless meetings', meaning: 'Sub-managers repeatedly re-delegating a disagreement without converging.' },
+      { term: 'Process.hierarchical', gloss: 'CrewAI\'s manager mode', meaning: 'CrewAI\'s manager-LLM mode that assigns, evaluates, and can re-delegate crew work.' },
+      { term: 'Decomposition drift', gloss: 'the boss lost the plot', meaning: 'The manager\'s current split no longer covers what the user actually asked.' },
+      { term: 'Depth-2 ceiling', gloss: 'do not go deeper than 2 levels', meaning: 'An empirical guardrail: a third level of management collapses observability.' },
+      { term: 'Canary question', gloss: 'ground truth at every level', meaning: 'A worker always asked the original, unmodified query, used to detect drift.' },
+      { term: 'Provenance chain', gloss: 'who said what', meaning: 'A trace from each synthesis back to the leaf outputs that produced it.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A task has three levels: top manager to two sub-managers to five workers. A claim in the final synthesis is wrong. How many hops does the attribution trace need to walk to find the point of drift?' },
+      { level: 'medium', prompt: 'A manager decomposes "review the contract" into engineering and finance branches, missing legal. Where does this error first become visible to a human, and where should it become visible?' },
+      { level: 'medium', prompt: 'Design a canary question: a worker at each sub-manager that is always asked the original, unmodified user question. What should happen when the canary\'s answer disagrees with the synthesized answer?' },
+      { level: 'design', prompt: 'Build the nested, expandable trace UI for a three-level hierarchy. At each hop, what diff do you show between what a level was told and what it reported upward?' },
+      { level: 'hard', prompt: 'CrewAI\'s Process.hierarchical caps reconciliation with a step limit. Argue for a specific number (2, 3, 5) and what UI element tells the user which attempt they are watching.' },
+    ],
+    furtherReading: [
+      { label: 'CrewAI introduction, Process.hierarchical', url: 'https://docs.crewai.com/en/introduction', why: 'The textbook hierarchical process with a manager LLM.' },
+      { label: 'LangGraph supervisor reference', url: 'https://reference.langchain.com/python/langgraph-supervisor', why: 'Nested supervisors via create_supervisor, LangGraph\'s hierarchical form.' },
+      { label: 'Anthropic engineering, Research system', url: 'https://www.anthropic.com/engineering/multi-agent-research-system', why: 'Why Anthropic deliberately chose a flat supervisor over a hierarchical one.' },
+      { label: 'Cemri et al., Why Do Multi-Agent LLM Systems Fail? (arXiv:2503.13657)', url: 'https://arxiv.org/abs/2503.13657', why: 'The MAST taxonomy; its coordination-failure section documents decomposition drift directly.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Hierarchical architecture guardrail checklist',
+      body: '- Cap tree depth at 2 levels.\n- Explicit reconciliation budget, usually 2 rounds, before the top manager commits.\n- Provenance on every synthesis: each summary cites the leaf outputs behind it.\n- A canary worker at each sub-manager level, always asked the original unmodified question.\n- Alert when the manager\'s logged decomposition no longer covers the original user query.',
+    },
     demoCaption:
       'One mislabel at the top, three levels down. The manager sends the legal question to a finance branch, the branch does correct finance work, and the top synthesis reports findings nobody asked for. The original question is never answered or flagged.',
     demo: {
@@ -408,15 +607,22 @@ export const phase16Part1: Lesson[] = [
     phase: 'Phase 16 · Multi-Agent and Swarms',
     part: 'Part 1 · Why more than one agent',
     index: '16.08',
-    title: 'Planner, executor, critic, verifier: the verifier is load-bearing',
+    title: 'Planner, executor, critic, verifier: the verifier holds the veto',
     oneLiner:
       'Three coders in a group chat write three flavors of the same mediocre code. The fix is not more agents, it is different ones, and one of them must be a verifier whose pass or fail is decided by code. PwC moved accuracy from 10 percent to 70 percent by adding that one role.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-08.svg',
     diagramCaption:
       'The four roles and their distinct tool sets: planner, executor, critic (subjective, LLM), verifier (objective, code).',
     whyItMatters:
       'Critic and verifier produce different schemas, so they cannot share a component. A critic returns accept or reject plus prose reasons, which renders as reviewable commentary you can disagree with. A verifier returns pass or fail plus evidence (a test name, an exit code, a schema path), which renders as a gate: the primary action is disabled and the failing check is named. Collapse them into one "review" panel and you lose the only signal a user can act on without reading. MAST traced 1642 failures and found 21.3 percent were pure verification gaps, meaning the system shipped an answer nothing had checked.',
+    learningObjectives: [
+      'Distinguish a critic\'s schema, accept/reject plus prose, from a verifier\'s schema, pass/fail plus evidence.',
+      'Explain why an all-LLM role roster is a named MAST failure mode rather than a staffing choice.',
+      'Apply communicative dehallucination: write a role-prompt clause that makes an agent ask instead of invent.',
+      'Order a four-role pipeline (planner, executor, critic, verifier) by cost, running cheap checks before slow ones.',
+      'Design a UI gate that disables a primary action until a named verifier check passes.',
+    ],
     sections: [
       {
         heading: 'The problem: generic agents produce generic output',
@@ -435,8 +641,30 @@ export const phase16Part1: Lesson[] = [
         body: 'A critic is an LLM reviewing an artifact for quality. Subjective, and fully capable of being fooled by plausible prose. A verifier is a deterministic program running on the artifact. Objective, and it hands you pass or fail with evidence.\n\nUse both. The critic catches taste issues the verifier cannot articulate. The verifier catches bugs the critic cannot see because they only appear at runtime. The anti-pattern is the system where every role is an LLM and every output is "looks good to me", which is a textbook MAST failure. At least one role\'s pass or fail must be decided by code.',
       },
       {
-        heading: 'Why verification is the load-bearing role',
-        body: 'Cemri et al. (MAST, arXiv:2503.13657) traced 1642 multi-agent execution failures. 21.3 percent were verification gaps, meaning the system shipped an answer nobody had checked. The remaining 79 percent often trace back to a check that failed silently or was never run at all.\n\nPwC reported, across CrewAI deployments in 2025, that adding a structured validation loop moved accuracy from 10 percent to 70 percent. A 7 times gain from one role. The framework surfaces are all there already: CrewAI\'s Agent(role, goal, backstory), specialized LangGraph nodes with pipeline-enforcing edges, role-specific AutoGen ConversableAgents, handoff tools between OpenAI Agents SDK agents. The roster is the design decision, not the framework.',
+        heading: 'Why verification decides the outcome',
+        body: 'Cemri et al. (MAST, arXiv:2503.13657) traced 1642 multi-agent execution failures. 21.3 percent were verification gaps, meaning the system shipped an answer nobody had checked. The remaining 79 percent often trace back to a check that failed silently or was never run at all.\n\nPwC reported, across CrewAI deployments in 2025, that adding a structured validation loop moved accuracy from 10 percent to 70 percent. A 7 times gain from one role, and the gain came from adding a verifier, not from adding another coder or another round of critique. That is the number worth remembering when a system underperforms: check the roster for a verifier before you reach for a bigger model.',
+      },
+      {
+        heading: 'Order the roles by cost, not by instinct',
+        body: 'Run critic before verifier, not the other way round. A critic is a single LLM call: cheap, fast, and good at catching design and taste issues a test suite has no vocabulary for, a misleading variable name, a function doing two jobs, an approach that technically works but will not survive the next requirement. A verifier is slower: it compiles, runs a sandbox, executes a test suite, and only then returns pass or fail.\n\nCatching the cheap issues first means the expensive verifier only runs on artifacts that already cleared the cheap bar, which is strictly more efficient than running both in parallel and reconciling. Cap the critic-executor revision loop at two rounds before escalating to a human; a critic that keeps rejecting past round two is usually disagreeing with the plan, not the code, and no amount of re-execution fixes a disagreement one level up.',
+      },
+      {
+        heading: 'The roster is the design decision, not the framework',
+        body: 'Every major framework already gives you the surface to build this roster: CrewAI\'s Agent(role, goal, backstory) is the textbook specialization primitive, LangGraph lets you write specialized prompts per node with edges that enforce the pipeline order, AutoGen names role-specific ConversableAgents inside a GroupChat, and the OpenAI Agents SDK wires role-specialized agents together with handoff tools.\n\nNone of these frameworks ship a verifier for you by default; each treats verification as just another agent unless you deliberately wire a deterministic check into the loop. That is the actual decision a team makes when it adopts one of these frameworks, not which framework, but which of the four roles get a real implementation and which get skipped because an LLM playing the part felt close enough at the time.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-08-inline-schema.svg',
+        alt: 'Critic and verifier return different shapes',
+        caption: 'A critic returns prose you can argue with. A verifier returns evidence you cannot.',
+        diagramBrief: 'Two-panel comparison on cream paper. Left panel "Critic": a speech-bubble icon containing the words "accept / reject + reasons", styled as commentary with a dashed border and an editable feel. Right panel "Verifier": a gate icon, a barrier or turnstile shape, containing "pass / fail + evidence" with a small test-name tag, styled as a hard block with a solid border and a locked feel. One accent color on the verifier gate to signal it is the one that blocks an action.',
+      },
+      {
+        src: '/lessons/p16-08-inline-mast.svg',
+        alt: 'MAST failure taxonomy and the PwC accuracy jump',
+        caption: '21.3 percent of 1642 traced failures were pure verification gaps. Adding one verifier moved PwC\'s accuracy from 10 to 70 percent.',
+        diagramBrief: 'Two small charts side by side on cream paper. Left: a horizontal stacked bar labeled "1642 failures" split into two segments, one shaded segment at 21.3 percent labeled "verification gaps", the rest at 78.7 percent labeled "other causes". Right: a simple before/after bar pair labeled "10%" and "70%" with an arrow between them labeled "+1 verifier role". One accent color used consistently for the verifier-related segments in both charts.',
       },
     ],
     takeaways: [
@@ -446,13 +674,35 @@ export const phase16Part1: Lesson[] = [
       'Communicative dehallucination is a prompt clause: when a detail is missing, ask the role that owns it by name instead of inventing it.',
     ],
     terms: [
-      { term: 'Planner', meaning: 'The role that turns a goal into a structured plan or spec.' },
-      { term: 'Executor', meaning: 'The role that produces the artifact from one plan step, holding the real work tools.' },
-      { term: 'Critic', meaning: 'An LLM reviewing an artifact for quality, subjective and foolable by plausible prose.' },
-      { term: 'Verifier', meaning: 'A deterministic program returning pass or fail with evidence, decided by code not judgement.' },
-      { term: 'Code = SOP(Team)', meaning: 'MetaGPT\'s formulation: encoding standard operating procedures as role prompts to make a team predictable.' },
-      { term: 'Communicative dehallucination', meaning: 'ChatDev\'s rule that an agent must ask the owning role for a missing detail rather than invent it.' },
+      { term: 'Planner', gloss: 'the one who makes the plan', meaning: 'The role that turns a goal into a structured plan or spec.' },
+      { term: 'Executor', gloss: 'the one who does the work', meaning: 'The role that produces the artifact from one plan step, holding the real work tools.' },
+      { term: 'Critic', gloss: 'an LLM reviewer', meaning: 'An LLM reviewing an artifact for quality, subjective and foolable by plausible prose.' },
+      { term: 'Verifier', gloss: 'a deterministic check', meaning: 'A deterministic program returning pass or fail with evidence, decided by code not judgment.' },
+      { term: 'Code = SOP(Team)', gloss: 'an encoded standard operating procedure', meaning: 'MetaGPT\'s formulation: encoding standard operating procedures as role prompts to make a team predictable.' },
+      { term: 'Communicative dehallucination', gloss: 'ask before inventing', meaning: 'ChatDev\'s rule that an agent must ask the owning role for a missing detail rather than invent it.' },
+      { term: 'Verification gap', gloss: 'no one checked', meaning: 'A shipped answer that no deterministic check ran against, 21.3 percent of MAST\'s traced failures.' },
+      { term: 'Revision loop', gloss: 'the critic sends it back', meaning: 'A critic rejection triggering an executor re-run with feedback, which needs a round budget.' },
+      { term: 'All-LLM anti-pattern', gloss: 'looks good to me', meaning: 'Every role is an LLM, no deterministic check anywhere in the loop; a classic MAST failure.' },
+      { term: 'Role specialization', gloss: 'different agents, different jobs', meaning: 'Distinct system prompts tuned for planner, executor, critic, and verifier roles.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Given a code artifact, a critic returns "accept, looks well structured" and a verifier returns "fail, assertion error on line 12". Which one gates the merge button?' },
+      { level: 'medium', prompt: 'Write the role-prompt clause that implements communicative dehallucination for an executor that is missing a required config value.' },
+      { level: 'medium', prompt: 'MAST found 21.3 percent of 1642 failures were pure verification gaps. Name a task type where a deterministic verifier is not possible, and describe what you would use instead.' },
+      { level: 'design', prompt: 'Design the two components a critic-plus-verifier system needs: a commentary panel and a gate. What does each render when the two roles disagree with each other?' },
+      { level: 'hard', prompt: 'PwC measured a 7x accuracy gain, 10 percent to 70 percent, from adding one structured validation loop. Sketch the before and after roster and name which role was missing.' },
+    ],
+    furtherReading: [
+      { label: 'Hong et al., MetaGPT: Meta Programming for Multi-Agent Collaboration (arXiv:2308.00352)', url: 'https://arxiv.org/abs/2308.00352', why: 'The SOP-as-role-prompt reference paper, five roles with strict schemas.' },
+      { label: 'Qian et al., Communicative Agents for Software Development, ChatDev (arXiv:2307.07924)', url: 'https://arxiv.org/abs/2307.07924', why: 'The chat-chain design plus communicative dehallucination in detail.' },
+      { label: 'Cemri et al., Why Do Multi-Agent LLM Systems Fail? (arXiv:2503.13657)', url: 'https://arxiv.org/abs/2503.13657', why: 'The MAST taxonomy; verification gaps are 21.3 percent of traced failures.' },
+      { label: 'CrewAI docs, Agent roles', url: 'https://docs.crewai.com/en/introduction', why: 'The production role-specification surface referenced by the roster mapping above.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Role roster checklist',
+      body: '- At least one role\'s verdict is decided by code, never all-LLM.\n- Explicit input/output schema per role: the planner returns a spec, not prose.\n- Communicative dehallucination clause: an agent asks the role that owns a missing detail instead of inventing it.\n- Critic runs before verifier; cheap checks first, expensive checks second.\n- Loop budget: max 2 critic-executor revision rounds before escalating to a human.',
+    },
     demoCaption:
       'The executor ships off-spec code that reads perfectly well. The critic accepts it because the prose is plausible. The verifier fails it because the test fails. Two reviewers, one useful signal, and only one of them can gate the action.',
     demo: {
@@ -512,12 +762,19 @@ export const phase16Part1: Lesson[] = [
     title: 'Swarm architectures: trading determinism for throughput',
     oneLiner:
       'Remove the orchestrator. Workers pull tasks off a shared queue and write results back, so the system scales until the queue does. You pay for it in determinism, traceability, and the ability to reproduce a bug.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-09.svg',
     diagramCaption:
       'Workers pulling from one shared queue with no central decider, each writing results and optionally enqueuing follow-ups.',
     whyItMatters:
       'A swarm has no central log, which means there is no run to render. Supervisor gives you a plan and a position in it. A swarm gives you a queue depth, a per-worker current task, and a completion count, so the honest surface is a throughput dashboard, not a progress bar with a percentage. Partial results are the normal state rather than an error state: 340 of 500 done, 4 workers busy, 12 tasks aged past their priority window. Starvation is a UI problem too, because a long task that never gets pulled looks identical to a task that is quietly running.',
+    learningObjectives: [
+      'Explain why a swarm has no run to render and what dashboard fields replace a progress bar.',
+      'Compute the fit of swarm versus supervisor for a given task using independence, duration variance, and ordering requirements.',
+      'Diagnose starvation from a completion-count trace and apply one of three mitigations.',
+      'Distinguish worker idempotency requirements in a swarm from the state assumptions a supervisor pattern makes.',
+      'Design a throughput dashboard showing queue depth, per-worker current task, and completion count.',
+    ],
     sections: [
       {
         heading: 'The problem: the supervisor becomes the bottleneck',
@@ -537,7 +794,29 @@ export const phase16Part1: Lesson[] = [
       },
       {
         heading: 'Starvation, hot-spotting, and the three fixes',
-        body: 'If all workers pull the fastest available task, long-running tasks never get picked until they are the only ones left. That is classic queue starvation, and in an agent swarm it reads as a task that simply never happens.\n\nThree mitigations work. Priority queues with explicit aging, so priority rises with wait time. Worker specialization, where some workers only take long tasks. Back-pressure, limiting how many fast tasks enter the queue at all.\n\nSwarm also pairs naturally with content-based routing: instead of one generic queue, run one queue per message type and have specialist workers subscribe only to theirs. That is the basis for message-bus architectures that reach thousands of agents.',
+        body: 'If all workers pull the fastest available task, long-running tasks never get picked until they are the only ones left. That is classic queue starvation, and in an agent swarm it reads as a task that simply never happens, not as an error anyone gets paged for.\n\nThree mitigations work. Priority queues with explicit aging, so a task\'s priority rises the longer it waits. Worker specialization, where some workers only take long tasks, so they never compete with fast ones for the queue\'s attention. Back-pressure, limiting how many fast tasks enter the queue at all, so producers slow down before workers drown.',
+      },
+      {
+        heading: 'Production hygiene: idempotency and durable queues',
+        body: 'A swarm\'s queue assumption breaks quietly if you skip two properties. Worker idempotency: a worker can crash mid-task, and the task gets pulled again by another worker, so every task must produce the same result whether it runs once or twice. An update that increments a counter is not idempotent; an update that sets a value to a specific state is.\n\nDurable queues: an in-process queue disappears the moment the process restarts, which is fine for a demo and unacceptable in production. Kafka, Redis Streams, or a database-backed queue survive a crash and let a worker resume where the fleet left off. Add a trace ID to every task and have every worker log start and end against it; that log is the only replacement you get for the central log a supervisor pattern gives you for free.',
+      },
+      {
+        heading: 'Content-based routing, and where swarm ends',
+        body: 'Swarm pairs naturally with content-based routing: instead of one generic queue, run one queue per message type and let specialist workers subscribe only to theirs. A scraping swarm might route by domain, a document-processing swarm by file type. This is the basis for message-bus architectures that scale to thousands of agents, because no single queue becomes a shared point of contention.\n\nIt is also where the honest limit of the pattern sits. Content-based routing solves distribution, not coherence. A swarm of routed workers still cannot hold a plan across tasks, cannot notice that two of its results contradict each other, and cannot decide when the whole job is actually done rather than merely empty of pending tasks. Those are supervisor problems, and pretending a well-routed swarm has solved them is how a throughput win quietly becomes a correctness bug.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-09-inline-queue.svg',
+        alt: 'Four workers under fixed assignment versus a shared queue',
+        caption: 'Fixed assignment leaves fast workers idle. A shared queue keeps every worker busy until the work runs out.',
+        diagramBrief: 'Two-panel comparison on cream paper. Left panel "Fixed assignment": four worker lanes, each with pre-assigned task blocks of different lengths, three lanes ending early and shown with a hatched idle fill for the remaining time, one lane running long. Right panel "Shared queue": four worker lanes pulling variable-length blocks from a shared queue icon, all four lanes ending at roughly the same time with no idle fill, uneven block counts per lane labeled 5 / 2 / 3 / 2. One accent color on the idle hatching in the left panel to make the waste visible.',
+      },
+      {
+        src: '/lessons/p16-09-inline-starvation.svg',
+        alt: 'Priority aging rescuing a long task from starvation',
+        caption: 'A starved long task and a slow-but-running task look identical from the outside. Priority aging is what tells them apart.',
+        diagramBrief: 'A timeline diagram on cream paper showing one long task entering a queue at time 0, with its priority value drawn as a rising line as short tasks keep cutting ahead of it, crossing an accent-colored threshold line at which point it finally gets pulled. A small annotation at the crossing point reads "priority now exceeds incoming short tasks". Below it, a second identical-looking task with no aging rule is shown as a flat line that never crosses the threshold, labeled "never runs".',
       },
     ],
     takeaways: [
@@ -547,13 +826,34 @@ export const phase16Part1: Lesson[] = [
       'Starvation renders identically to slow progress, so aged priority or long-task workers is a UX fix as much as a scheduling one.',
     ],
     terms: [
-      { term: 'Swarm architecture', meaning: 'Workers pulling tasks from shared queues with no central orchestrator.' },
-      { term: 'Event bus semantics', meaning: 'Coordination encoded in queue and topic behavior rather than in an agent\'s reasoning.' },
-      { term: 'Starvation', meaning: 'Long-running tasks never getting pulled because workers keep taking faster ones.' },
-      { term: 'Priority aging', meaning: 'Raising a queued task\'s priority the longer it waits, to break starvation.' },
-      { term: 'Back-pressure', meaning: 'Limiting how much work enters the queue to protect throughput and fairness.' },
-      { term: 'Matrix', meaning: 'arXiv:2511.21686, a framework serializing both control and data flow as messages on distributed queues.' },
+      { term: 'Swarm architecture', gloss: 'decentralized agents', meaning: 'Workers pulling tasks from shared queues with no central orchestrator.' },
+      { term: 'Event bus semantics', gloss: 'agents subscribe to topics', meaning: 'Coordination encoded in queue and topic behavior rather than in an agent\'s reasoning.' },
+      { term: 'Starvation', gloss: 'a task never runs', meaning: 'Long-running tasks never getting pulled because workers keep taking faster ones.' },
+      { term: 'Priority aging', gloss: 'the queue remembers how long you waited', meaning: 'Raising a queued task\'s priority the longer it waits, to break starvation.' },
+      { term: 'Back-pressure', gloss: 'slow down the producer', meaning: 'Limiting how much work enters the queue to protect throughput and fairness.' },
+      { term: 'Matrix', gloss: 'a full message-passing swarm', meaning: 'arXiv:2511.21686, a framework serializing both control and data flow as messages on distributed queues.' },
+      { term: 'Hot-spotting', gloss: 'one worker drowns', meaning: 'A load imbalance where one worker ends up handling most of the tasks.' },
+      { term: 'Idempotent worker', gloss: 'safe to re-run', meaning: 'A task processed twice produces the same result, required because workers may crash mid-run.' },
+      { term: 'Durable queue', gloss: 'survives crashes', meaning: 'A queue backed by disk or replicated storage; tasks are not lost when a worker crashes.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Four workers, 12 tasks of mixed duration. Fixed assignment gives 3 tasks each. Explain why a shared queue instead gives an uneven split like 5/2/3/2, and why that is correct.' },
+      { level: 'medium', prompt: 'A worker crashes mid-task. The task gets pulled again by another worker. What property must every worker have for this to be safe?' },
+      { level: 'medium', prompt: 'Design a priority-aging rule that prevents a long task from starving under continuous arrival of short tasks.' },
+      { level: 'design', prompt: 'Design the throughput dashboard for a 500-task swarm run: what three numbers replace the progress bar, and how do you render a task that has been aged past its priority window without it reading as an error?' },
+      { level: 'hard', prompt: 'Matrix (arXiv:2511.21686) serializes both control and data flow as queue messages. Name one thing this buys in scalability and one thing it costs in traceability, in your own words.' },
+    ],
+    furtherReading: [
+      { label: 'LangGraph, Workflows and Agents, Swarm Architecture', url: 'https://docs.langchain.com/oss/python/langgraph/workflows-agents', why: 'Explicit swarm support inside a graph-native framework.' },
+      { label: 'Matrix, A Decentralized Framework for Multi-Agent Systems (arXiv:2511.21686)', url: 'https://arxiv.org/abs/2511.21686', why: 'The full message-passing swarm that removes the orchestrator entirely.' },
+      { label: 'Anthropic engineering, Research system', url: 'https://www.anthropic.com/engineering/multi-agent-research-system', why: 'Why a specific production system chose supervisor over swarm, and what that decision cost.' },
+      { label: 'AutoGen v0.4, actor-model docs', url: 'https://microsoft.github.io/autogen/stable/', why: 'The event-driven actor rewrite, closer to swarm than v0.2\'s GroupChat.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Swarm production checklist',
+      body: '- Priority queue with explicit aging to prevent long-task starvation.\n- Every worker is idempotent: a task pulled twice produces the same result.\n- A durable queue (Kafka, Redis Streams, or a database-backed queue), not an in-memory one, backs production traffic.\n- Every task carries a trace ID; every worker logs start and end against it.\n- Back-pressure on the producer once queue depth outpaces worker throughput.',
+    },
     demoCaption:
       'Twelve tasks of mixed duration across four workers. Pre-assigning them leaves fast workers idle while one grinds on a 10-second job. A shared queue distributes unevenly, which is the point: uneven is optimal when durations vary.',
     demo: {
