@@ -9,13 +9,20 @@ export const phase16Part3: Lesson[] = [
     index: '16.07',
     title: 'Society of Mind: agents and rounds are two separate knobs',
     oneLiner:
-      'Du et al. turned Minsky\'s 1986 premise into an algorithm: N agents answer, read each other, revise for R rounds, then majority-vote. The ablation is the real finding. More agents helps and plateaus, more rounds alone barely helps, and both together produce the jump.',
-    readTime: '~8 min read',
+      'Du et al. turned Minsky\'s 1986 premise into an algorithm: N agents answer, read each other, revise for R rounds, then vote. Agent count alone plateaus, round count alone barely moves, and both together produce the jump.',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-07.svg',
     diagramCaption:
       'Three agents over three rounds: independent answers, then each reading the others and revising, converging on a majority.',
     whyItMatters:
-      'Debate turns one response into an N times R matrix, and that matrix is your interface. A 5-agent, 3-round debate is 25 calls on a growing context and can cost 10 times a single chain-of-thought call, so the surface is not a spinner: it is a round counter, a per-agent state, and a diff of what changed since the last round. The output schema changes too. You render a converged answer plus the agreement fraction, and consensus is only fraction-on-majority, never truth, so the component needs a confidence read and a minority disclosure rather than a bare green answer.',
+      'Debate turns one response into an N times R matrix, and that matrix is your interface. A 5-agent, 3-round debate is 15 calls on a growing context, already several times a single chain-of-thought call; push to 5 rounds and it is 25 calls, about 10 times CoT. So the surface is not a spinner: it is a round counter, a per-agent state, and a diff of what changed since the last round. Consensus is only fraction-on-majority, never truth, so the component needs an agreement read and a minority disclosure rather than a bare green answer.',
+    learningObjectives: [
+      'Explain why self-consistency saturates while multi-agent debate does not.',
+      'Separate the two independent knobs, agent count and round count, and predict which configuration produces a jump versus a plateau.',
+      'Compute the call count and cost multiple for an N-agent, R-round debate.',
+      'Identify the three debate collapse modes, sycophancy cascade, topic drift, and compute blowup, and their mitigations.',
+      'Design a debate interface that renders agreement fraction and minority disclosure rather than a single answer.',
+    ],
     sections: [
       {
         heading: 'The problem: self-consistency saturates',
@@ -37,6 +44,30 @@ export const phase16Part3: Lesson[] = [
         heading: 'The three ways it collapses',
         body: 'Sycophancy cascade: every agent defers to whichever one sounds most confident, and the debate becomes an expensive way to agree. The mitigation is an adversarial slot, one agent prompted to argue the counter-position regardless.\n\nTopic drift: over many rounds the debate wanders off the original question. Re-inject the question every round.\n\nCompute blowup: N agents times R rounds, each with a context that grows as it accumulates peers\' answers. Five agents at five rounds is 25 calls at inflating context, and per-question cost can exceed 10 times a single CoT call. The shipping defaults are cap rounds at 3, cap agents at 5, and log every round, because a debate system that hides intermediate rounds cannot be debugged or audited.',
       },
+      {
+        heading: 'What the bill actually looks like',
+        body: 'Self-consistency at N=40 is 40 calls on a flat context, cheap per call, and it saturates because every sample shares the same weights. A single chain-of-thought call is 1 call, the floor. A 5-agent, 3-round debate is 15 calls on a context that grows every round, because each agent carries the accumulating record of what its peers said.\n\nThe fifteen calls only earn their cost when disagreement is informative: open-ended reasoning, multi-step arithmetic, factuality checks where a wrong turn is visible to a peer. On tasks with one cheap, verifiable answer, a lookup, a regex match, self-consistency at N=5 or a single verified call beats debate on cost with no accuracy loss. Debate is not a universal upgrade. It is a tool for the specific failure mode where one model\'s correlated errors need a second, independent read.',
+      },
+      {
+        heading: 'Debate, reflection, and self-consistency in one table',
+        body: 'Method | Calls | What decorrelates errors | Ceiling\nSelf-consistency | N (flat) | Nothing, same weights every sample | Plateaus fast\nReflection | R (1 agent) | Nothing, same weights judging itself | Barely moves the needle\nDebate | N times R (growing) | Peer disagreement forces justify-or-update | Keeps rising through round 3\n\nThe table is the whole argument in one row: reflection looks like debate because it also has "rounds," but a single agent re-reading its own reasoning is not a second opinion, it is the same opinion read twice. Debate\'s extra calls buy something reflection\'s extra calls do not: an independent vantage point. That is also why capping at 3 rounds and 5 agents is not a compromise. Du et al.\'s ablations show most of the gain lands by round 3, and the calls past that point are buying context bloat, not decorrelation.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-07-inline-knobs.svg',
+        alt: 'Agent count and round count as independent axes',
+        caption: 'Agents alone plateaus. Rounds alone barely moves. Both together produce the jump.',
+        diagramBrief:
+          'Line chart on cream paper (#faf6ef), monochrome ink. X axis: rounds 1 to 5. Three lines: "agents=1" flat and low, "rounds=1, agents scaling" rising then flattening, "agents x rounds both scaling" rising steeply in one accent color. Small annotation arrow pointing to where the steep line pulls away from the other two.',
+      },
+      {
+        src: '/lessons/p16-07-inline-cost.svg',
+        alt: 'Call count grid for agents times rounds',
+        caption: '5 agents times 5 rounds is 25 calls on growing context, about 10 times a single CoT call.',
+        diagramBrief:
+          '5x5 grid of small squares on cream paper, each square one LLM call, rows labeled by agent, columns labeled by round. Fill the full grid in one accent color, caption "25 calls" below. Beside it, a single small square labeled "1 call: single CoT" for scale comparison.',
+      },
     ],
     takeaways: [
       'Agents and rounds contribute independently. Adding rounds to a single agent is reflection and it barely moves; you need both to get the jump.',
@@ -45,13 +76,35 @@ export const phase16Part3: Lesson[] = [
       'Put an adversarial slot in the pool. Without one prompted dissenter, sycophancy cascade collapses the debate to the loudest agent.',
     ],
     terms: [
-      { term: 'Society of Mind', meaning: 'Minsky\'s framing of intelligence as interacting specialists, now operationalized as LLM debate.' },
-      { term: 'Multi-agent debate', meaning: 'N agents propose, read and critique each other over R rounds, then majority-vote.' },
-      { term: 'Round', meaning: 'One pass where every agent reads the others\' latest answers and updates once.' },
-      { term: 'Correlated error', meaning: 'Shared bias across samples from the same model, the reason self-consistency saturates.' },
-      { term: 'Heterogeneous debate', meaning: 'Using different base model families in the pool to decorrelate errors.' },
-      { term: 'Sycophancy cascade', meaning: 'Agents deferring to the most confident peer regardless of whether it is right.' },
+      { term: 'Society of Mind', gloss: '"Minsky\'s idea"', meaning: 'Intelligence as interacting specialists; 1986 framing now operationalized as LLM debate.' },
+      { term: 'Multi-agent debate', gloss: '"Agents argue"', meaning: 'N agents propose, read and critique each other over R rounds, then majority-vote.' },
+      { term: 'Consensus', gloss: '"They agree"', meaning: 'Not epistemic truth, just fraction-on-majority-answer. Can be confidently wrong.' },
+      { term: 'Round', gloss: '"Exchange steps"', meaning: 'One pass where every agent reads the others\' latest answers and updates once.' },
+      { term: 'Correlated error', gloss: '"Same model, same bug"', meaning: 'Shared bias across samples from the same model, the reason self-consistency saturates.' },
+      { term: 'Heterogeneous debate', gloss: '"Mix model families"', meaning: 'Using different base model families in the pool to decorrelate errors.' },
+      { term: 'Sycophancy cascade', gloss: '"Everyone agrees with the loud one"', meaning: 'Agents deferring to the most confident peer regardless of whether it is right.' },
+      { term: 'NLSOM', gloss: '"129-agent society"', meaning: 'Natural-language society of mind; Zhuge et al.\'s scaled version where specialization emerged with size.' },
+      { term: 'Topic drift', gloss: '"The conversation wanders"', meaning: 'Debate straying from the original question over many rounds; mitigated by re-injecting the question each round.' },
+      { term: 'Compute blowup', gloss: '"It got expensive"', meaning: 'N agents times R rounds on growing context, which can exceed 10 times a single CoT call.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Three agents debate for 3 rounds. Agent 2 flips its answer after round 1, having seen the majority. Is that update justified reasoning or sycophancy? What would you need to see in the transcript to tell the difference?' },
+      { level: 'medium', prompt: 'A debate configuration runs 5 agents for 5 rounds. Compute the total call count and estimate cost relative to a single chain-of-thought call, using the 10x figure this lesson cites.' },
+      { level: 'medium', prompt: 'Read Du et al. Section 4 ablations (arXiv:2305.14325). Summarize the agents-only vs rounds-only vs both result in three sentences.' },
+      { level: 'design', prompt: 'Sketch the round-by-round view for a 4-agent, 3-round debate. What does a user see change between round 1 and round 2, and how do you visually distinguish "updated its answer" from "held its position"?' },
+      { level: 'hard', prompt: 'Read "Should we be going MAD?" (arXiv:2311.17371) and name two debate variants beyond round-robin. For each, what does the extra structure buy you and what does it cost?' },
+    ],
+    furtherReading: [
+      { label: 'Du et al., Improving Factuality and Reasoning in Language Models through Multiagent Debate (arXiv:2305.14325)', url: 'https://arxiv.org/abs/2305.14325', why: 'The reference paper, ICML 2024, source of the agents-vs-rounds ablation.' },
+      { label: 'Zhuge et al., Mindstorms in Natural Language-Based Societies of Mind (arXiv:2305.17066)', url: 'https://arxiv.org/abs/2305.17066', why: 'The 129-agent NLSOM extension showing specialization emerging with scale.' },
+      { label: 'Should we be going MAD? A Look at Multi-Agent Debate Strategies for LLMs (arXiv:2311.17371)', url: 'https://arxiv.org/abs/2311.17371', why: 'Benchmarks debate variants against plain self-consistency at equal budget.' },
+      { label: 'Debate project page (Du et al.)', url: 'https://composable-models.github.io/llm_debate/', why: 'Code, demos, and the full ablation detail behind the numbers in this lesson.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Debate deployment checklist',
+      body: '- Cap rounds at 3. Most of the gain lands by round 3; more is cost, not quality.\n- Cap agents at 5. Beyond that, context bloat and compute dominate.\n- Heterogeneous by default: at least two different base models in the pool.\n- One adversarial slot: an agent prompted to disagree regardless, to break sycophancy cascade.\n- Log every round. A debate system that hides intermediate rounds cannot be debugged or audited.\n- Render the agreement fraction and the minority answer, never just the majority string.',
+    },
     demoCaption:
       'Move the agent count and watch the two knobs separate. One agent over many rounds is reflection and flat. Many agents in one round plateaus. The gain lives where both are above one, and so does the 25-call bill.',
     demo: {
@@ -97,12 +150,19 @@ export const phase16Part3: Lesson[] = [
     title: 'Voting topology: who talks to whom decides whether debate helps',
     oneLiner:
       'Star, chain, tree, graph. MultiAgentBench measured all four and found graph best for research, chain for pipelines, star for fast factual answers, and a coordination tax past roughly 4 agents. Heterogeneity beats numerosity: three different models usually beat five copies of one.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-15.svg',
     diagramCaption:
       'The four topologies side by side, with the edge count that drives token cost growing from chain to fully connected graph.',
     whyItMatters:
       'Topology is the thing you actually pick in a config, and it sets both the latency profile and what you can show. A chain streams progressively, since each agent finishes before the next starts, so you can render a stepper. A graph resolves all at once and needs a bounded-round progress state with nothing partial to show. Star gives you one hub answer plus N worker rows. The coordination tax past 4 agents is a budget you should surface: cost and wall-clock grow faster than quality, so the config UI needs an agent count with a warning threshold, not an open number field.',
+    learningObjectives: [
+      'Compare star, chain, tree, and graph topologies by information flow and cost.',
+      'Explain the coordination tax and why it appears past roughly 4 agents on graph topology.',
+      'Decide when swapping a model beats adding an agent.',
+      'Distinguish volunteer and conformity behaviors and identify which one is a liability.',
+      'Choose a UI pattern, stepper versus bounded-round wait, that matches a given topology\'s completion shape.',
+    ],
     sections: [
       {
         heading: 'The problem: bolting on five agents often regresses',
@@ -124,6 +184,30 @@ export const phase16Part3: Lesson[] = [
         heading: 'Two emergent behaviors, one of them a liability',
         body: 'AgentVerse (ICLR 2024) documented two behaviors that emerge from debate without anyone designing them.\n\nVolunteer: an agent offers unprompted to take the next step, which usefully routes work to whichever agent is most capable on that subtask. Conformity: an agent adjusts its stance to match a critic, even when the critic is wrong. Conformity is the debate-equivalent of sycophancy, and it is why debate-until-agreement rewards bullies.\n\nThe mitigations are structural: bound the rounds at 2 to 3, add a separate judge that scores but does not vote, and always log the minority cluster. A minority that is persistently right is a diversity signal you are otherwise throwing away.',
       },
+      {
+        heading: 'Self-consistency: the baseline you have to beat',
+        body: 'Before any multi-agent topology, there is Wang et al. 2022: sample one model N times at temperature above zero, majority-vote on the reasoning paths. On GSM8K that produced substantial gains at N=40 over a single greedy decode. It is one model, it is cheap per call, and it is the floor every topology has to clear.\n\nThe limit is structural: all N samples share the same weights, so a systematic bias rides along in every one of them. Self-consistency is the single-agent precursor to multi-agent voting, and it is worth running first. If a task is simple enough that N=5 self-consistency already saturates accuracy, no topology below is worth its coordination cost.',
+      },
+      {
+        heading: 'Jury methods: the middle ground',
+        body: 'Between plain majority vote and full multi-agent debate sits the jury: a small, role-differentiated panel. The Sibyl framework formalizes it with three roles, one agent cross-examines, one supplies context, one scores plausibility, and the panel votes after each stage rather than only at the end.\n\nA jury costs more than a vote, each role is a separate call, and less than full debate, no all-to-all exchange, no growing shared context. It buys some of debate\'s decorrelation, since the roles see the problem from different angles, without graph topology\'s N-squared edge growth. Treat it as the answer to "debate feels too expensive but voting feels too shallow": three specialized calls instead of five generalist ones arguing in a circle.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-15-inline-topologies.svg',
+        alt: 'Star, chain, tree, and graph edge counts',
+        caption: 'Edge count grows from chain (linear) to graph (N squared), and that edge count is the token-cost driver.',
+        diagramBrief:
+          'Four small node-and-edge diagrams side by side on cream paper (#faf6ef): star (1 hub, 4 spokes), chain (4 nodes in a line), tree (root plus 2 children plus 4 grandchildren), graph (4 nodes fully connected, 6 edges). Print the edge count below each. One accent color per diagram\'s edges, monochrome ink otherwise.',
+      },
+      {
+        src: '/lessons/p16-15-inline-coordination-tax.svg',
+        alt: 'Coordination tax curve past 4 agents',
+        caption: 'Past roughly 4 agents on graph topology, cost and latency outrun quality.',
+        diagramBrief:
+          'Two overlaid line charts on cream paper, X axis agent count 1 to 8. Line 1 "quality" rises and flattens after 4. Line 2 "cost / latency" rises faster and keeps climbing past 4, in accent color. Shade the region past X=4 lightly and label it "coordination tax zone".',
+      },
     ],
     takeaways: [
       'Topology is a product decision. Chain streams and gives you a stepper. Graph resolves all at once and gives you a bounded-round progress state.',
@@ -132,13 +216,35 @@ export const phase16Part3: Lesson[] = [
       'Log the minority cluster. A persistently correct minority is measurable diversity value, and hiding it makes consensus look better than it is.',
     ],
     terms: [
-      { term: 'Self-consistency', meaning: 'One model sampled N times above temperature zero, majority-voted on reasoning paths.' },
-      { term: 'Topology', meaning: 'Who reads whom: star, chain, tree, or graph. It determines information flow and edge count.' },
-      { term: 'Coordination tax', meaning: 'Cost and latency growing faster than quality, appearing past roughly 4 agents on graph.' },
-      { term: 'A-HMAD', meaning: 'Adversarial heterogeneous multi-agent debate: different base models plus a dissenting role.' },
-      { term: 'Conformity behavior', meaning: 'An agent shifting its stance to match a critic, correct or not. The AgentVerse liability.' },
-      { term: 'Jury', meaning: 'A small role-differentiated panel (examiner, context supplier, scorer) between plain vote and full debate.' },
+      { term: 'Self-consistency', gloss: '"Sample N times, vote"', meaning: 'Wang 2022. One model, N samples above temperature zero, majority vote on reasoning paths.' },
+      { term: 'Heterogeneity', gloss: '"Different models"', meaning: 'An ensemble of different base models or prompt families in the pool, which breaks monoculture.' },
+      { term: 'MAD', gloss: '"Multi-agent debate"', meaning: 'The generic term for agents exchanging critiques over rounds, per Du et al. 2023.' },
+      { term: 'A-HMAD', gloss: '"Adversarial heterogeneous MAD"', meaning: 'A debate variant naming different base models plus a dissenting role.' },
+      { term: 'Topology', gloss: '"Who talks to whom"', meaning: 'Star, chain, tree, or graph. It determines information flow and edge count.' },
+      { term: 'Coordination tax', gloss: '"Diminishing returns"', meaning: 'Past roughly 4 agents on graph topology, cost and latency grow faster than quality.' },
+      { term: 'Volunteer behavior', gloss: '"Unprompted help"', meaning: 'AgentVerse\'s emergent pattern where an agent offers to take the next step unasked.' },
+      { term: 'Conformity behavior', gloss: '"Agreement under pressure"', meaning: 'An agent shifting its stance to match a critic, correct or not. The AgentVerse liability.' },
+      { term: 'Jury', gloss: '"Small specialized panel"', meaning: 'A Sibyl-style role-differentiated ensemble (examiner, context supplier, scorer) between plain vote and full debate.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A team runs 5 agents in a fully connected graph for a fact-lookup task. Name two structural reasons this likely underperforms a single agent with self-consistency at N=5.' },
+      { level: 'medium', prompt: 'At N=7 on graph topology, MARBLE\'s coordination tax means cost and latency outrun quality gains. Sketch the accuracy-vs-N and cost-vs-N curves you would expect and mark where they cross.' },
+      { level: 'medium', prompt: 'Read MultiAgentBench (arXiv:2503.01935) Section 4. Name one topology-task pairing the paper measures that this lesson does not cover.' },
+      { level: 'design', prompt: 'Design the progress component for a chain topology at N=4 versus a graph topology at N=4. What can the chain view show that the graph view structurally cannot?' },
+      { level: 'hard', prompt: 'A jury of 3 role-differentiated agents (examiner, context supplier, scorer) replaces a 5-agent full debate. Estimate the call-count savings and name one accuracy risk of the smaller panel.' },
+    ],
+    furtherReading: [
+      { label: 'Wang et al., Self-Consistency Improves Chain of Thought Reasoning (arXiv:2203.11171)', url: 'https://arxiv.org/abs/2203.11171', why: 'The single-model baseline every multi-agent topology has to beat.' },
+      { label: 'MultiAgentBench / MARBLE (arXiv:2503.01935)', url: 'https://arxiv.org/abs/2503.01935', why: 'The topology benchmark: graph best for research, chain best for pipelines, coordination tax past ~4 agents.' },
+      { label: 'Should we be going MAD? (arXiv:2311.17371)', url: 'https://arxiv.org/abs/2311.17371', why: 'Finds MAD often loses to self-consistency at equal budget unless agents are genuinely heterogeneous.' },
+      { label: 'AgentVerse (ICLR 2024)', url: 'https://proceedings.iclr.cc/paper_files/paper/2024/file/578e65cdee35d00c708d4c64bce32971-Paper-Conference.pdf', why: 'Source of the volunteer and conformity emergent-behavior findings.' },
+      { label: 'MARBLE reference implementation', url: 'https://github.com/ulab-uiuc/MARBLE', why: 'The benchmark harness behind the topology numbers in this lesson.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Topology picker',
+      body: '- Start with self-consistency at N=5 on one strong base model. It is the cheap baseline.\n- Upgrade to heterogeneous voting at N=3 if accuracy matters, and measure the delta.\n- Only upgrade to a debate topology if the task has structure (research, multi-step) and bounded rounds are feasible.\n- Pick chain for stepwise pipelines, star for fast factual consolidation, graph only for genuine any-to-any critique.\n- Cap agents at 4 on graph topology and put a warning threshold on the control past that.\n- Always log the minority cluster and benchmark wall-clock and tokens alongside accuracy.',
+    },
     demoCaption:
       'Switch between chain and graph on the same 5-agent task. The agent count is identical; the edge count, the latency shape, and the progress component you can build are not. Chain hands you a stepper, graph hands you a bounded-round wait.',
     demo: {
@@ -196,12 +302,19 @@ export const phase16Part3: Lesson[] = [
     title: 'Negotiation: let the model narrate, never let it compute the offer',
     oneLiner:
       'LLMs close tightly parameterized bargains at about 27 percent. Split the job in two, a deterministic offer generator plus an LLM narrator, and the deal rate goes to about 89 percent. Scale does not fix it; decomposition does.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-16.svg',
     diagramCaption:
       'The OG-Narrator split: negotiation state feeds a deterministic offer generator, whose price the LLM wraps in language.',
     whyItMatters:
       'This is a schema boundary you will implement literally. The message a negotiating agent sends is two fields, not one: a numeric offer produced by code and a narration string produced by the model, and only the number is authoritative. That split determines what you render (the price as a typed value with a history chart, the framing as prose), what you validate (reject out-of-ZOPA offers at the protocol boundary), and the hardest part: private scratchpad context must never reach the counterpart\'s window. If your trace viewer shows reasoning in the same pane as sent messages, you have already leaked the reservation price.',
+    learningObjectives: [
+      'Explain why decomposing offer-generation from narration lifts deal rate without a larger model.',
+      'Trace a Contract Net negotiation through cfp, propose, accept-proposal, and reject-proposal.',
+      'Identify why concealing reasoning from a counterpart improves negotiation outcomes.',
+      'Distinguish ZOPA and BATNA and use them to validate an incoming offer.',
+      'Design a message schema that separates a typed numeric offer from a non-authoritative narration string.',
+    ],
     sections: [
       {
         heading: 'The problem: a 27 percent deal rate that scale does not fix',
@@ -223,6 +336,30 @@ export const phase16Part3: Lesson[] = [
         heading: 'The benchmark texture: personas, exploitation, and model styles',
         body: 'NegotiationArena (arXiv:2402.05863) is the canonical benchmark. Models improve payoffs about 20 percent by adopting personas such as "I am desperate to sell this by Friday," so persona manipulation is a real tactic. Fair and cooperative agents get exploited by adversarial ones, and defending requires explicit counter-posturing. Symmetric pair-ups still converge to inequitable outcomes on about 40 percent of scenarios. The read is not "models are bad negotiators," it is "models negotiate too much like humans, including the exploitable parts."\n\nBhattacharya et al. 2025, scored on Harvard Negotiation Project metrics, found Llama-3 most effective at striking bargains, Claude-3 most aggressive with high anchors and late concessions, and GPT-4 fairest with the smallest payoff variance. The snapshot ages; the point that base models have persistent negotiation styles does not.',
       },
+      {
+        heading: 'Contract Net as a task market, not just a handshake',
+        body: 'The modern reuse of Contract Net scales past two-party bargaining into task allocation. A manager agent decomposes a job into units and broadcasts a cfp to a pool of worker agents. Each worker replies with an offer of price, ETA, and confidence, three numbers, not prose. The manager awards the units and the losing bidders stay free to bid on the next call.\n\nThis is why the protocol survives past 100 workers where synchronous chat collapses: coordination is broadcast-and-respond, not a conversation everyone has to track. Microsoft Agent Framework\'s orchestration patterns and several LangGraph implementations use this shape for exactly that reason. The manager\'s UI is a bid table, not a transcript, and that table is what a user reviewing task allocation should actually see.',
+      },
+      {
+        heading: 'N-party negotiation and secret scores',
+        body: 'Two-party bargaining generalizes to coalition formation once you add a third stakeholder with its own private utility. The LLM-Stakeholders Interactive Negotiation benchmark (NeurIPS 2024) sets up multi-party scorable games where each party has a secret score and a minimum-acceptance threshold, and the model has to infer what the others value from what they say, not from a shared ledger.\n\nThis is the production case for a task market with heterogeneous workers: a manager, a specialist bidder, and a budget holder do not share a utility function, and no single message reveals all three. The engineering consequence is the same one CoT concealment forces on two-party deals: each party\'s private valuation lives in its own scratchpad, and the negotiation transcript only ever shows what was actually said.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-16-inline-schema.svg',
+        alt: 'OG-Narrator message schema, two fields',
+        caption: 'The message is two fields: a typed numeric offer and a non-authoritative narration string.',
+        diagramBrief:
+          'Cream paper (#faf6ef), a message box split into two labeled sub-boxes: left "offer: number (authoritative)" with a small lock icon in accent color, right "narration: string (decorative)" with a speech-bubble icon. Arrow from a "negotiation state" box on the far left into the offer box only, showing narration has no path back to state.',
+      },
+      {
+        src: '/lessons/p16-16-inline-dealrate.svg',
+        alt: 'Deal rate before and after decomposition',
+        caption: 'All-model bargaining closes around 27 percent. Splitting offer from narration closes around 89 percent.',
+        diagramBrief:
+          'Two horizontal bar charts on cream paper stacked vertically. Bar 1 "model decides offer" filled to 27%. Bar 2 "code decides, model narrates" filled to 89%, accent color. Gridlines at 25/50/75/100.',
+      },
     ],
     takeaways: [
       'The message is two fields. A number computed deterministically and a narration written by the model, with only the number authoritative.',
@@ -231,13 +368,34 @@ export const phase16Part3: Lesson[] = [
       'Validate incoming offers at the protocol boundary. An out-of-ZOPA offer cannot close, so reject it before it enters the negotiation state.',
     ],
     terms: [
-      { term: 'Contract Net', meaning: 'Smith 1980, FIPA 1996: cfp, propose, accept or reject. The canonical task-market protocol.' },
-      { term: 'ZOPA', meaning: 'Zone of possible agreement: the overlap between the buyer\'s maximum and the seller\'s minimum.' },
-      { term: 'BATNA', meaning: 'Best alternative to a negotiated agreement, the fallback that sets your reservation price.' },
-      { term: 'OG-Narrator', meaning: 'The decomposition where code computes the offer and the model only writes the framing.' },
-      { term: 'CoT concealment', meaning: 'Keeping strategy in a private scratchpad so the counterpart reads only the offer.' },
-      { term: 'Persona manipulation', meaning: 'Framing urgency or desperation in narration, worth roughly 20 percent payoff in NegotiationArena.' },
+      { term: 'Contract Net', gloss: '"Task market"', meaning: 'Smith 1980, FIPA 1996: cfp, propose, accept-proposal, reject-proposal. The canonical task-market protocol.' },
+      { term: 'ZOPA', gloss: '"Zone of possible agreement"', meaning: 'The overlap between the buyer\'s maximum and the seller\'s minimum; offers outside it cannot close.' },
+      { term: 'BATNA', gloss: '"Best alternative to a negotiated agreement"', meaning: 'Your fallback if the deal fails, which sets your reservation price.' },
+      { term: 'OG-Narrator', gloss: '"Offer generator plus narrator"', meaning: 'The decomposition where a deterministic function computes the price and the model only writes the framing.' },
+      { term: 'Zeuthen strategy', gloss: '"Risk-minimizing concession"', meaning: 'A classical offer-generator rule that concedes based on a risk limit, one option for the deterministic half of OG-Narrator.' },
+      { term: 'Rubinstein bargaining', gloss: '"Alternating-offer equilibrium"', meaning: 'A game-theoretic model for infinite-horizon bargaining with discounting, another deterministic offer-generator choice.' },
+      { term: 'CoT concealment', gloss: '"Hide your reasoning"', meaning: 'Keeping strategy in a private scratchpad so the counterpart\'s context only ever contains the offer.' },
+      { term: 'Persona manipulation', gloss: '"Emotional posturing"', meaning: 'Framing urgency or desperation in the narration only, worth roughly 20 percent payoff in NegotiationArena.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'A negotiating agent\'s message contains an offer and a narration. Which field is authoritative, and what should happen if the two disagree?' },
+      { level: 'medium', prompt: 'OG-Narrator moves deal rate from about 27 percent to about 89 percent without a larger model. Name the two anchoring failures decomposition removes.' },
+      { level: 'medium', prompt: 'A Contract Net manager receives three bids of (price, eta, confidence) for one task. Two bids beat the reserve price on cost, one wins on confidence. Which award rule do you pick and why?' },
+      { level: 'design', prompt: 'Sketch a negotiation trace viewer for a support agent negotiating a refund. Show where the private scratchpad lives relative to the sent-message log, and what happens to the design if a developer tries to put them in the same pane.' },
+      { level: 'hard', prompt: 'Read the Large-Scale Autonomous Negotiation Competition paper (arXiv:2503.06416). What single design choice most explains why concealment-favoring agents won across roughly 180,000 negotiations?' },
+    ],
+    furtherReading: [
+      { label: 'NegotiationArena (arXiv:2402.05863)', url: 'https://arxiv.org/abs/2402.05863', why: 'The canonical benchmark: persona manipulation and exploitation findings.' },
+      { label: 'Measuring Bargaining Abilities of Language Models (arXiv:2402.15813)', url: 'https://arxiv.org/abs/2402.15813', why: 'Source of OG-Narrator and the 27-to-89-percent deal-rate result.' },
+      { label: 'Large-Scale Autonomous Negotiation Competition (arXiv:2503.06416)', url: 'https://arxiv.org/abs/2503.06416', why: 'Roughly 180,000 negotiations; chain-of-thought concealment wins.' },
+      { label: 'LLM-Stakeholders Interactive Negotiation (NeurIPS 2024)', url: 'https://proceedings.neurips.cc/paper_files/paper/2024/file/984dd3db213db2d1454a163b65b84d08-Paper-Datasets_and_Benchmarks_Track.pdf', why: 'Multi-party scorable games with secret utilities, the N-party generalization.' },
+      { label: 'Smith 1980, The Contract Net Protocol', url: 'https://ieeexplore.ieee.org/document/1675516', why: 'The classical mechanism this lesson\'s task-market pattern reuses.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Production bargaining checklist',
+      body: '- Separate scratchpad. Private state never reaches the counterpart\'s context. Non-negotiable.\n- Deterministic offer generation. Compute prices, quantities, and ETAs; do not prompt for them.\n- Validate all incoming offers against a schema. Reject out-of-ZOPA offers at the protocol boundary.\n- Bound rounds at 3 to 5. Escalate to a mediator on deadlock.\n- Measure deal rate and payoff variance continuously. A falling deal rate is a symptom of prompt drift or a counterpart-side attack.\n- Log all rejected proposals with the deterministic rationale, so losing bidders understand why.',
+    },
     demoCaption:
       'Toggle the two architectures on the same bargain. The all-model bargainer writes both the price and the pitch and lands outside the ZOPA. The split version computes the price and lets the model write only the pitch, and closes.',
     demo: {
@@ -295,12 +453,19 @@ export const phase16Part3: Lesson[] = [
     title: 'Generative agents: memory stream, reflection, plan',
     oneLiner:
       'Park et al. populated Smallville with 25 agents on three components: an append-only memory stream, periodic reflection that synthesizes beliefs, and a revisable plan tree. One seeded goal produced a party that 24 unseeded agents organized themselves.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-17.svg',
     diagramCaption:
       'Observations enter the append-only stream, reflection synthesizes higher-order beliefs back into it, and plans read from ranked retrieval.',
     whyItMatters:
       'The retrieval score is the interface. Memory ranks by recency times decay, plus self-rated importance, plus embedding relevance, and every action is driven by a top-k slice of that ranking. Which means the debuggable surface is a per-action panel showing exactly which memories won, with their three sub-scores visible, because "why did the agent do that" has a literal answer you can render. The append-only rule is a hard constraint on your data layer: corrections are new rows, never edits, so any UI that lets a user fix a memory writes a superseding entry and shows both.',
+    learningObjectives: [
+      'Describe the three components of the generative-agent architecture and what each contributes to believability.',
+      'Compute a memory\'s retrieval score from its recency, importance, and relevance sub-scores.',
+      'Trace how one seeded goal produces unscripted group behavior through observation, reflection, and plan.',
+      'Identify the three documented failure modes and their mitigations.',
+      'Design a per-action panel that exposes which memories drove a decision.',
+    ],
     sections: [
       {
         heading: 'The problem: scripted teams cannot produce emergence',
@@ -322,6 +487,30 @@ export const phase16Part3: Lesson[] = [
         heading: 'The three documented failures, all of them yours to inherit',
         body: 'Spatial norm errors: agents walk into closed stores, try to share a single-person bathroom, eat in rooms not meant for eating. The model does not infer social-physical norms from the environment, so you detect these explicitly or they happen.\n\nMemory overflow: deep runs grow retrieval cost. The remedy is periodic compaction, summarize-and-prune, plus decay on low-importance entries. Retention policy is a design decision, not a detail.\n\nReflection hallucination: reflections invent relationships not present in the stream. The mitigation is provenance, include source memory ids in the reflection prompt and verify at retrieval. Budget note: each agent\'s retrieve plus reflect plus plan is O(k) model calls per tick, and N agents times T ticks times calls-per-tick will dwarf a naive budget.',
       },
+      {
+        heading: 'Five rules that keep the architecture honest',
+        body: 'The three components only work if the implementation follows rules the paper is explicit about. Memory is append-only, never mutate an entry, a correction is a new entry, full stop. Importance scores are cheap: call the model once at write time, rate 1 to 10, cache it, never recompute. Retrieval is ranked, not filtered, a hard filter throws away context a weighted score would have surfaced. Reflection runs periodically, triggered when the summed importance of unprocessed memories crosses a threshold, not on a fixed clock. Plans are revisable, and only the contradicted segment regenerates, not the whole tree.\n\nEach rule maps to a specific bug if you skip it: mutate a memory and you lose the audit trail, filter hard and you lose serendipitous context, regenerate the whole plan and you burn the token budget rebuilding what a contradiction never touched.',
+      },
+      {
+        heading: 'Where the architecture ships beyond Smallville',
+        body: 'The three-component shape has outgrown the original sandbox. Policy and market research use Smallville-like populations to simulate how users might respond to a feature, faster than an A/B test and with contested accuracy, since a simulated user is not a real one. Game studios use it for NPC AI, replacing scripted quests with agents that generate their own storylines from memory and reflection. Evaluation itself has shifted: the metric is not task accuracy but believability and coherence over a long run, scored by human raters.\n\nThe dividing line to hold onto: tight task execution, a pipeline that must produce a correct answer, still wants the supervisor-and-roles patterns from earlier in this phase. Emergent social behavior, where the interesting output is the unscripted interaction itself, is what the memory-reflection-plan architecture is for. Using one where the other belongs is the actual failure mode.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-17-inline-retrieval.svg',
+        alt: 'Three memory sub-scores combining into one retrieval score',
+        caption: 'Recency, importance, and relevance combine into a weighted score; only the top-k enters the prompt.',
+        diagramBrief:
+          'Cream paper (#faf6ef). Three labeled bars (recency, importance, relevance) feeding into a plus sign, feeding into a single "score" box, feeding into a ranked list of 5 memory rows with the top 3 highlighted in accent color and the bottom 2 grayed out, labeled "never enters the prompt".',
+      },
+      {
+        src: '/lessons/p16-17-inline-spread.svg',
+        alt: 'One seeded goal spreading through a social graph',
+        caption: 'Isabella\'s invitation becomes an observation, a reflection, then a plan in each neighbor, and neighbors tell neighbors.',
+        diagramBrief:
+          'Cream paper, a small social network of 8 to 10 dots. One dot (Isabella) in accent color at center. Arrows radiating outward labeled "invitation, observation, reflection, plan" in sequence to two neighbors, then further arrows from those neighbors to their neighbors showing second-hand spread. Final frame shows several dots converged near a small cafe icon.',
+      },
     ],
     takeaways: [
       'Every action traces to a top-k retrieval. Show the winning memories with their recency, importance, and relevance sub-scores, and "why did it do that" stops being a mystery.',
@@ -330,13 +519,33 @@ export const phase16Part3: Lesson[] = [
       'Cost is N agents times T ticks times O(k) calls per tick. Price the simulation before you scale the population.',
     ],
     terms: [
-      { term: 'Memory stream', meaning: 'An append-only log of observations, actions, reflections, and plans with derived scores.' },
-      { term: 'Importance', meaning: 'A 1 to 10 self-rating the agent assigns a memory at write time, then cached.' },
-      { term: 'Relevance', meaning: 'Embedding cosine similarity between a memory and the current query.' },
-      { term: 'Reflection', meaning: 'A higher-order synthesis generated from recent memories and written back as a new memory.' },
-      { term: 'Plan tree', meaning: 'Day, hour, and action level decomposition, regenerated only in the segment an observation contradicts.' },
-      { term: 'Believability', meaning: 'The human-rater score Park et al. used, highest with all three components present.' },
+      { term: 'Memory stream', gloss: '"The agent\'s diary"', meaning: 'An append-only log of observations, actions, reflections, and plans, each entry carrying derived scores.' },
+      { term: 'Recency', gloss: '"How new is the memory"', meaning: 'An exponential-decay score by age, one of the three terms in the retrieval score.' },
+      { term: 'Importance', gloss: '"How much does the agent care"', meaning: 'A 1 to 10 self-rating the agent assigns a memory at write time, then cached.' },
+      { term: 'Relevance', gloss: '"How related to the current query"', meaning: 'Embedding cosine similarity between a memory and the current query.' },
+      { term: 'Reflection', gloss: '"Higher-order belief"', meaning: 'A synthesis generated from recent memories and written back into the stream as a new, retrievable entry.' },
+      { term: 'Plan tree', gloss: '"Day, hour, action decomposition"', meaning: 'A top-down plan, revisable, where only the segment an observation contradicts gets regenerated.' },
+      { term: 'Smallville', gloss: '"Park 2023\'s sandbox"', meaning: 'The 25-agent simulation that produced the unscripted Valentine\'s Day party.' },
+      { term: 'Believability', gloss: '"The quality metric"', meaning: 'The human-rater score Park et al. used, highest with all three architecture components present.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'An agent\'s memory stream shows a reflection with importance 8 outranking a raw observation with importance 4. Under what condition should that be a red flag rather than the ranking working correctly?' },
+      { level: 'medium', prompt: 'Compute the retrieval score for a memory with recency decay 0.74, importance 8, relevance 0.6, using equal weights of 1 for each term. Would it outrank a memory with recency 0.91, importance 3, relevance 0.5?' },
+      { level: 'medium', prompt: 'One agent is seeded with a goal; 24 are not, and a party emerges. Name the three architecture components load-bearing for that outcome and what breaks in the outcome if each is dropped.' },
+      { level: 'design', prompt: 'Design the per-action "why did it do that" panel for a generative-agent simulation. What three numbers does every row need, and how do you visually flag a reflection that outranks its own source observations?' },
+      { level: 'hard', prompt: 'Read Park et al. Section 6 (arXiv:2304.03442). Name one documented emergent behavior beyond the Valentine\'s Day party and the architecture component most responsible for it.' },
+    ],
+    furtherReading: [
+      { label: 'Park et al., Generative Agents: Interactive Simulacra of Human Behavior (arXiv:2304.03442)', url: 'https://arxiv.org/abs/2304.03442', why: 'The reference architecture: memory stream, reflection, plan, and the ablations.' },
+      { label: 'UIST \'23 paper page', url: 'https://dl.acm.org/doi/10.1145/3586183.3606763', why: 'The publication venue, with the full experiment writeup.' },
+      { label: 'Smallville code release', url: 'https://github.com/joonspk-research/generative_agents', why: 'The reference Python implementation of the three components.' },
+      { label: 'Hayes-Roth 1985, A Blackboard Architecture for Control', url: 'https://www.sciencedirect.com/science/article/abs/pii/0004370285900639', why: 'Prior art for structured-memory agents, decades before Smallville.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Generative-agent simulation checklist',
+      body: '- Memory is the database. Pick a real store (vector DB, Postgres) at scale; in-memory is for prototypes only.\n- Log the retrieval trace. For every action, log the top-k memories that drove it.\n- Budget per-agent tokens. Each agent\'s retrieve plus reflect plus plan is O(k) calls per tick; N agents times T ticks can dwarf your budget.\n- Compact memory periodically. Summarize-and-prune low-importance entries; retention policy is a design decision.\n- Detect spatial and social norm violations explicitly. The architecture does not learn them on its own.',
+    },
     demoCaption:
       'Open the retrieval behind one action. The summary says the agent decided to attend a party. The payload is the three memories that won the ranking, with recency, importance, and relevance broken out, which is the actual explanation.',
     demo: {
@@ -388,12 +597,19 @@ export const phase16Part3: Lesson[] = [
     title: 'Theory of mind: coordination is prompt-conditional, not free',
     oneLiner:
       'Riedl measured coordination at population scale and found it only clears baseline under the theory-of-mind prompt condition. Without it, apparent coordination does not survive statistical controls. In a token-collection task, first-order ToM cut duplicate effort from about 35 percent to about 5 percent.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-18.svg',
     diagramCaption:
       'A zeroth-order agent acting on its own observations, beside a first-order agent carrying an explicit per-peer belief model.',
     whyItMatters:
       'The load-bearing state is a per-peer belief map: agent id keyed to the beliefs you attribute to that agent, held outside the model context and injected per turn. That structure is the fix for the documented failure, which is identity-belief binding decay: over a long horizon the model forgets which belief belonged to whom and produces "I thought he thought X" errors that compound. So this is an external store with an explicit schema, not a prompt paragraph. And it gives you three measurable signals to render in a coordination view: complementarity, anticipation, and correction.',
+    learningObjectives: [
+      'Distinguish zeroth-, first-, and second-order theory of mind and what state each requires.',
+      'Explain why coordination claims need a control condition and a significance test.',
+      'Identify the mechanism by which long-horizon context degrades identity-belief binding.',
+      'Recognize the three measurable coordination signals: complementarity, anticipation, and correction.',
+      'Design an audit view that separates measured coordination from prompt-dressed appearance.',
+    ],
     sections: [
       {
         heading: 'The problem: most "emergent coordination" is prompt dressing',
@@ -415,6 +631,30 @@ export const phase16Part3: Lesson[] = [
         heading: 'Where ToM actively hurts',
         body: 'Adversarial settings: an agent with good ToM is easier to manipulate, because a counterpart can model what you model of them and exploit it. This is the same finding as chain-of-thought concealment in negotiation, arriving from the other direction.\n\nHeterogeneous teams: a peer model tuned to one opponent does not generalize to a different base model with a different style.\n\nGround-truth tasks: ToM is about beliefs. When correctness depends on facts, modelling what a peer believes is a distraction from checking the fact. The shipping discipline is a control condition without the coordination prompt, a significance test against it, a complementarity measure rather than just final success, and disclosure when the effect vanishes on smaller models.',
       },
+      {
+        heading: 'Why the illusion is so easy to produce',
+        body: 'Three ordinary mistakes manufacture the appearance of coordination without the substance. A system prompt that says "work together" bakes coordination in before the agents do anything, so what you are measuring is prompt compliance, not emergent behavior. Observer bias does the rest: humans watching a multi-agent transcript see intentional-looking patterns whether or not they are there, the same way people see faces in clouds. Post-hoc selection finishes the job, a demo reel of the five best runs out of fifty looks like a capability rather than a lucky draw.\n\nRiedl\'s contribution is refusing all three shortcuts at once: a controlled prompt condition, a metric measured against a no-ToM baseline, and a significance test before any claim of coordination is allowed to stand. A product team that skips the control is not lying, exactly. It is reporting the demo reel as the mean.',
+      },
+      {
+        heading: 'The three signals you can actually log',
+        body: 'Three agents split three boxes with no communication channel, only each other\'s moves to read. Zeroth-order agents, no model of peers, duplicate effort on roughly 35 percent of trials, two agents reaching for the same box because neither can predict the other. First-order agents, holding a belief map per peer, cut that to roughly 5 percent.\n\nThe three signals that separate this from prompt dressing are loggable in any real system. Complementarity: over a multi-turn task, do actions cover disjoint subtasks rather than duplicate ones? Anticipation: does agent A\'s move at turn T+1 depend on a prediction about B at T+2 that turns out correct? Correction: when A misreads B\'s belief at turn T, does A fix it by T+2? None of these require a lab; a duplication counter and a turn-indexed action log produce all three from data you are probably already collecting.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-18-inline-orders.svg',
+        alt: 'Zeroth, first, and second order theory of mind state',
+        caption: 'Zeroth order holds no model of peers. First order holds one per-peer belief map. Second order nests one level deeper.',
+        diagramBrief:
+          'Cream paper (#faf6ef), three side-by-side boxes. Box 1 "zeroth order": single agent icon, no arrows out. Box 2 "first order": agent icon with arrows to two peer icons labeled "beliefs I attribute to them", in accent color. Box 3 "second order": same but one arrow has a nested smaller box inside labeled "what I think they think a third believes".',
+      },
+      {
+        src: '/lessons/p16-18-inline-duplication.svg',
+        alt: 'Duplication rate, zeroth order vs first order ToM',
+        caption: 'First-order ToM cuts duplicate effort from about 35 percent to about 5 percent on a token-collection task.',
+        diagramBrief:
+          'Cream paper, two bar charts side by side. Left "zeroth order" bar filled to 35%. Right "first order" bar filled to 5%, accent color. Small icon above each bar: two hands reaching for the same box (left) vs two hands reaching for different boxes (right).',
+      },
     ],
     takeaways: [
       'The state is a typed per-peer belief map held outside the context window, because identity-belief binding is what decays over a long horizon.',
@@ -423,13 +663,33 @@ export const phase16Part3: Lesson[] = [
       'Good ToM is an attack surface in adversarial settings, for the same reason a visible reservation price is.',
     ],
     terms: [
-      { term: 'Theory of mind', meaning: 'The capacity to model another agent\'s beliefs, graded by order: 0, 1, 2 and up.' },
-      { term: 'First-order ToM', meaning: 'Modelling a peer\'s beliefs about facts: "Alice believes X."' },
-      { term: 'Second-order ToM', meaning: 'Modelling recursive beliefs one level deeper: "Alice believes Bob believes X."' },
-      { term: 'Sally-Anne test', meaning: 'The 1985 false-belief probe; models pass plain versions and fail long or indirect ones.' },
-      { term: 'Goal-directed complementarity', meaning: 'Riedl\'s metric for agents covering disjoint subtasks rather than duplicating.' },
-      { term: 'Coordination illusion', meaning: 'Prompt-dressed apparent coordination that does not survive statistical controls.' },
+      { term: 'Theory of mind', gloss: '"Understanding others\' minds"', meaning: 'The capacity to model another agent\'s beliefs, graded by order: 0, 1, 2 and up.' },
+      { term: 'First-order ToM', gloss: '"Alice believes X"', meaning: 'Modelling a peer\'s beliefs about facts directly, one level of attribution.' },
+      { term: 'Second-order ToM', gloss: '"Alice believes Bob believes X"', meaning: 'Modelling recursive beliefs one level deeper than first-order.' },
+      { term: 'Sally-Anne test', gloss: '"The false-belief test"', meaning: 'The 1985 developmental-psychology probe; models pass plain versions and fail long or indirect ones.' },
+      { term: 'Identity-linked differentiation', gloss: '"Stable roles over time"', meaning: 'Riedl\'s metric for whether agents develop persistent role distinctions rather than shuffling randomly.' },
+      { term: 'Goal-directed complementarity', gloss: '"Disjoint actions"', meaning: 'Riedl\'s metric for agents covering different subtasks rather than duplicating each other.' },
+      { term: 'Higher-order synergy', gloss: '"Group exceeds any subset"', meaning: 'Riedl\'s statistical measure for whether the group achieves what no smaller subset could.' },
+      { term: 'Coordination illusion', gloss: '"It looks coordinated"', meaning: 'Prompt-dressed apparent coordination that does not survive a control condition or a significance test.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'An agent\'s per-peer belief map has not been updated in 12 turns while the conversation has moved on. What failure mode does this predict, and what would you see in the transcript?' },
+      { level: 'medium', prompt: 'First-order ToM cuts duplication from about 35 percent to about 5 percent at short horizon. Sketch the duplication-rate curve you would expect from 10 to 30 turns and mark where it starts eroding.' },
+      { level: 'medium', prompt: 'A coordination demo claims "emergent teamwork" with no control condition. Name the three most likely mundane explanations for what you are seeing.' },
+      { level: 'design', prompt: 'Design a coordination-claims audit panel for a multi-agent product page. What does it show alongside the success metric to prove the coordination is measured, not marketed?' },
+      { level: 'hard', prompt: 'Read Riedl (arXiv:2510.05174). Name the one condition under which large models show coordination without the explicit ToM prompt, and by how much it lags the prompted condition.' },
+    ],
+    furtherReading: [
+      { label: 'Li et al., Theory of Mind for Multi-Agent Collaboration via Large Language Models (arXiv:2310.10701)', url: 'https://arxiv.org/abs/2310.10701', why: 'Emergent ToM in cooperative games and the long-horizon degradation finding.' },
+      { label: 'Riedl, Emergent Coordination in Multi-Agent Language Models (arXiv:2510.05174)', url: 'https://arxiv.org/abs/2510.05174', why: 'The population-scale measurement showing ToM prompting is the load-bearing condition.' },
+      { label: 'Premack & Woodruff, Does the chimpanzee have a theory of mind?', url: 'https://www.cambridge.org/core/journals/behavioral-and-brain-sciences/article/does-the-chimpanzee-have-a-theory-of-mind/1E96B02CD9850E69AF20F81FA7EB3595', why: 'The 1978 origin of the theory-of-mind concept.' },
+      { label: 'Baron-Cohen, Leslie, Frith, Does the autistic child have a theory of mind?', url: 'https://doi.org/10.1016/0010-0277(85)90022-8', why: 'The 1985 Sally-Anne paper that defines the false-belief test.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Coordination claims checklist',
+      body: '- Control condition. Run a version of the system without the coordination prompt and measure it too.\n- Statistical test. Is the difference between system and control significant at p < 0.05 on your metric?\n- Complementarity measure. Action-disjointness over time, not just final success.\n- Failure-case log. When agents miscoordinate, capture what the ToM state looked like.\n- Model-capacity disclosure. If the effect vanishes on smaller models, say so.',
+    },
     demoCaption:
       'Slide the horizon from 10 turns to 30 and watch first-order ToM decay. The duplication advantage is large early and erodes as identity-belief binding degrades in a filling context, which is the argument for an external store.',
     demo: {
@@ -475,12 +735,19 @@ export const phase16Part3: Lesson[] = [
     title: 'Agent economies: Shapley credit, second-price auctions, reputation',
     oneLiner:
       'When agents produce value jointly you have to reward them individually. Shapley values are fair by construction and factorially expensive, second-price auctions are truthful under monotone aggregation, and reputation is the cheap layer that actually ships first.',
-    readTime: '~8 min read',
+    readTime: '~10 min read',
     diagram: '/lessons/p16-21.svg',
     diagramCaption:
       'Five agents bidding for one task slot: the highest value wins and pays the second-highest, which is what makes truthful bidding optimal.',
     whyItMatters:
       'Credit attribution is a schema you will render whether or not you use tokens. A joint output scored 0.8 splits into per-agent contributions, so the run detail view needs a contribution column, not just a transcript, and the number has to carry its own provenance: exact Shapley or sampled over K orderings, with the sampling error visible. Reputation is the part with a real product surface: a decayed per-agent score, slashable when a contribution fails verification, which becomes routing policy (send hard tasks to high-rep agents) and therefore needs an explanation affordance when a user asks why this agent got the work.',
+    learningObjectives: [
+      'Explain why joint-value tasks need individual credit attribution and why naive splits are gameable.',
+      'Compute Shapley credit for a small coalition and explain why larger ones require sampling.',
+      'Explain why second-price auctions are truthful under monotone aggregation.',
+      'Describe the reputation update rule and why it ships before tokenized incentives.',
+      'Identify the four ways agent-economy mechanisms fail: oracle manipulation, sybil attacks, verification cost, and regulatory overhang.',
+    ],
     sections: [
       {
         heading: 'The problem: joint value, individual reward',
@@ -500,7 +767,31 @@ export const phase16Part3: Lesson[] = [
       },
       {
         heading: 'The four ways the economics breaks',
-        body: 'Oracle manipulation: if the credit function can be gamed, agents will game it. Every mechanism needs an adversarial test before the network opens.\n\nSybil attacks: one operator spins up N fake agents to inflate its own contribution. Durable identifiers slow this; the real mitigation is that reputation is costly to accumulate.\n\nVerification cost: credit attribution is only as fair as the verifier. Cheap verification (a small model) is gameable; expensive verification (a human panel) does not scale. Never distribute credit without an independent verification step, because self-reported quality is exactly what sybil games feed on.\n\nRegulatory overhang: tokenized agent payments sit in legal gray areas in several jurisdictions as of 2026. Which is why the order is reputation first, tokens later, and closed corporate systems can skip the economics entirely for managers assigning work against internal metrics.',
+        body: 'Oracle manipulation: if the credit function can be gamed, agents will game it. Every mechanism needs an adversarial test before the network opens.\n\nSybil attacks: one operator spins up N fake agents to inflate its own contribution. Durable identifiers slow this, but the actual defense is that reputation is costly to accumulate.\n\nVerification cost: credit attribution is only as fair as the verifier. Cheap verification (a small model) is gameable; expensive verification (a human panel) does not scale. Never distribute credit without an independent verification step, because self-reported quality is exactly what sybil games feed on.\n\nRegulatory overhang: tokenized agent payments sit in legal gray areas in several jurisdictions as of 2026. Which is why the order is reputation first, tokens later, and closed corporate systems can skip the economics entirely for managers assigning work against internal metrics.',
+      },
+      {
+        heading: 'Who is actually running which layer',
+        body: 'The five-layer stack, physical compute, identity, cognition, settlement, governance, is a reference map, and almost nobody implements all five. Bittensor covers compute and identity, partially wires cognition and settlement through its subnet structure, and skips governance: miners submit models, validators rank them, stake-weighted scoring pays out TAO per subnet, so you are paid for task-specific output quality, not for compute burned. Fetch.ai runs its ASI-1 Mini LLM on its own network and charges FET for inference, with agents able to pay each other directly, the peers-as-economy story is more literal here than in Bittensor. Gonka replaces hash-based proof-of-work with transformer forward passes as the work itself, paying miners for inference against known-correct outputs.\n\nMost corporate agent systems use layer 3 only, a reasoning loop, and skip the rest entirely. The stack tells you what exists, not what you need.',
+      },
+      {
+        heading: 'Decentralizing the credit step',
+        body: 'AAMAS 2025\'s decentralized LaMAS proposal combines three pieces this lesson already covers separately: DID-bound identity, Shapley-value credit attribution, and a lightweight auction mechanism, and makes one additional claim. Moving the credit-attribution step out of a single trusted auditor\'s hands and into a protocol that any participant can verify makes the system harder to manipulate at a single point. A corrupt or compromised auditor can quietly favor one agent under a centralized scheme; a decentralized attribution step has to be gamed in the open, against a rule every participant can check.\n\nThe tradeoff is the one you would expect: a decentralized credit mechanism is slower to compute and harder to change than "the platform owner decides," and it only pays for itself in open networks with operators who do not trust each other. Inside one company, a trusted auditor is still the cheaper answer.',
+      },
+    ],
+    inlineImages: [
+      {
+        src: '/lessons/p16-21-inline-shapley.svg',
+        alt: 'Marginal contribution averaged over agent orderings',
+        caption: 'Shapley value averages each agent\'s marginal contribution across every possible ordering; at N=10 that is 3.6 million orderings, so you sample.',
+        diagramBrief:
+          'Cream paper (#faf6ef), a small table of 6 rows (orderings for N=3), each row showing a sequence of 3 agent icons in a different order with the marginal value of the last-added agent circled in accent color. Below, an arrow to a single "averaged credit" bar per agent. Footnote text: "N=3: 6 orderings. N=10: 3.6M, sample 100-1000".',
+      },
+      {
+        src: '/lessons/p16-21-inline-auction.svg',
+        alt: 'Second-price auction: highest bid wins, pays the second-highest',
+        caption: 'The winner pays the second-highest bid, which is what makes truthful bidding the optimal strategy.',
+        diagramBrief:
+          'Cream paper, five vertical bars of different heights representing five agents\' bids, tallest in accent color labeled "winner". A dashed horizontal line at the second-tallest bar\'s height labeled "price paid", with an arrow from the winner\'s bar down to that line.',
       },
     ],
     takeaways: [
@@ -510,13 +801,35 @@ export const phase16Part3: Lesson[] = [
       'Verify before you reward. Credit attribution without an independent verifier is a sybil incentive with a dashboard.',
     ],
     terms: [
-      { term: 'Shapley value', meaning: 'The unique credit split satisfying efficiency, symmetry, linearity, and null.' },
-      { term: 'Shapley sampling', meaning: 'Monte Carlo over K orderings instead of enumerating all N factorial permutations.' },
-      { term: 'Second-price auction', meaning: 'The winner pays the second-highest bid, making truthful bidding optimal.' },
-      { term: 'Monotone aggregation', meaning: 'Value depending on which proposal is chosen, not how many were bid. The truthfulness condition.' },
-      { term: 'Reputation capital', meaning: 'An identity-bound quality score accumulated from verified contributions, decaying over time.' },
-      { term: 'Sybil attack', meaning: 'One operator running many fake agents to inflate its own share of credit.' },
+      { term: 'Shapley value', gloss: '"Fair credit attribution"', meaning: 'The unique credit split satisfying efficiency, symmetry, linearity, and null.' },
+      { term: 'Shapley sampling', gloss: '"Monte Carlo credit"', meaning: 'Averaging marginal contribution over K sampled orderings instead of enumerating all N factorial permutations.' },
+      { term: 'Second-price auction', gloss: '"Vickrey auction"', meaning: 'The winner pays the second-highest bid, which makes truthful bidding the optimal strategy.' },
+      { term: 'Monotone aggregation', gloss: '"Value depends on the pick"', meaning: 'The condition, value depends on which proposal is chosen and not on how many were bid, that makes the auction truthful.' },
+      { term: 'Reputation capital', gloss: '"Accumulated quality score"', meaning: 'An identity-bound score accrued from verified contributions, decaying over time and slashable on failure.' },
+      { term: 'Sybil attack', gloss: '"Fake agent farm"', meaning: 'One operator running many fake agents to inflate its own share of credit.' },
+      { term: 'DePIN', gloss: '"Decentralized physical infrastructure"', meaning: 'Token-incentivized compute, storage, and bandwidth networks such as Bittensor subnets, Akash, and Render.' },
+      { term: 'DID', gloss: '"Decentralized identifier"', meaning: 'A W3C-specified portable identity that reputation binds to, independent of any single platform.' },
+      { term: 'ERC-4337', gloss: '"Account abstraction"', meaning: 'A contract-account standard that lets agents sponsor their own gas and pay each other directly.' },
     ],
+    exercises: [
+      { level: 'easy', prompt: 'Three agents produce a joint score of 0.8. Equal split gives each 0.267. Name one way an agent could game an equal-split rule that it could not game under Shapley.' },
+      { level: 'medium', prompt: 'At N=10 agents, exact Shapley requires 3.6 million orderings. If you sample 500, what do you report alongside the credit number, and why does omitting it matter?' },
+      { level: 'medium', prompt: 'Five agents bid for one task slot in a second-price auction. Agent A bids above its true value hoping to win cheaper. Under monotone aggregation, does this help A? Why or why not?' },
+      { level: 'design', prompt: 'Design the run-detail view for a joint agent output. What column sits next to the transcript, and how do you show that a contribution number is sampled versus exact?' },
+      { level: 'hard', prompt: 'Read the AAMAS 2025 decentralized LaMAS paper. What does decentralizing the credit-attribution step buy you that a single trusted auditor does not?' },
+    ],
+    furtherReading: [
+      { label: 'The Agent Economy (arXiv:2602.14219)', url: 'https://arxiv.org/abs/2602.14219', why: 'A 2026 survey of the five-layer agent-economy stack this lesson maps.' },
+      { label: 'Google Research, Mechanism design for large language models', url: 'https://research.google/blog/mechanism-design-for-large-language-models/', why: 'The source of the second-price token-auction proposal under monotone aggregation.' },
+      { label: 'AAMAS 2025, decentralized LaMAS', url: 'https://www.ifaamas.org/Proceedings/aamas2025/pdfs/p2896.pdf', why: 'Shapley-value credit attribution combined with DID identity and an auction mechanism.' },
+      { label: 'Bittensor TAO documentation', url: 'https://docs.bittensor.com/', why: 'Subnet structure and reward distribution for the largest production agent economy.' },
+      { label: 'W3C Decentralized Identifiers (DIDs) spec', url: 'https://www.w3.org/TR/did-core/', why: 'The identity foundation that reputation capital binds to.' },
+    ],
+    shipIt: {
+      kind: 'checklist',
+      name: 'Agent economy checklist',
+      body: '- Start with reputation, not tokens. Reputation is cheap to implement and valuable alone.\n- Verify before you reward. Never distribute credit without an independent verification step.\n- Shapley-sample, not Shapley-exact. Sample 100 to 1000 orderings; exact enumeration does not scale past small N.\n- Cap the decay factor and floor reputation. Unbounded decay wipes legitimate contributors; too-slow decay rewards stale high-rep agents.\n- Audit mechanisms adversarially. Run red-team scenarios before opening the network.',
+    },
     demoCaption:
       'The run says three agents produced a 0.8 result. Open it and the credit split appears, along with how it was computed: sampled orderings, per-agent marginal contribution, and the efficiency check that the shares sum to the total.',
     demo: {
