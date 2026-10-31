@@ -106,7 +106,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Cap rounds at 3. Most of the gain lands by round 3; more is cost, not quality.\n- Cap agents at 5. Beyond that, context bloat and compute dominate.\n- Heterogeneous by default: at least two different base models in the pool.\n- One adversarial slot: an agent prompted to disagree regardless, to break sycophancy cascade.\n- Log every round. A debate system that hides intermediate rounds cannot be debugged or audited.\n- Render the agreement fraction and the minority answer, never just the majority string.',
     },
     demoCaption:
-      'Move the agent count and watch the two knobs separate. One agent over many rounds is reflection and flat. Many agents in one round plateaus. The gain lives where both are above one, and so does the 25-call bill.',
+      'Drag the agent count from 1 to 5. At one agent the bars stay flat across rounds (that is reflection); above one, rounds start paying, and the readout puts the accuracy gain next to the call bill.',
     demo: {
       archetype: 'slider-map',
       subject: 'Debate configuration · agents times rounds',
@@ -246,7 +246,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Start with self-consistency at N=5 on one strong base model. It is the cheap baseline.\n- Upgrade to heterogeneous voting at N=3 if accuracy matters, and measure the delta.\n- Only upgrade to a debate topology if the task has structure (research, multi-step) and bounded rounds are feasible.\n- Pick chain for stepwise pipelines, star for fast factual consolidation, graph only for genuine any-to-any critique.\n- Cap agents at 4 on graph topology and put a warning threshold on the control past that.\n- Always log the minority cluster and benchmark wall-clock and tokens alongside accuracy.',
     },
     demoCaption:
-      'Switch between chain and graph on the same 5-agent task. The agent count is identical; the edge count, the latency shape, and the progress component you can build are not. Chain hands you a stepper, graph hands you a bounded-round wait.',
+      'Switch topologies on the same five agents and press Run one pass. The readout shows edges, messages and serial hops for each shape, and the progress component it gives you: a stepper for chain, a bounded-round counter for graph.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Coordination topology · N=5',
@@ -397,7 +397,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Separate scratchpad. Private state never reaches the counterpart\'s context. Non-negotiable.\n- Deterministic offer generation. Compute prices, quantities, and ETAs; do not prompt for them.\n- Validate all incoming offers against a schema. Reject out-of-ZOPA offers at the protocol boundary.\n- Bound rounds at 3 to 5. Escalate to a mediator on deadlock.\n- Measure deal rate and payoff variance continuously. A falling deal rate is a symptom of prompt drift or a counterpart-side attack.\n- Log all rejected proposals with the deterministic rationale, so losing bidders understand why.',
     },
     demoCaption:
-      'Toggle the two architectures on the same bargain. The all-model bargainer writes both the price and the pitch and lands outside the ZOPA. The split version computes the price and lets the model write only the pitch, and closes.',
+      'Press Next offer until the bargain closes, first with the model setting prices, then with the generator. The readout counts offers that broke the sender\'s own limit and where the deal landed against the 90 to 120 zone of agreement.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Bargaining agent · one message',
@@ -547,7 +547,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Memory is the database. Pick a real store (vector DB, Postgres) at scale; in-memory is for prototypes only.\n- Log the retrieval trace. For every action, log the top-k memories that drove it.\n- Budget per-agent tokens. Each agent\'s retrieve plus reflect plus plan is O(k) calls per tick; N agents times T ticks can dwarf your budget.\n- Compact memory periodically. Summarize-and-prune low-importance entries; retention policy is a design decision.\n- Detect spatial and social norm violations explicitly. The architecture does not learn them on its own.',
     },
     demoCaption:
-      'Open the retrieval behind one action. The summary says the agent decided to attend a party. The payload is the three memories that won the ranking, with recency, importance, and relevance broken out, which is the actual explanation.',
+      'Flip the retrieval score between recency only and the full three-part score. The memories reorder with each component shown, and the readout shows where the party invite ranks and whether Klaus goes.',
     demo: {
       archetype: 'reveal',
       subject: 'One agent action · why it happened',
@@ -691,7 +691,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Control condition. Run a version of the system without the coordination prompt and measure it too.\n- Statistical test. Is the difference between system and control significant at p < 0.05 on your metric?\n- Complementarity measure. Action-disjointness over time, not just final success.\n- Failure-case log. When agents miscoordinate, capture what the ToM state looked like.\n- Model-capacity disclosure. If the effect vanishes on smaller models, say so.',
     },
     demoCaption:
-      'Slide the horizon from 10 turns to 30 and watch first-order ToM decay. The duplication advantage is large early and erodes as identity-belief binding degrades in a filling context, which is the argument for an external store.',
+      'Drag the horizon from 10 turns to 30. Each red cell is a turn where both agents reached for the same token; the readout shows the first-order ToM advantage shrinking from 30 points to about 13 as belief binding decays.',
     demo: {
       archetype: 'slider-map',
       subject: 'ToM coordination vs task horizon',
@@ -831,7 +831,7 @@ export const phase16Part3: Lesson[] = [
       body: '- Start with reputation, not tokens. Reputation is cheap to implement and valuable alone.\n- Verify before you reward. Never distribute credit without an independent verification step.\n- Shapley-sample, not Shapley-exact. Sample 100 to 1000 orderings; exact enumeration does not scale past small N.\n- Cap the decay factor and floor reputation. Unbounded decay wipes legitimate contributors; too-slow decay rewards stale high-rep agents.\n- Audit mechanisms adversarially. Run red-team scenarios before opening the network.',
     },
     demoCaption:
-      'The run says three agents produced a 0.8 result. Open it and the credit split appears, along with how it was computed: sampled orderings, per-agent marginal contribution, and the efficiency check that the shares sum to the total.',
+      'Press Sample ordering six times under Shapley, then flip to equal split. Each ordering\'s marginals are listed, the shares converge to 0.30, 0.40 and 0.10, and the sum check stays at 0.80 the whole way.',
     demo: {
       archetype: 'reveal',
       subject: 'Joint run · score 0.80',

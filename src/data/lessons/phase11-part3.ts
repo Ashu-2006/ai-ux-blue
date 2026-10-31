@@ -114,7 +114,7 @@ export const phase11Part3: Lesson[] = [
         '- Provider prompt caching enabled, stable prefix confirmed with no per-request reordering\n- Exact cache wired for every temperature-0 code path\n- Semantic cache live with a tuned similarity threshold (start at 0.93)\n- Model router sending simple queries to a mini/Haiku tier\n- Token bucket rate limits set per tier (free/pro/enterprise)\n- Circuit breaker with three thresholds: warn at 70 percent, throttle at 85 percent, cache-only at 95 percent\n- Batch API wired for any non-real-time queue\n- Cost dashboard showing cost per query and cache hit rate, not just the monthly total',
     },
     demoCaption:
-      'One monthly bill, six layers underneath. Toggle each optimization and watch the headline number move. The distribution is the argument: no single layer saves the product, and the stack compounds to about 76 percent.',
+      'Switch optimization layers on and off. The readout shows the monthly bill and total savings, and each row shows what that layer saves given the others, so you can see them compound.',
     demo: {
       archetype: 'meter',
       subject: 'RAG chatbot, 10,000 DAU',
@@ -269,7 +269,7 @@ export const phase11Part3: Lesson[] = [
         '- Length and rate limits rejecting before any classifier runs\n- Injection classifier on every input, tuned above 90 percent on a scripted test set\n- PII detector on input and a separate PII scrubber on output\n- Topic classifier scoped to your domain, not a generic one\n- Toxicity check on every output via a moderation API or self-hosted classifier\n- Relevance check comparing output to the original question\n- Block reason returned as a structured field, never a bare refusal\n- Block rate tracked as a UX metric with an alert above 5 percent',
     },
     demoCaption:
-      'Step through one request twice. The unguarded path hands user text straight to the model and ships whatever comes back. The layered path inserts five checks around the same call. Note where the irreversible step sits in each.',
+      'Send each message with guardrails off, then layered. The readout shows where a request stopped, how many milliseconds the checks cost, and what leaked when nothing stood in the way.',
     demo: {
       archetype: 'sequence',
       subject: 'Support bot handling one message',
@@ -435,7 +435,7 @@ export const phase11Part3: Lesson[] = [
         '- API keys in environment variables, never in code\n- Per-user rate limiting (10 to 50 requests/min default)\n- Input guardrails active: injection, PII\n- Output guardrails active: content filtering, format validation\n- Semantic cache configured and tested\n- Streaming enabled on every chat endpoint\n- Exponential backoff on every LLM API call\n- Fallback model chain configured\n- Structured logging with request ids\n- Cost tracking per request and per user\n- Health check endpoint reporting dependency status\n- Max token limits on input and output\n- Timeout on every external call (30s default)\n- CORS locked to production domains only\n- Load test with 100 concurrent users passing',
     },
     demoCaption:
-      'The same user request through two services. The prototype is one call. The production service is the same call with six components around it, and every one of them maps to something the user can feel: wait time, correctness, or a bill.',
+      'Send the four scripted requests through each service: a normal one, a duplicate, one that hits a provider 500, and one more. The readout tracks first-token time, cache hits, user-visible errors, and cost.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'One chat request',
@@ -601,7 +601,7 @@ export const phase11Part3: Lesson[] = [
         '- Every tool has a name, description, and closed JSON Schema input\n- Mutating tools carry destructiveHint: true and route through host approval\n- Roots or explicit path/directory params scope what the server can see\n- Resource content is documented as untrusted, never concatenated into a system message\n- Every request attaches _meta with protocol version, client capabilities, and client identity\n- Server implements server/discover for version and capability negotiation\n- Tool count budgeted against the roughly 40-tool ceiling before mounting alongside other servers\n- stdout reserved for JSON-RPC only; diagnostics go to stderr',
     },
     demoCaption:
-      'Three tools across five hosts, drawn two ways. The integration count is the argument, and it is also the maintenance cost every time a provider adds a field.',
+      'Add tools and hosts, then change one schema. The readout counts how many schemas you maintain and how many edits one change needs, bespoke versus one MCP server.',
     demo: {
       archetype: 'before-after',
       subject: '3 tools, 5 hosts',
@@ -771,7 +771,7 @@ export const phase11Part3: Lesson[] = [
         '- Every discrete decision or side-effecting action named as a node\n- State declared as a minimal typed dict with a reducer on every list field\n- Message lists specifically annotated with an append reducer\n- Edges drawn static by default, conditional only where model output decides the branch\n- Checkpointer chosen before writing the first node (never ship with none)\n- Interrupts placed on the edge into the side-effecting node, not after it\n- Streaming mode chosen per UI surface before launch, not added later\n- Refuse to ship: no checkpointer, an interrupt after the side effect, or a messages field without its reducer',
     },
     demoCaption:
-      'One agent run, two levels of visibility. The while-true version reports a single outcome. Open the checkpoint log and the same run becomes a list of states you can pause at, rewind to, and fork from.',
+      'Run the refund agent, kill the process after the refund step, then restart. The readout counts steps, saved checkpoints, and refunds issued; the graph also pauses for approval before refunding.',
     demo: {
       archetype: 'reveal',
       subject: 'Agent run, thread_id: ord_4471',

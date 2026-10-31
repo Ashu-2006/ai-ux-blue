@@ -106,7 +106,7 @@ export const phase12Part2: Lesson[] = [
       body: '- Does the model have a resampler (fixed token count regardless of image size), or does token count scale with resolution?\n- What is the cross-attention frequency (every N layers)? Lower N means more visual influence per layer.\n- Is there a learnable gate initialized near zero, or does vision mix in at full strength from step one?\n- If a fine-tuned checkpoint answers worse on text-only prompts than its base model, check whether the gate schedule opened too fast before checking the data.\n- Does the prompt format support more than one image? If not, this is a BLIP-2-style bridge, not a Flamingo-style one.',
     },
     demoCaption:
-      'Drag the gate value from zero upward and watch how much visual signal reaches the frozen LLM. At zero the model is untouched Chinchilla; the whole trick is that vision arrives as a gradual addition, never a replacement.',
+      'Click any message to see which screenshot it cross-attends to, then switch to all earlier images. The readout counts the visual tokens each message can read, and the zero shows none were added to the text stream.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Gate value tanh(alpha)',
@@ -245,7 +245,7 @@ export const phase12Part2: Lesson[] = [
       body: '- Token budget: does your context window comfortably fit 576+ tokens per image alongside your system prompt and chat history?\n- Multi-image or video: do you need to concatenate several images in one request? If yes, favor an MLP-style bridge over a fixed-size compressive one.\n- LLM churn: will you swap the base LLM within a year? An MLP projector retrains in hours; a co-designed bridge does not.\n- Data cost: can you synthesize instruction data from existing captions via a strong text-only model, or do you need human annotation?\n- Compute ceiling: one 8-GPU node for a day is the LLaVA bar. If your budget is below that, look at fine-tuning an existing open checkpoint instead of training from scratch.',
     },
     demoCaption:
-      'Two bridge recipes for the same image, side by side. The clever one compresses and couples everything; the simple one projects everything and swaps parts freely. The simple one is the industry standard.',
+      'Hover the screenshot patches and flip the bridge. With the MLP each patch keeps its own token; with the Q-Former every patch is blended into all 32 queries, and the readout shows what each costs in context.',
     demo: {
       archetype: 'before-after',
       subject: 'VLM bridge recipe',
@@ -399,7 +399,7 @@ export const phase12Part2: Lesson[] = [
       body: '- What aspect ratios does your product actually receive? Portrait documents, wide charts, and tall receipts each break square-resize differently.\n- Is your vision encoder fixed-resolution (needs AnyRes tiling) or native-resolution-capable (M-RoPE, NaFlex)?\n- What per-task pixel cap fits your latency budget? Set min_pixels and max_pixels deliberately, not at the library default.\n- Does a single feature need more than one token budget (a thumbnail feed vs a document reader)? If yes, that is two configurations of one encoder, not two models.\n- Before shipping, test on your worst-case aspect ratio, not your best-case square photo.',
     },
     demoCaption:
-      'The same receipt through both pipelines. Square-resize crushes a 1:2.5 document into a square and the line items go with it; native packing keeps every patch legible and pays only for real content.',
+      'Switch the resize policy and watch the receipt shape and the TOTAL line at the pixel size the encoder actually gets. The readout gives the glyph height against a 14px patch and the token bill.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Receipt, 600x1500 px',
@@ -693,7 +693,7 @@ export const phase12Part2: Lesson[] = [
       body: '- Does training start with single-image data at high resolution before introducing multi-image or video? If the order is reversed, expect measurably worse image performance on identical data.\n- Is the total visual-token budget held roughly constant across scenarios, with only the allocation changing? A budget that balloons for video will make cost unpredictable in production.\n- Is pooling applied on the 2D patch grid, not the flattened token sequence? Pooling in the wrong space silently destroys spatial locality.\n- Have you tested for emergent skills you did not train for, both the useful ones and the risky ones? Capabilities can ship that nobody specified.\n- Does your budget plan account for your product\'s actual scenario mix, not the paper\'s default 3000 to 4000 tokens?',
     },
     demoCaption:
-      'Two training orders, same data. The sequence is the design: build perception before structure and both survive; reverse it and the model learns the shape of reasoning without the sight to back it.',
+      'Switch between one image, six images, and a video. The pooled grid and the token bar show how OneVision spends a similar budget three different ways, computed per item in the readout.',
     demo: {
       archetype: 'sequence',
       badSequence: [
@@ -848,7 +848,7 @@ export const phase12Part2: Lesson[] = [
       body: 'Given clip duration T (seconds), token budget B, and tokens_per_frame:\n\nfps_max = B / (T * tokens_per_frame)\n\nPick fps from {1, 2, 4, 8} such that fps <= fps_max.\nBias toward the higher end of that set when the clip has fast motion (sports, UI interaction); bias toward the lower end for static or slow footage (lectures, security feeds).\n\nExample: a 60-second clip, budget 20,000 tokens, 81 tokens per frame.\nfps_max = 20000 / (60 * 81) = 4.1, so pick fps = 4.\nTotal cost: 60 * 4 * 81 = 19,440 tokens, inside a 32k context.',
     },
     demoCaption:
-      'Slide the motion level of a 30-second clip and watch the sampling rate follow. Fixed-FPS pipelines spend the same tokens on a lecture and a tennis rally; dynamic FPS spends where the events are.',
+      'Drag the clip length. The readout computes the fps ceiling from a 32k budget, and the timeline shows whether the sampled frames still land on each quick racket contact.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Motion in the clip (lecture to tennis rally)',

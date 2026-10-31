@@ -106,7 +106,7 @@ export const phase11Part2: Lesson[] = [
       body: '- Does every answer carry the chunks it was grounded in, not just the final text?\n- Is there a source drawer or citation chip, not just a paragraph of prose?\n- Below the retrieval threshold, does the UI say so, or does it let the model guess?\n- Is a document date attached to every chunk, so a stale source is visible?\n- Does the loading state show retrieved sources before the generated answer streams in?',
     },
     demoCaption:
-      'Step through the same question twice: once with the model answering from memory, once through the retrieve-then-generate pipeline. Watch where the source enters, and where it can be shown to the user.',
+      'Toggle retrieval and ask the same question. With retrieval on, the top three chunks enter the prompt and the answer carries a citation you can hover back to its source chunk.',
     demo: {
       archetype: 'sequence',
       subject: 'Question: "What is the refund window for enterprise plans?"',
@@ -256,7 +256,7 @@ export const phase11Part2: Lesson[] = [
       body: '- Are ambiguous or code-like queries (error codes, IDs) failing pure vector search? Add BM25 and fuse with RRF.\n- Is the top result "about" the topic but missing the fact? Add a cross-encoder rerank stage.\n- Are vague questions retrieving nothing useful? Try HyDE or query rewriting before blaming the retriever.\n- Are chunks either too small to be useful or too broad to be relevant? Add parent-child chunking.\n- Have you measured Recall@k and faithfulness on a real test set, or are you still reading five examples and calling it done?',
     },
     demoCaption:
-      'One query, two retrieval stacks. Switch between them and read what comes back at rank 1. The failure is not that the model is weak, it is that the right chunk never reached it.',
+      'Switch the ranking stack and watch the $47.2M chunk move. Only the top three reach the model, so the readout shows whether the answer can contain the number at all.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Query: "What was revenue last quarter?"',
@@ -410,7 +410,7 @@ export const phase11Part2: Lesson[] = [
       body: '- Does the model just need better instructions or examples? Fix the prompt first, it is free.\n- Does the model need to know specific documents or facts that change over time? Build RAG, do not train on it.\n- Does the model need a consistent voice, format, or reasoning pattern prompting cannot reach? Fine-tune with LoRA, rank 8-16 to start.\n- Does the task need very low latency with no room for few-shot examples? Consider fine-tuning to bake the pattern in.\n- Are you about to fine-tune to fix a freshness problem? Stop, that is a RAG problem wearing a training budget.',
     },
     demoCaption:
-      'Move the rank and watch trainable parameters, memory, and cost move with it. The curve is the reason r=16 shows up in almost every config file you will ever read.',
+      'Drag the LoRA rank. The adapter strips grow, and the readout computes trainable parameters, share of the 8B model, adapter size, and QLoRA memory against a 24GB card.',
     demo: {
       archetype: 'slider-map',
       subject: 'Fine-tuning Llama 3 8B on 50,000 support tickets',
@@ -548,7 +548,7 @@ export const phase11Part2: Lesson[] = [
       body: '- Does every tool description say what it does and what it returns, in one specific sentence?\n- Is tool_choice set deliberately (auto, required, or named), not left on the default without thinking about it?\n- Does the code path between "model proposes" and "code executes" have a visible confirmation state for anything irreversible?\n- Are arguments validated against type, range, and allowlist before the function runs?\n- Are tool results sanitised before they go back to the model, so a poisoned result cannot hijack the next turn?',
     },
     demoCaption:
-      'The chat shows a sentence. Open it up and the turn is really a JSON object your code parsed, executed, and fed back. Everything you can govern lives in that hidden payload.',
+      'Ask the same question with and without a tool defined. The right pane logs what the turn really contains: model calls, the tool calls your code runs, and the results fed back.',
     demo: {
       archetype: 'reveal',
       subject: 'User: "What is the weather in Tokyo and New York?"',
@@ -693,7 +693,7 @@ export const phase11Part2: Lesson[] = [
       body: '- Do you have at least 200 test cases, or is your confidence interval too wide to trust a merge decision?\n- Does your rubric name observable behaviour per score level, not just a bare 1-5 scale?\n- Are you scoring at least four criteria (relevance, correctness, helpfulness, safety), not one?\n- Is the judge model at least as capable as the model being judged?\n- Does the gate block on any single criterion regressing, not just on the overall average moving?',
     },
     demoCaption:
-      'A single headline score looks like progress. Open the per-criterion breakdown and the prompt change that "reduced hallucinations" shows what it actually cost.',
+      'Drag the number of eval cases. At ten cases v2 looks better; the confidence interval only clears zero, and shows the real 5 point regression, once the suite is large enough.',
     demo: {
       archetype: 'meter',
       subject: 'Prompt v2 vs v1, 200-case eval suite',

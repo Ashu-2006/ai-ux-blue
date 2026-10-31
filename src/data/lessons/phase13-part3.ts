@@ -104,7 +104,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Show the full prompt text the server wants sampled, not a truncated summary\n- Show the requested modelPreferences next to the model the client actually chose\n- Show the includeContext mode by name, and flag anything other than none\n- Show a live sample counter and remaining round budget, not a spinner\n- On the MRTR compatibility path, confirm requestState is being echoed unmodified, never edited client-side\n- Reject any embedded input request for a capability the client did not just declare',
     },
     demoCaption:
-      'One tool call, two views of the same run. The summary reads as a single action; the payload underneath is two sampling rounds against the user\'s own model with a stated cost and intelligence weighting. Deciding which view a user sees before approving is the whole design problem.',
+      'Run summarize_repo and approve both samples. The wire log shows the server calling back into the client in the live version, and a client retry carrying requestState in the input_required version.',
     demo: {
       archetype: 'reveal',
       subject: 'summarize_repo · one tool call',
@@ -254,7 +254,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Scope is a visible argument (workspaceUri, resource URI, or server config), never a hidden client-side list\n- Authorization, containment, and sandbox are three separate checks, all re-run immediately before a destructive write\n- Form-mode elicitation renders as flat controls only; nested schemas get rejected before they reach the user\n- accept, decline, and cancel each have a distinct, tested code path, not one dismiss handler\n- Destructive confirmations are bound to a signed candidate set and claimed once from a replay store\n- URL-mode destinations are shown in full before the browser opens, and never prefetched',
     },
     demoCaption:
-      'Same request, two ways the ambiguity resolves. One guesses across three matching notes and destroys two of them; the other halts the call and returns an enum plus a confirm boolean for the user to answer.',
+      'Ask to delete the TPS report both ways. Guessing deletes all three matches and still reports success; input_required stops and asks which one, with Accept, Decline and Cancel as separate outcomes.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'notes_delete("TPS report") · 3 matches',
@@ -408,7 +408,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Render the nested task status, not the outer resultType, for working / input_required / completed / failed / cancelled\n- Route in-task input to tasks/update, never to a retried tools/call, once a task id exists\n- Treat a tasks/cancel acknowledgment as a request sent, not a confirmation the work stopped\n- Do not build a task history view on client-side memory; use an authorized domain tool with filters, since tasks/list does not exist\n- Show ttlMs as a backstop expiry from creation, never as "we will keep this result for N minutes after it finishes"\n- Prefer subscriptions/listen for progress when available, and degrade to polling tasks/get on its pollIntervalMs otherwise',
     },
     demoCaption:
-      'A three-minute report under two models. Held synchronously the call dies at a transport timeout with nothing to show; promoted to a task it returns an id in 40ms and the states become renderable.',
+      'Generate the three-minute report both ways. The synchronous call dies at 1:00 with nothing saved; the task returns an id at once, pauses to ask you a question, and finishes at 3:00.',
     demo: {
       archetype: 'sequence',
       subject: 'generate_report · ~3 min of server work',
@@ -564,7 +564,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Show the full descriptor text, publisher namespace, and a diff against the last approved version, never a truncated summary\n- Pin a hash of the whole canonicalized descriptor (schema and annotations included), not just the description string\n- Reject header-to-body mismatches before RBAC, backend selection, or rate limiting run\n- Treat every declared client capability as compatibility only; authorize separately against principal, tool, resource, and arguments\n- Sign MRTR requestState to method, tool, exact arguments, principal, and expiry, and claim any one-time nonce from shared storage\n- Classify every tool against the Rule of Two and gate the ones that hit all three axes',
     },
     demoCaption:
-      'The same tool as the user sees it and as the model reads it. The row says "Look up user information" in six words; the description underneath carries an instruction to read a private key and stay quiet about it.',
+      'Allow the tool from the short approval row, then switch to the full description and look again. The readout counts how many of the words the model reads you actually approved, and the log shows what it did with them.',
     demo: {
       archetype: 'reveal',
       subject: 'user_lookup · pending approval',
@@ -715,7 +715,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Discover the authorization server from RFC 9728 metadata, preserving the resource path suffix in the well-known URL\n- Try pre-registered client info, then CIMD, before ever falling back to DCR\n- Validate iss on the authorization response with zero normalization; reject silently on any mismatch\n- Validate token audience against your own canonical resource URI; never forward an accepted token downstream\n- Store every credential (secrets, DCR ids, refresh tokens) keyed by exact issuer; never reuse one issuer\'s credentials at another\n- Render step-up prompts with exactly one requested scope, the triggering action on screen, and nothing from the original grant redone',
     },
     demoCaption:
-      'Two ways to get delete permission. One asks for the full scope set at install, before the user has any context; the other asks for notes:delete at the moment they ask to delete something.',
+      'Connect the server, open a note, then delete one. Install-time grants all three scopes up front and leaves some unused; step-up asks for notes:delete only after the 403, next to the action that needed it.',
     demo: {
       archetype: 'before-after',
       subject: 'Consent for notes:delete',
@@ -873,7 +873,7 @@ export const phase13Part3: Lesson[] = [
       body: '- Run all seven steps (authenticate, validate wire, authorize, apply policy, fresh backend request, validate result, audit) on every call, with nothing cached against a session\n- Recompute runtime policy per request from current principal, descriptor pin, and backend health, never from a registry status alone\n- Keep an admission record separate from the registry record: publisher status, provenance, reviewer, and status\n- Namespace every tool with its backend prefix, and treat renaming a public tool name as a migration\n- Preserve requestState byte for byte when forwarding an MRTR retry, and re-authorize every retry as its own request\n- Route Tasks by taskId as Mcp-Name; never invent a gateway-level tasks/list or tasks/result',
     },
     demoCaption:
-      'One tool call traced through a gateway. Each stage can reject it, and the stage that rejects is the copy the user reads, so a permission denial and a mutated description should never render as the same failure.',
+      'Send each of the four calls directly, then through the gateway. The gateway lights each check in order and stops at the one that rejects, so every denial carries its own reason and an audit entry.',
     demo: {
       archetype: 'sequence',
       subject: 'alice calls github.open_pr through the gateway',

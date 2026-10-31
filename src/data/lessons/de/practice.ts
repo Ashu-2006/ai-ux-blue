@@ -107,7 +107,7 @@ export const dePractice: Lesson[] = [
       body: '- Is a live preview URL attached to the PR, not just a screenshot?\n- Does the PR touch a component, not a one-off style override?\n- Can the reviewer interact with the actual states (empty, loading, error, real data length) rather than the happy path?\n- Is there a Figma frame at all, and if so, is it older than the PR, a sign it already drifted?\n- Would this decision, if approved, be reusable next time, or is it a one-off that needs its own component?\n- Did the author write one sentence explaining the interaction choice, the way they would write a commit message?',
     },
     demoCaption:
-      'A shipped Linear feature (the command menu) hides the tight design-eng loop behind it. Reveal what the PR actually carried.',
+      'Step the live preview through mockup data, long names, 400 rows and loading. The readout measures rows, list height and clipped text: things a red-line frame never shows.',
     demo: {
       archetype: 'reveal',
       subject: 'A Linear feature ships as one PR',
@@ -254,7 +254,7 @@ export const dePractice: Lesson[] = [
       body: '- List every component with a `transition` or animation property.\n- For each, note the duration and easing value it currently uses.\n- Group near-duplicate values (180ms and 200ms are probably the same intent).\n- Name two or three duration tokens and two or three easing tokens that cover every group.\n- Replace hardcoded values with the named tokens, one component at a time.\n- Write down, in one sentence, what each token is for (arrival, departure, emphasis) so the next person does not have to guess.',
     },
     demoCaption:
-      'Same drawer, two setups: motion as an afterthought in component code, motion as a named token on the shelf. Toggle to see the drift disappear.',
+      'Drag --motion-base and let go, with motion inline and then read from the token. The readout counts how many components followed the one edit.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Motion in the system',
@@ -407,7 +407,7 @@ export const dePractice: Lesson[] = [
       body: '- What does this curve say the object is made of (paper, wood, glass)?\n- Does the arrival curve differ from the departure curve, and if not, why not?\n- What is the actual measured duration in devtools, not the value you typed?\n- What visibly breaks if this value is doubled, halved, or removed? If the answer is "nothing," the value was probably guessed.',
     },
     demoCaption:
-      'A drawer close, two settings: the default browser easing vs the intent-driven 200ms ease-out. Toggle to feel the sentence change.',
+      'Open and close the drawer under each curve. The chart and readout show how far it has travelled at 100ms.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Drawer close, same DOM, two curves',
@@ -560,7 +560,7 @@ export const dePractice: Lesson[] = [
       body: "- Does this action need the user's full, undivided attention (destructive, blocking, multi-step)? If yes, modal.\n- Does the user need to keep seeing the list, row, or selection they came from? If yes, drawer.\n- Will dismissing this need to preserve scroll position and multi-select state in the background? If yes, avoid a modal.\n- Is the interaction genuinely small (one row's details, one quick action)? If yes, a drawer or popover is probably over-weighted by a modal.\n- Would 'press Escape and be back exactly where I was' describe success? If yes, you are describing a drawer or palette, not a modal.",
     },
     demoCaption:
-      'Same task, "view invoice details," in two containers. See how much of the current view survives each choice.',
+      'Open an invoice, then try to change the selection or open another one. The readout reports where focus went and how many clicks the container refused.',
     demo: {
       archetype: 'before-after',
       subject: 'Where does the detail go',
@@ -714,7 +714,7 @@ export const dePractice: Lesson[] = [
       body: "Paste 10-30 real transcripts from your product into this prompt to get a first-pass audit:\n\n'Read these conversation transcripts. For each one, flag any model response that: (1) invents a format or convention not specified anywhere in the system prompt, (2) uses a tone that contradicts our brand voice [paste 2-3 sentences of your voice guide], (3) takes a tool action without a preceding preview or explanation, or (4) refuses in a way that is harsher or vaguer than necessary. For each flagged instance, quote the exact line and suggest one specific system-prompt clause that would fix it.'",
     },
     demoCaption:
-      'A Claude.ai product decision (the citation footnote) hides the model-behavior work behind it. Reveal what the "design change" actually shipped.',
+      'Switch the system prompt and hover the footnotes. The same citation UI renders nothing until the model behaviour supplies a source for each claim.',
     demo: {
       archetype: 'reveal',
       subject: 'Citation UI, one product decision',
@@ -873,7 +873,7 @@ export const dePractice: Lesson[] = [
       body: "Score your own system against these five statements, then read the level below where you first said 'no':\n- L0 to L1: Do you have a token file at all, even just primitives?\n- L1 to L2: Do you have semantic tokens (named by purpose) that most components read from?\n- L2 to L3: Do your components read only from semantic tokens, never bypassing to a primitive?\n- L3 to L4: Could you white-label your product today by swapping a theme file, with zero component changes?\n- L4: Does a named owner review every new or renamed token, with a documented deprecation process for retiring old ones?\nWhichever question you first answered 'no' to is the level your system actually stalled at, regardless of how many tokens you have shipped.",
     },
     demoCaption:
-      'A design system headline ("340 tokens shipped") hides the maturity level underneath. See where on the five-level ladder the library actually sits.',
+      'Retarget action-primary from blue-500 to violet-500, like a rebrand. The readout finds the one component that skipped the alias chain.',
     demo: {
       archetype: 'meter',
       subject: 'Token maturity, one library',

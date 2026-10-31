@@ -103,7 +103,7 @@ export const phase15Part1: Lesson[] = [
       body: '- Does the progress surface show a checkpoint list and a trajectory view, not a spinner or a percent bar?\n- Is there a hard token and dollar ceiling the agent cannot raise on its own?\n- Is the review unit a filterable step list, not a scrollable transcript?\n- Is the stop control reachable at every scroll position, not just at the top?\n- Does the budget meter show remaining action count, not just elapsed time?\n- Have you estimated median trajectory length in tool calls and multiplied it by real per-step reliability, and does that number match what the UI promises?\n- Is there a resume-from-checkpoint path, or does a failure force a full restart?',
     },
     demoCaption:
-      'Drag per-step reliability and watch end-to-end reliability over a 70-step trajectory. Ninety-nine percent per step lands near a coin flip. This is the number your progress component is actually reporting on, not the per-call success rate in your dashboard.',
+      'Drag per-step reliability and watch 100 simulated 70-step runs. The readout raises your number to the 70th power: 99 percent per step finishes about half the runs.',
     demo: {
       archetype: 'slider-map',
       subject: 'Per-step reliability across a 70-step run',
@@ -242,7 +242,7 @@ export const phase15Part1: Lesson[] = [
       body: '- What is the filter: answer match only, or a process-level signal too?\n- Does rationalization exist, and does it get flagged separately from organically correct rationales?\n- Is there a held-out out-of-distribution eval, and does its accuracy track in-distribution accuracy or trail it?\n- If a verifier is used at inference, was it trained on the same label set as the generator, and could it be rewarding confident wrongness?\n- Does the product surface a chain of thought at full fidelity, and if so, does the UI offer step-level correction rather than a single confidence number?',
     },
     demoCaption:
-      'Reveal what the correctness filter actually kept. The summary says the round retained 400 correct rationales; the payload shows how many of those reached the label by a pattern that will not transfer. Any UI that renders a chain of thought is rendering this payload without the labels.',
+      'Open a few traces, then switch the filter from final answer to every step. The readout shows how many kept rationales actually transfer out of distribution: 240 of 400, against 240 of 240.',
     demo: {
       archetype: 'reveal',
       subject: 'One STaR bootstrap round',
@@ -385,7 +385,7 @@ export const phase15Part1: Lesson[] = [
       body: '- Is the evaluator deterministic and machine-checkable, or does it rely on another model\'s judgment?\n- Are evaluation inputs generated at scoring time, or reused every generation where they can be memorized?\n- Does the archive preserve diverse solutions (MAP-elites, islands), or does it only keep the current leader?\n- Have you tried to break the evaluator yourself: what is the cheapest way to raise the score without doing the intended task?\n- If no machine-checkable oracle exists, does the surface read as a review queue with a human accept step, not a scored leaderboard?',
     },
     demoCaption:
-      'Toggle the held-out evaluator off and watch the leaderboard keep climbing while the real metric collapses. This is the failure the promote gate exists to catch, and it looks like success in every score column your UI renders.',
+      'Switch between fixed test inputs and inputs generated per eval, then replay the loop. The leaderboard climbs either way; the dashed held-out line and the memorized count show which climb is real.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Evolutionary loop · generation 400',
@@ -534,7 +534,7 @@ export const phase15Part1: Lesson[] = [
       body: '- Gate one, experiment validity: did every experiment behind this claim exit zero, and how many retries did it take?\n- Gate one, novelty: does the novelty check\'s citation list actually support "this is new," checked by a human, not just the retrieval step?\n- Gate two, presentation: does the figure quality match the experiment quality, or is a vision-language critic polishing over a gap?\n- Gate two, provenance: can a reviewer trace every figure and claim back to the run that produced it?\n- Isolation: is the execution sandboxed beyond Docker (seccomp, gVisor) for anything running longer than a single session?',
     },
     demoCaption:
-      'One headline yield number over 100 loop runs, then the distribution underneath it. The clean-paper share is smaller than the submission share, and the gap is entirely papers whose figures survived an experiment that did not.',
+      'Click a few runs, then switch from the roll-up to the failure-class view. The same 61 submissions split into 24 clean, 26 polished over a failed experiment, and 11 with a wrong novelty claim.',
     demo: {
       archetype: 'meter',
       subject: 'AI Scientist v2 · 100 loop runs',
@@ -676,7 +676,7 @@ export const phase15Part1: Lesson[] = [
       body: '- Is there a per-cycle diff showing exactly what the system changed about itself?\n- Are capability and alignment scores tracked as two separate curves, not one blended metric?\n- Is there a numeric threshold on the gap between them, checked automatically every cycle?\n- Does the loop pause by default when the threshold trips, with approve as the active choice rather than stop?\n- Is a human actually in the loop at the seam (evaluator validation, publication curation, domain selection), or has that seam quietly been automated too?',
     },
     demoCaption:
-      'Move the capability-to-alignment rate ratio and watch how many cycles it takes for the gap to cross a pause threshold. At 1.15 against 1.08 the threshold trips in single-digit cycles, which is the interval your audit surface has to fit inside.',
+      'Drag the capability rate against a fixed alignment rate of 1.08 per cycle. The readout names the cycle where the gap crosses the pause line: cycle 8 at 1.15, which is the window your audit has to fit inside.',
     demo: {
       archetype: 'slider-map',
       subject: 'Capability and alignment compounding per cycle',
@@ -815,7 +815,7 @@ export const phase15Part1: Lesson[] = [
       body: '- Invariants: are they checked by code outside the loop\'s edit surface, or can the loop reach the checker?\n- Anchor: is the objective pinned read-only, and is there a separate check for interpretation drift, not just text drift?\n- Multi-objective: does every edit have to clear performance, safety, fairness, and robustness, or can one axis be traded away for another?\n- Regression: is each cycle compared against a historical distribution per task, or only against a single rolling average that can absorb a quiet drop?\n- Which of the four primitives does this loop actually implement versus merely claim? Score each yes, partial, or no.',
     },
     demoCaption:
-      'Step through the gate order for one proposed self-edit. Cheap and decisive checks run first, and the gate that fails decides what the reviewer sees: a hash, a text diff, a per-axis chart, or a per-task delta.',
+      'Pick a proposed self-edit and watch the four gates run in cost order. A score-only gate accepts every one of them; the readout shows where the stack stops each edit and what the reviewer gets to see.',
     demo: {
       archetype: 'sequence',
       subject: 'One proposed self-edit',

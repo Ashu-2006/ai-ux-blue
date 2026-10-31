@@ -104,7 +104,7 @@ export const phase12Part3: Lesson[] = [
       body: '- Does the product need to generate images, or only understand them?\n- If generation: what tokenizer or codebook size backs the model, and what PSNR does it reconstruct at?\n- If understanding only: is a full VQ-VAE pipeline overkill? A late-fusion adapter model is simpler and cheaper.\n- What does "soft" or "slightly wrong" output trace back to: the transformer, or the tokenizer ceiling?\n- Does the UI need interleaved text and image output in one response, or are separate calls acceptable?\n- What is the fallback microcopy when the model can only describe, not draw?',
     },
     demoCaption:
-      'Same prompt, two architectures. The adapter VLM can only describe; the early-fusion model emits image tokens and text in one pass, in the order it chooses.',
+      'Ask for a cat with each output vocabulary. The readout tracks every emitted token id and which range it falls in: text, image code, or separator.',
     demo: {
       archetype: 'toggle-fix',
       badLabel: 'Adapter VLM',
@@ -253,7 +253,7 @@ export const phase12Part3: Lesson[] = [
       body: '- Latency budget: does the feature tolerate 1-10 minutes per image, or does it need under 10 seconds?\n- Infra count: would one unified model replace a separate diffusion stack, or do you already have one working?\n- Quality bar: check FID and GenEval both, not just one; the two benchmarks reward different strengths.\n- Loading state: if autoregressive, design the wait explicitly, do not treat it as a diffusion-shaped progress bar.\n- Fallback: what happens if the user cancels mid-generation? Sequential tokens make partial results meaningful; diffusion mid-cancel usually is not.',
     },
     demoCaption:
-      'Drag the target resolution and watch the token count and generation time. Autoregressive image gen emits every token in sequence; resolution is quadratic and the wait is real.',
+      'Drag the resolution, then press Generate to watch the raster fill top to bottom. The readout computes (size/8)² tokens and the wait at 30 tokens a second; the verdict names the UI that wait demands.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Generated image resolution (512 to 2048px)',
@@ -390,7 +390,7 @@ export const phase12Part3: Lesson[] = [
       body: 'M[i, j] = 1 if:\n  (i is text and j is text and j <= i)                 # causal for text\n  OR (i is image and j is image and same_block(i, j))  # bidirectional in image\n  OR (i is text and j is image and j < image_end)      # text sees prior images\n  OR (i is image and j is text and j < image_start)    # image sees prior text\n\nUse this as the spec you hand an engineer when reviewing whether an "interleaved generation" feature request is architecturally possible on the current backbone.',
     },
     demoCaption:
-      'Same image, two representations. Discrete VQ tokens pay the quantization tax; continuous patches keep the detail and denoise in parallel.',
+      'Click any token or image patch to light its row of the attention mask, then flip the mask. The readout counts what that token can see, how much of it lies ahead, and which loss trains it.',
     demo: {
       archetype: 'before-after',
       badLabel: 'Discrete (VQ tokens)',
@@ -540,7 +540,7 @@ export const phase12Part3: Lesson[] = [
       body: '- Does the edit map to a token region the model can mask, or does it require pixel-precise control the tokenizer cannot express?\n- Is the brush selecting a mask (native operation) or writing a new prompt (a different, harder capability)?\n- What is the smallest maskable unit at this tokenizer\'s resolution, and does it match the brush size you are designing?\n- How do you communicate that "erase" here means "regenerate," not "delete"?\n- What happens at the mask boundary: does the model blend or does the edit read as a visible seam?',
     },
     demoCaption:
-      'Two ways to produce the same 1024-token image. Step through both: one forward pass per token, or sixteen parallel unmask rounds.',
+      'Replay both decoders on the same 1024-token image. Accent cells are the ones committed in the latest pass; the readout counts passes and the model time they cost.',
     demo: {
       archetype: 'sequence',
       badLabel: 'Autoregressive',

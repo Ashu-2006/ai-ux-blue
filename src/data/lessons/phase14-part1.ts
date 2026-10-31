@@ -104,7 +104,7 @@ export const phase14Part1: Lesson[] = [
       body: '- Turn counter rendered against the budget, not hidden behind a spinner\n- Reasoning block present and collapsed by default, not parsed out of a string\n- Every tool call shows its arguments and a distinct tool_use_id\n- Every observation carries a provenance tag (tool output, not user or agent speech)\n- Three stop reasons render as three different terminal states: finished, capped, guardrail-tripped\n- A failed step at turn N is inspectable on its own, not buried in a wall of text\n- 400 and other tool errors arrive as readable observation strings, never as a blank crash',
     },
     demoCaption:
-      'Step through one agent run and watch what each iteration appends to the buffer. Note where the turn counter sits against the cap, and which of the three stop reasons ends the run.',
+      'Step the loop and watch each turn append a thought, a tool call and an observation, including a 429 the agent retries. At max_turns 3 the run ends capped with no answer; at 8 it finishes on turn 5.',
     demo: {
       archetype: 'sequence',
       subject: 'Agent run',
@@ -253,7 +253,7 @@ export const phase14Part1: Lesson[] = [
       body: '- Every node names its tool, its arguments, and its dependencies before anything executes\n- Write nodes are visually marked apart from read nodes\n- One confirm gates the write nodes; reads can proceed without blocking\n- A failed node renders as a blocked row, with everything downstream marked blocked, not silently wrong\n- If a replanner revises the DAG, the diff against the prior plan is visible, not just the new plan\n- Node-level cost is itemized where worker calls are priced individually',
     },
     demoCaption:
-      'Toggle between the interleaved run and the decoupled plan. Watch where the plan becomes visible, and what a human could approve or reject in each case.',
+      'Step the same four-tool task both ways. The bars show tokens per LLM call: ReAct re-reads its growing history on every call (8.8k total), ReWOO plans once and solves once (3.4k), and its plan is visible before any tool runs.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Research task',
@@ -403,7 +403,7 @@ export const phase14Part1: Lesson[] = [
       body: '- Source trial and timestamp are attached, not just the text\n- Evaluator type is recorded (scalar, heuristic, self-evaluated) and rendered with matching confidence\n- Scope is explicit: which task class this reflection applies to\n- A TTL or re-trigger condition exists; nothing lives forever by default\n- The reflection names a specific correctable behaviour, not a vague narrative about a one-off flake\n- A user can list, pin, correct, and delete it like any other owned record',
     },
     demoCaption:
-      'Open the episodic buffer behind a run that "just got better". Every entry is a row a user should be able to read, correct, or expire.',
+      'Run trials with reflection memory off, then on. Off, the agent repeats the same mistake every trial; on, each failure writes one sentence the next trial reads, and trial 3 passes.',
     demo: {
       archetype: 'reveal',
       subject: 'Trial 3 succeeded',
@@ -544,7 +544,7 @@ export const phase14Part1: Lesson[] = [
       body: '- A cheap, deterministic value function exists (unit tests, an explicit numeric target) rather than another model guessing plausibility\n- The task has demonstrably failed on a single trajectory, not just "might be hard"\n- Wall-clock time matters less than correctness for this task class\n- The user or system has explicitly opted into the cost, not defaulted into it\n- A live meter shows nodes explored, nodes pruned, and spend against a cap, not a single spinner\n- A stop control exists that is not a page refresh',
     },
     demoCaption:
-      'One headline token cost, opened up by branch. The number a user sees before approving a search run should be the sum of the branches, including the ones that get thrown away.',
+      'Drag breadth to keep more candidate thoughts at each level. At 1 and 2 the search commits to branches that cannot reach 24; at 3 it keeps the solving branch, and the readout shows what the extra scoring costs.',
     demo: {
       archetype: 'meter',
       subject: 'Search run cost',
@@ -684,7 +684,7 @@ export const phase14Part1: Lesson[] = [
       body: '- The badge names the verifier that ran, not just "approved"\n- A self-rated pass and a verifier-backed pass render as visually distinct states\n- Refine history (prior outputs and critiques) is retained and viewable, not discarded after the final pass\n- Iteration count is shown against the cap, so a user can tell "converged" from "ran out"\n- Evaluator and optimizer prompts are confirmed structurally different, not variations of the same instruction\n- A fourth pass never happens silently; it becomes an explicit human escalation',
     },
     demoCaption:
-      'Two runs that both end in a green check. One check is a model rating itself, the other is a test suite that ran. Only one of them is evidence.',
+      'Press Critique with each critic. The same-model critic approves version 1 while the hidden tests show 2 of 5 passing; the test-suite critic feeds real failures back and reaches 5 of 5 on iteration 3.',
     demo: {
       archetype: 'before-after',
       subject: 'Approved output',
@@ -834,7 +834,7 @@ export const phase14Part1: Lesson[] = [
       body: '- Each description states when to use the tool, not just what it does\n- A no_tool option exists in the registry with its own trigger condition\n- Every argument path resolves to coerced, rejected, or executed, never a crash\n- Enum and format fields are validated with real parsers, not regex\n- Parallel calls carry distinct tool_use_id values and results route back by ID, never by arrival order\n- Each tool declares its read and write surface, network access, timeout, and memory cap',
     },
     demoCaption:
-      'Slide the tool description from vague to specific and watch which tool the model selects. The description is the only thing the model reads before choosing.',
+      'Send all three queries under each description style. When descriptions only say what a tool does, the model picks the right tool 1 of 3 times; when they say when to use it, 3 of 3, including no tool call for arithmetic.',
     demo: {
       archetype: 'slider-map',
       subject: 'Tool selection',
@@ -979,7 +979,7 @@ export const phase14Part1: Lesson[] = [
       body: '- Every plan step traces to an operator with explicit preconditions and effects, not just a fluent description\n- A blocked step names the specific unmet precondition and the action that would unblock it\n- Model-proposed decompositions are visually marked apart from library-derived steps\n- The evaluator behind any optimization step is deterministic and machine-checkable, not another model asked to judge quality\n- The soundness claim could survive an audit that does not trust the model at all',
     },
     demoCaption:
-      'The same plan step, refused two ways. One refusal ends the interaction; the other names the fact that is missing and tells the user what would unblock it.',
+      'Run the plan and it stops at transfer_funds. Reported as prose, all you can do is retry; reported as a precondition, the missing fact is named, so recording the approval re-plans from step 4 and finishes.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Blocked plan step',

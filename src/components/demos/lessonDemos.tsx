@@ -1,4 +1,14 @@
 import { useMemo, useState } from 'react';
+import { CRAFT_INTERACTION_SPECIMENS } from './specimens/craftInteraction';
+import { DE_AGENTIC_AIUX_SPECIMENS } from './specimens/deAgenticAiux';
+import { DE_CRAFT_MOTION_VISUAL_SPECIMENS } from './specimens/deCraftMotionVisual';
+import { PHASE11_SPECIMENS } from './specimens/phase11';
+import { PHASE12_SPECIMENS } from './specimens/phase12';
+import { PHASE13_SPECIMENS } from './specimens/phase13';
+import { PHASE14A_SPECIMENS } from './specimens/phase14a';
+import { PHASE14B_SPECIMENS } from './specimens/phase14b';
+import { PHASE15_SPECIMENS } from './specimens/phase15';
+import { PHASE16_SPECIMENS } from './specimens/phase16';
 
 // Small interactive demos for curriculum lessons. Self-contained, token-styled,
 // registered by lesson id in LESSON_DEMOS at the bottom.
@@ -262,4 +272,14 @@ export const LESSON_DEMOS: Record<string, React.FC> = {
   'p12-01-patch-tokens': PatchGridDemo,
   'p12-02-clip-contrastive': ZeroShotDemo,
   'p12-03-qformer-bridge': BridgeDemo,
+  ...CRAFT_INTERACTION_SPECIMENS,
+  ...DE_AGENTIC_AIUX_SPECIMENS,
+  ...DE_CRAFT_MOTION_VISUAL_SPECIMENS,
+  ...PHASE11_SPECIMENS,
+  ...PHASE12_SPECIMENS,
+  ...PHASE13_SPECIMENS,
+  ...PHASE14A_SPECIMENS,
+  ...PHASE14B_SPECIMENS,
+  ...PHASE15_SPECIMENS,
+  ...PHASE16_SPECIMENS,
 };

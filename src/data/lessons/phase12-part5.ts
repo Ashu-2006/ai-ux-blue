@@ -111,7 +111,7 @@ export const phase12Part5: Lesson[] = [
         '- What is the robot\'s control frequency, and what latency budget per action does that set?\n- Discrete-bin tokens, FAST compression, or continuous flow matching: which fits that budget?\n- What is the co-fine-tuning ratio, and does it preserve instruction generalization or just demo replay?\n- Does the base model train on Open X-Embodiment, and how many task-specific demos does LoRA fine-tuning need to close the domain gap?\n- What hard joint limits, velocity clips, and workspace bounds live in the control layer, outside the model?\n- Which tasks require human approval before the first action executes, and what does that approval screen show?',
     },
     demoCaption:
-      'Same robot, same instruction, two training recipes. Flip between a robot-only model and a co-fine-tuned one and watch what happens when the phrasing leaves the training distribution.',
+      'Click the table to place a part, then drag the number of action bins. The gripper snaps to the nearest bin center and the readout measures the miss in millimeters.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Instruction: "pick up the third largest object from the left"',
@@ -268,7 +268,7 @@ export const phase12Part5: Lesson[] = [
         '- What is the document type: clean print, scientific paper, mixed handwriting, or regulated form?\n- What is the daily page volume, and does per-page cost dominate the decision at that scale?\n- Does the workflow require an auditable, deterministic failure mode, or is a confident wrong answer an acceptable risk?\n- Pick one: OCR pipeline plus rules, an OCR-free specialist (Donut or Nougat), or VLM-native reading.\n- If regulated: what is the cross-check step, and what happens when the pipeline and the VLM disagree?\n- Does the review UI show a confidence treatment, or does it present extraction as fact?',
     },
     demoCaption:
-      'One invoice, two readers. The left side is what a flat OCR dump preserves; the right is what a layout-aware reading returns. The difference is not the words, it is knowing where they were.',
+      'Ask for the total under each reading. Flat OCR picks the next number in reading order; layout-aware picks the value on the same row. Hover any word to see what each reader knows about it.',
     demo: {
       archetype: 'before-after',
       subject: 'Invoice #8841, one page',
@@ -425,7 +425,7 @@ export const phase12Part5: Lesson[] = [
         '- Layout signal: does the corpus have charts, tables, or annotated figures that carry meaning beyond the words? If no, text-RAG is likely enough.\n- Scale: is the corpus in the millions of pages, where storage cost could dominate the decision regardless of accuracy?\n- Regulatory need: must the pipeline produce extractable OCR text alongside retrieval, independent of which retriever is used?\n- Quality bar: does the product need ViDoRe-level accuracy (about 80 percent nDCG@5), or is text-RAG\'s 50 to 60 percent tolerable?\n- Budget: raw storage is about 30x a text index; product quantization brings that to 5 to 10x. Is that line item acceptable at this corpus size?\n- Pick one: ColPali/ColQwen2 for quality, VisRAG for scale, text-RAG for text-only corpora.',
     },
     demoCaption:
-      'The query asks for chart data. Flip between the two retrieval stacks and trace where the chart survives, and where it silently disappears before the model ever sees the page.',
+      'Pick a query word and flip the retrieval stack. MaxSim highlights the patch each word matches best; text-RAG averages one vector per page, drops the chart, and the ranking flips.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Query: "What was Q3 revenue growth?"',
@@ -577,7 +577,7 @@ export const phase12Part5: Lesson[] = [
         '- Decompose the query: which fragment of intent maps to which modality, and does a retriever exist for each?\n- Cross-modal bridge: shared embedding space (CLIP, CLAP), translator module, or VLM hidden states, and why that one?\n- Fusion method: score fusion by default; only move to MoE after an A/B test shows a real win.\n- Per-modality recall: is it instrumented and visible, or does the product only ever show the composite score?\n- Grounding: does the generator tag each claim with its specific source, text, image, or audio, and timestamp where relevant?\n- Citation UI: does each modality have its own verification affordance, or is there one generic source chip doing three jobs?',
     },
     demoCaption:
-      'A trip planner returns one composite match score. Open the breakdown and see what the roll-up was hiding: one modality never delivered, and the headline number never said so.',
+      'Flip the fusion rule. The readout shows the weighted sum that puts Cafe Flora on top, and what happens when every modality has to clear a floor.',
     demo: {
       archetype: 'meter',
       subject: 'Top result: Cafe Flora, composite match 0.84',
@@ -726,7 +726,7 @@ export const phase12Part5: Lesson[] = [
         '- Does every action type in the schema have a named risk level (safe, reversible, irreversible)?\n- Is there an approval gate in front of every irreversible action, not just a general "are you sure" at the end of the run?\n- Is the action log replayable by a human after the fact, with screenshots or state snapshots at each step?\n- Does the agent verify the outcome of an action (price, selection, confirmation text) before treating it as ground truth for the next step?\n- What is the target benchmark score for this task category, and does the product design assume supervision at that failure rate?\n- Does long-horizon memory use a strategy (summary-chain, skip-frame, log) matched to whether cross-tab or cross-form state actually matters for this workflow?',
     },
     demoCaption:
-      'Two runs of the same booking task. Step through both sequences and find where the unsupervised run crosses the line it cannot uncross, and where the governed run stops to check.',
+      'Watch the agent book a flight with and without a gate on irreversible actions. With the gate on, reject the payment and watch it recover; the readout counts unreviewed irreversible clicks and the money spent.',
     demo: {
       archetype: 'sequence',
       subject: 'Task: book the Tokyo flight under $800',

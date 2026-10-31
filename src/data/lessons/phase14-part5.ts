@@ -109,7 +109,7 @@ export const phase14Part5: Lesson[] = [
         '- Name the question class this debate answers: factual, rule-following, or open-ended reasoning.\n- Start at N=3, R=2. Do not scale up without a benchmark number that justifies it.\n- Compute critique operations for full mesh at your N and R before committing to it.\n- Check whether a star or ring topology holds accuracy at a fraction of the critique cost.\n- Add a forced-disagreement rule for round one.\n- Vary prompts, temperature, or models across proposers. Identical setups waste the run.\n- Design the progress UI before the backend: round counter, active proposer, what changed since last round.\n- Decide what ships to the user: the converged answer alone, or the answer plus the disagreement record.',
     },
     demoCaption:
-      'Switch between full mesh and star at N=5, R=3. The proposal count is identical; the critique operations drop from 60 to 12. That difference is the token bill and the wall-clock time your progress component has to cover.',
+      'Step a five-agent debate through three rounds, then switch between full mesh and star. Both converge on the same answer; the readout shows critiques, tokens and cost climbing at very different rates (60 vs 12 critiques by round 3).',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Debate topology · N=5, R=3',
@@ -265,7 +265,7 @@ export const phase14Part5: Lesson[] = [
         '- Tag every failing trace with one of the five modes: hallucinated action, scope creep, cascade, context loss, tool misuse.\n- Build a weekly distribution across modes, not a single error rate.\n- For any "success" claim, name the environment check that would re-probe it independently of the agent\'s own report.\n- Give each mode its own UI surface. Do not route all five into one error toast.\n- Set a baseline distribution so you can say "cascades are up" instead of just "errors happened."\n- Cluster and rate-limit alerts by mode so the team does not learn to ignore them.',
     },
     demoCaption:
-      'Step through a cascade from a single hallucinated SKU. Four API calls fire on a phantom, the 400 comes back, and the run still closes green. Note where a state re-probe would have cut the chain.',
+      'Step a reorder run that starts from one hallucinated SKU, with and without a state re-probe per step. The readout counts side-effect calls made on the phantom SKU and how the run closed.',
     demo: {
       archetype: 'sequence',
       subject: 'Refund agent · one phantom SKU',
@@ -423,7 +423,7 @@ export const phase14Part5: Lesson[] = [
         '- Tag every context item with its source: user_message, tool_output, or retrieved.\n- Refuse anything directive-shaped arriving under a non-user_message tag, before the tool call fires.\n- Put the validator before the side effect, never only on the final output.\n- Require human confirmation for login, purchase, CAPTCHA, and send-message actions, showing the concrete arguments.\n- Store retrieved content externally; spans carry references, not full prose.\n- Guard memory writes the same way you guard tool calls: refuse anything shaped like an instruction.\n- Name the action, the surface, and the offending string in every block reason.',
     },
     demoCaption:
-      'Toggle the provenance tags on a message history. Untagged, the injected line in a retrieved PDF is indistinguishable from the user\'s request. Tagged, the validator has something to refuse on and the UI has something to show.',
+      'Run the validator over three proposed tool calls with and without provenance tags, and hover a call to see which history line it came from. The readout counts allowed and refused calls and whether the conversation was sent to the attacker.',
     demo: {
       archetype: 'reveal',
       subject: 'Agent context window · 4 messages',
@@ -571,7 +571,7 @@ export const phase14Part5: Lesson[] = [
         '- Write down the specific problem before naming a topology. "We need multi-agent" is not a problem statement.\n- Start with one agent plus the workflow patterns from lesson 14.12.\n- Move to supervisor-worker only with 2 to 4 named specialists.\n- Move to swarm only when latency beats reasoning clarity as a priority, and add a hop counter before shipping it.\n- Move to hierarchical only when a supervisor\'s context budget measurably fails, not for organizational tidiness.\n- Reach for debate only when accuracy matters more than cost.\n- Match the trace UI to the topology: tree for supervisor, chain plus hop counter for swarm, recursive collapse for hierarchical, columns for debate.',
     },
     demoCaption:
-      'Step through a single support ticket under a supervisor and under a swarm. Same task, same specialists, different trace. The swarm is two hops shorter and has no row that can tell you why any handoff happened.',
+      'Step one support ticket through a supervisor and through a swarm. The readout counts hops, estimated latency, and how many handoffs left a recorded reason in the trace.',
     demo: {
       archetype: 'before-after',
       subject: 'Refund ticket · 3 specialists',
@@ -732,7 +732,7 @@ export const phase14Part5: Lesson[] = [
         '- Write down expected task duration and the cost of a full restart before picking a framework.\n- Under 30 seconds and restart is cheap: request-response or streaming.\n- Over 30 seconds and restart is expensive: durable execution.\n- Long-running or many-step, user not watching: queue-based, with a DLQ surfaced somewhere.\n- Starts from an external trigger, not a user request: event-driven.\n- Periodic and unattended: scheduled, paired with durable execution.\n- Design the resumed-run state separately from the retry state before writing any resume logic.\n- Wire OpenTelemetry GenAI spans regardless of shape; no user is watching the trace in queue or event-driven runtimes.',
     },
     demoCaption:
-      'Slide the expected task duration from 5 seconds to 20 minutes and watch which runtime shape survives it, and what the user is looking at while it runs. The 30-second mark is where the interface changes completely.',
+      'Drag the expected task duration from 5 seconds to 20 minutes. Each runtime shape marks whether it survives a 30s gateway timeout, a socket drop at 1:00 and a user who leaves at 2:00, and the preview shows what the user sees under the cheapest shape that does.',
     demo: {
       archetype: 'slider-map',
       subject: 'Runtime shape vs task duration',
@@ -874,7 +874,7 @@ export const phase14Part5: Lesson[] = [
         '- Inputs named: which artifacts (diff, scope, rules, feedback log) feed the gate, and where each one lives.\n- Every check has a stated severity: block or warn, never unstated.\n- Zero LLM calls inside the gate function itself.\n- One report path, one schema, read by CI and humans identically.\n- Block findings have a defined override path: reason field, signer id, commit hash, all required.\n- A coverage floor check exists and also fails on regression from the last merge.\n- Strict mode exists, is opt-in by branch, and is never the global default.\n- The gate is called from at least a CI step and a pre-handoff hook, not just one place.',
     },
     demoCaption:
-      'Toggle between what the agent reports and what the gate computes from the same run. Seven checks, two of them blocking, one artifact each. The row that fails is the row the primary action gets disabled on.',
+      'Flip between what the agent reports and what the gate computes from the artifacts, and click a check to see its evidence. The readout counts passing and blocking checks; the Merge button follows the gate, not the chat.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Task close-out · PR-2214',

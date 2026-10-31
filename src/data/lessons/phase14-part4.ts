@@ -101,7 +101,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Which split is this: raw, Verified, or a contamination-audited variant like SWE-bench+?\n- What are the actual tasks, and do they resemble what your product does?\n- Is this a mean, or do you have the P50, P75, and P95?\n- What does this benchmark structurally not measure (cost, safety, your domain, tail failures)?\n- If the number is under 40 percent, has the failure-handling UI been designed, not just the success card?',
     },
     demoCaption:
-      'Drag the reported success rate and watch the two surfaces resize. The headline number is a budget split between the answer view and the failure view, and at benchmark-realistic rates most of your screen time is spent on the second one.',
+      'Flip the leaked tasks out of the scoring and watch the leaderboard reorder. The readout shows the leader\'s score and rank before and after, from the same twelve task results.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Reported benchmark success rate',
@@ -233,7 +233,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Are hit targets at least 44px, not 24px icon-only?\n- Does every control have a persistent text label, not a hover-only affordance?\n- Is the primary action distinguished by shape or weight, not color alone?\n- Is every frequently used action promoted to one menu level, not buried three deep?\n- Does every glyph have a unique, readable accessible name?',
     },
     demoCaption:
-      'Compare a screen built for a confident human against the same screen read at 1920x1080 by a model that only sees pixels. The properties that fix grounding are the ones already on your accessibility checklist.',
+      'Run the same twelve predicted clicks against 24px and 44px targets. The pixel error is identical; the readout counts how many land on Export, on a neighbour, or on nothing.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Settings screen, as the agent sees it',
@@ -379,7 +379,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Does every proposed action pass a per-step classifier before it executes?\n- Is there a confirmation gate on login, purchase, data-sharing, and delete actions, rendered with the real target or amount?\n- Is navigation restricted by an allowlist or blocklist, not left open?\n- Is retrieved content (DOM, PDFs, tool output) stored externally with only a reference on the trace?\n- Does every step in the trace carry the screenshot, the action, the provenance, and the classifier verdict?',
     },
     demoCaption:
-      'Expand a single agent step and see what the safety layer actually inspects. The opaque version shows an action; the expanded one shows the provenance, the classifier verdict, and the gate that stands between a proposal and a click.',
+      'Step the agent through a checkout page that carries an injected instruction, with and without a per-step check. The readout counts proposed, executed and held actions, and whether an order got placed.',
     demo: {
       archetype: 'reveal',
       subject: 'Agent step 47',
@@ -519,7 +519,7 @@ export const phase14Part4: Lesson[] = [
       body: '- VAD: target 20-60ms. Measured: ___\n- STT first partial: target 100-250ms. Measured: ___\n- LLM first token: target 150-400ms. Measured: ___\n- TTS first audio: target 100-200ms. Measured: ___\n- Transport RTT: target 30-80ms. Measured: ___\n- Sum, then classify: under 600ms premium, under 1200ms common, over 1500ms reads as broken.\n- Before any model or provider swap, re-run this worksheet and know what you spent.',
     },
     demoCaption:
-      'Add up one stage at a time and watch the total cross the thresholds where a conversation stops feeling like one. The headline "sub-second voice" hides a five-way split where any single swap can spend the whole margin.',
+      'Play the call under silence-based and semantic turn detection. The user pauses mid-sentence; the readout shows when the turn closed, when the reply started, and how many milliseconds the agent talked over them.',
     demo: {
       archetype: 'meter',
       subject: 'End-to-end voice latency',
@@ -657,7 +657,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Does every span carry gen_ai.provider.name?\n- Do gen_ai.request.model and gen_ai.response.model both appear, and does the UI surface a gap between them?\n- Is every tool span parented to its invoke_agent span, with no orphans?\n- Does gen_ai.data_source.id appear on every retrieval, for citation?\n- Is content capture opt-in, with prose stored externally and only references on the span?\n- Is OTEL_SEMCONV_STABILITY_OPT_IN pinned so attribute names cannot shift under a backend upgrade?',
     },
     demoCaption:
-      'The same agent run, once as a span that only records a duration and once as a span carrying the GenAI schema. The second version is the one a replay screen, a cost breakdown, and an audit query can all be built from.',
+      'Switch the same agent run between bare spans and GenAI schema spans, and click a span to read its attributes. The readout counts the dashboard queries the trace can answer and the raw prompts it stores.',
     demo: {
       archetype: 'before-after',
       subject: 'One tool span from an agent run',
@@ -804,7 +804,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Do you need tight prompt-to-trace bisecting? Weight Langfuse higher.\n- Is RAG relevancy or behavioral drift your top risk? Weight Phoenix higher.\n- Do you want automated prompt optimization and guardrails out of the box? Weight Opik higher.\n- Does your license policy exclude Elastic License 2.0? Rule out Phoenix as primary.\n- Have you measured any vendor-claimed number (like the 14x logging speed) on your own corpus? If not, treat it as unverified.',
     },
     demoCaption:
-      'Order a regression investigation two ways. The sequence is the insight: whether you can bisect depends entirely on a step you either did or did not take before the incident.',
+      'Toggle whether each trace carries its prompt version, and click a day in the chart. Unstamped, you only see the daily average sag; stamped, the readout splits scores by version and names the one that regressed.',
     demo: {
       archetype: 'sequence',
       subject: 'Quality dropped on Tuesday',
@@ -948,7 +948,7 @@ export const phase14Part4: Lesson[] = [
       body: '- Is this prompt or agent change versioned in the repo, not edited live in a console?\n- Does CI run the three-layer suite (static, custom offline, online replay) on this pull request?\n- Is there a stored baseline, and does the gate fail on regression greater than 5 percent versus it?\n- Does every guardrail this change touches have a corresponding eval case?\n- If this change follows a production incident, has that incident become a permanent case in the suite?',
     },
     demoCaption:
-      'Same prompt edit, two merge paths. What differs is not the change but whether anything stood between it and production, and what the team can say about it afterwards.',
+      'Open each prompt-edit PR, let CI run the 20 eval cases, then try to merge. Flip the eval from advisory to gating; the readout shows the score delta against main and how many regressions you have shipped.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Merging a prompt edit',

@@ -101,7 +101,7 @@ export const phase16Part1: Lesson[] = [
       body: '- Does the task fit under 100k tokens of working data end to end?\n- Does it take fewer than 20 tool calls to finish?\n- Does every stage need the same system prompt, or does one stage need a different quality bar?\n- Does any part of the work not depend on another part finishing first?\n- If you split it: what is the one summary message that crosses each agent boundary, and what does it drop?\n- What per-agent status row and roll-up state does the UI need before you write the first prompt?',
     },
     demoCaption:
-      'Same four-stage job, one agent versus three specialists. Watch what the context window holds at the review step. The single agent is reviewing code while still carrying 50k tokens of documentation it read an hour ago.',
+      'Click through the four stages and stop on Review, then switch to three specialists. The readout shows how much of the active window is stale context from earlier jobs: 110k for one agent, a 4k summary for the reviewer.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Research to code to review · one job',
@@ -253,7 +253,7 @@ export const phase16Part1: Lesson[] = [
       body: '- What is the agent unit: a class, a function, a config file?\n- How is a handoff implemented: function return, graph edge, or speaker selection?\n- Is shared state a full message pool or a projected, role-scoped view?\n- Who orchestrates: a static graph, an LLM selector, the current agent\'s handoff call, or a queue?\n- Write the mapping in one paragraph before reading past the quickstart. If you cannot fill all four blanks, the docs are incomplete or the framework has invented a fifth primitive worth naming.',
     },
     demoCaption:
-      'The same three-agent pipeline under three orchestrators. Agents and shared state are identical across all three runs. Only who picks next changes, and that one axis decides whether you can draw the run before it happens.',
+      'Press Run five or six times under each orchestrator. Agents and shared state never change; the run log and the distinct-path count show that only a static graph lets you draw the run before it happens.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Research to write to review · one pipeline',
@@ -404,7 +404,7 @@ export const phase16Part1: Lesson[] = [
       body: '- Lead on a reasoning-tier model, workers on a faster and cheaper one.\n- Worker timeout at roughly 2x median runtime; the lead re-spawns narrower or proceeds without it.\n- Token cap per worker so one runaway worker cannot blow the budget.\n- Trace the plan, every worker\'s tool calls, and the synthesis step for post-hoc debugging.\n- Rainbow rollout for new lead or worker versions; these are long-running, stateful agents, not stateless services you can blue-green.\n- A synthesis-conflict rule: re-ask and pay a round, or render the disagreement. Never pick silently.',
     },
     demoCaption:
-      'Three workers on three sub-questions, 0.3 seconds each. Serial gives you 0.9 seconds and one saturated window. Parallel gives you roughly 0.35 and three clean ones. The second number is why the pattern exists.',
+      'Press Run in Serial, then in Parallel workers. The readout shows wall time (0.90s versus 0.35s) and what the lead\'s window holds (54k of raw results versus 4.5k of summaries).',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Research query · three sub-questions',
@@ -552,7 +552,7 @@ export const phase16Part1: Lesson[] = [
       body: '- Cap tree depth at 2 levels.\n- Explicit reconciliation budget, usually 2 rounds, before the top manager commits.\n- Provenance on every synthesis: each summary cites the leaf outputs behind it.\n- A canary worker at each sub-manager level, always asked the original unmodified question.\n- Alert when the manager\'s logged decomposition no longer covers the original user query.',
     },
     demoCaption:
-      'One mislabel at the top, three levels down. The manager sends the legal question to a finance branch, the branch does correct finance work, and the top synthesis reports findings nobody asked for. The original question is never answered or flagged.',
+      'Step the legal question down the tree with no intent check, then with echo-back. Without the check an off-topic answer comes back and nothing is flagged; with it the mismatch is caught at level 2 for two extra model calls.',
     demo: {
       archetype: 'sequence',
       subject: 'Doc review · 3-level tree',
@@ -704,7 +704,7 @@ export const phase16Part1: Lesson[] = [
       body: '- At least one role\'s verdict is decided by code, never all-LLM.\n- Explicit input/output schema per role: the planner returns a spec, not prose.\n- Communicative dehallucination clause: an agent asks the role that owns a missing detail instead of inventing it.\n- Critic runs before verifier; cheap checks first, expensive checks second.\n- Loop budget: max 2 critic-executor revision rounds before escalating to a human.',
     },
     demoCaption:
-      'The executor ships off-spec code that reads perfectly well. The critic accepts it because the prose is plausible. The verifier fails it because the test fails. Two reviewers, one useful signal, and only one of them can gate the action.',
+      'Click each PR under the critic gate, then under the verifier gate. The critic approves all three on prose; the verifier actually runs the tests, blocks PR #42, and the shipped-bugs count drops to zero.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Off-spec function · same artifact',
@@ -855,7 +855,7 @@ export const phase16Part1: Lesson[] = [
       body: '- Priority queue with explicit aging to prevent long-task starvation.\n- Every worker is idempotent: a task pulled twice produces the same result.\n- A durable queue (Kafka, Redis Streams, or a database-backed queue), not an in-memory one, backs production traffic.\n- Every task carries a trace ID; every worker logs start and end against it.\n- Back-pressure on the producer once queue depth outpaces worker throughput.',
     },
     demoCaption:
-      'Twelve tasks of mixed duration across four workers. Pre-assigning them leaves fast workers idle while one grinds on a 10-second job. A shared queue distributes unevenly, which is the point: uneven is optimal when durations vary.',
+      'Run the same twelve tasks pre-assigned, then from a shared queue. The readout shows makespan falling from 14s to 10s and idle worker-seconds from 22 to 6, even though the queue gives one worker a single task and the others four.',
     demo: {
       archetype: 'toggle-fix',
       subject: '12 tasks · 4 workers · mixed duration',

@@ -102,7 +102,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Which protocol owns this call: MCP (tool), A2A (peer), ACP (audit), or ANP (trust)?\n- Does the Agent Card declare a version? Does your client check it?\n- Are INPUT_REQUIRED and AUTH_REQUIRED rendered as prompts, never as errors?\n- Does every response destined for a regulated workflow carry TrajectoryMetadata or an equivalent?\n- Is there a fail-open or fail-closed decision written down for identity resolution failures?\n- Is discovery cached with a TTL so a cold start does not become a thundering herd?',
     },
     demoCaption:
-      'The A2A task lifecycle as your run component sees it. Four terminal states, and two mid-run states that mean "waiting on a person". Treating those two as failures is the difference between a paused run and a broken product.',
+      'Press Delegate and let the task reach input-required, first with human states shown as failed, then as paused. As failed, Retry restarts the task and it stalls in the same place every time; as paused, you answer and it completes.',
     demo: {
       archetype: 'sequence',
       subject: 'A2A task · one delegated job',
@@ -253,7 +253,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Max rounds cap set (10-20 for typical tasks)?\n- Turn count per agent tracked and an imbalance threshold set to alert on?\n- A termination token or dedicated verifier agent wired, not just a token nobody emits?\n- A projection or scoped memory plan for chats past roughly 10 messages?\n- Selector input and output logged for every LLM-selected turn, so a wrong route is debuggable?',
     },
     demoCaption:
-      'The same three-agent chat under round-robin and LLM-selected. Watch turn 2. Round-robin hands the coder the floor during a legal question because the cycle says so; the LLM selector reads the pool and costs you a call to do it.',
+      'Press Next turn through the chat under round-robin, then under LLM-selected. The readout counts on-topic turns (round-robin hands the coder the floor at turn 2) and the selector model calls the LLM version pays to avoid that.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Coder, reviewer, manager · one pool',
@@ -403,7 +403,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Does every handoff write a trace event: from-agent, to-agent, context snapshot?\n- Is the context transfer rule explicit: full history, last N messages, or a summary?\n- Is a handoff to a specialist with different tool permissions authenticated, not just routed?\n- Is there a loop-detection rule for repeat handoffs between the same two agents?\n- Is there a fallback agent if a handoff target does not exist?',
     },
     demoCaption:
-      'Same refund request, same three agents. The difference is what crossed the handoff. In the first, the specialist restarts from its own prompt and asks for the order number again. In the second, a carried summary arrives with it and the user is asked for nothing twice.',
+      'Send the refund request with a bare handoff, then with a carried summary. The readout shows the payload size crossing the handoff and how many times the user had to repeat themselves.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Triage to refund specialist',
@@ -554,7 +554,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Does the Agent Card declare a protocol version your client checks?\n- Is task creation idempotent against network retries?\n- Are artifact schemas declared and validated by consumers, not assumed?\n- Is auth (bearer, mTLS, signed requests) declared in the card rather than negotiated ad hoc?\n- Is there a dead-letter path for tasks that fail, so recurring failure types are visible over time?',
     },
     demoCaption:
-      'What a delegated A2A task actually gives you versus what a local agent run gives you. The remote side owes you a state and an artifact and nothing else, so the component that renders it is a delegation card, not a transcript.',
+      'Run the same flight search as a local agent, then as a remote A2A task. The readout counts what your UI can actually render: five internal steps and a transcript locally, three states and one artifact remotely.',
     demo: {
       archetype: 'reveal',
       subject: 'Delegated task · partner agent',
@@ -698,7 +698,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Does every write record writer, timestamp, prompt hash, and cited source?\n- Is the log append-only, with corrections as new entries that reference the superseded one?\n- Is there at least one read-only verifier with independent source access?\n- Does the verifier\'s output route to a human or a separate channel, never back into the pool it checks?\n- Is the ratio of supersession writes to total writes tracked as an early hallucination signal?',
     },
     demoCaption:
-      'The 42 percent that never existed, in five writes. Then the same run with provenance on every entry and a read-only verifier that re-fetches the source. The second run does not prevent the bad write, it makes it visible and retractable.',
+      'Step through the five writes with bare entries, then with provenance and a read-only verifier. The bad 42% gets written either way; the readout shows whether anyone flagged it and, after Retract, how many dependent entries went with it.',
     demo: {
       archetype: 'sequence',
       subject: 'Research pool · one hallucinated decimal',
@@ -850,7 +850,7 @@ export const phase16Part2: Lesson[] = [
       body: '- Does the UI show the winning answer plus the vote spread plus which aggregator produced it?\n- Is sub-threshold treated as a first-class state (escalate to human review), not silently rounded up?\n- Are minority clusters logged with provenance, not discarded?\n- Is semantic clustering in place before counting, not string equality?\n- Are rounds bounded (2-3) to avoid rewarding sycophancy in multi-round settings?\n- Is the ensemble diversified across base models, not just prompted differently?',
     },
     demoCaption:
-      'Five voters, three of them on the same base model, all wrong the same way. Plurality returns the wrong answer with a clean 3 to 2. The geometric median pulls toward the honest cluster because it is robust to the correlated block.',
+      'Switch between plurality and geometric median, and click voters to move them onto the shared base model. With two correlated voters plurality returns 42% while the median holds the honest cluster; add a third and the median breaks too, because it is only robust below half.',
     demo: {
       archetype: 'meter',
       subject: 'Monoculture attack · n=5',

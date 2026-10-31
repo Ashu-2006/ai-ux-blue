@@ -109,7 +109,7 @@ export const phase13Part1: Lesson[] = [
       body: '- Is the name stable and machine-readable, not a description in disguise?\n- Does the description state when to use it, in one sentence a model or a person could act on?\n- Is the input schema JSON Schema 2020-12, with required fields and no untyped any?\n- Is the tool classified pure or consequential, and does that classification live in the registry, not the UI?\n- Does a consequential tool have a confirmation step that shows the real arguments before it runs?\n- Is there a turn cap on the loop this tool lives inside, and do you know what it is?',
     },
     demoCaption:
-      'Step through one user message with and without the loop. Without tools the model writes a fluent sentence from stale weights; with the loop the host validates, executes, and returns real state before the model answers.',
+      'Press Send with and without the loop. The host log shows every hop, and the readout counts model turns and API calls, so you can see that the confident no-tools answer never touched a live source.',
     demo: {
       archetype: 'sequence',
       subject: 'One message: weather in Bengaluru',
@@ -267,7 +267,7 @@ export const phase13Part1: Lesson[] = [
       body: 'Tool(name, description, input_schema, strict)\n\nto_openai(tool) -> {type: "function", function: {name, description, parameters: input_schema, strict}}\nto_anthropic(tool) -> {name, description, input_schema}\nto_gemini(tool) -> {functionDeclarations: [{name, description, parameters: input_schema}]}\n\ncanonical_call(response, provider) -> {id, name, args}\n  openai: parse response.tool_calls[i].function.arguments (string) into args\n  anthropic: read response.content[] where type is tool_use, args is input (already parsed)\n  gemini: read response.candidates[0].content.parts[] where functionCall, args is functionCall.args',
     },
     demoCaption:
-      'Reveal what one canonical tool becomes on each provider. The declaration and the response both change shape, which is why a component typed against a single provider breaks on port day.',
+      'Switch providers and watch the same get_weather call change shape. The component typed for Anthropic reads input.city and breaks on the other two, while the translator chip keeps working.',
     demo: {
       archetype: 'reveal',
       subject: 'get_weather · one tool, three wire shapes',
@@ -415,7 +415,7 @@ export const phase13Part1: Lesson[] = [
       body: '- Does every returned result echo the tool_call_id, tool_use_id, or functionResponse id it answers?\n- Is there one accumulator buffer per id, not one shared buffer for the whole stream?\n- Does the parse step wait for the provider\'s own end-of-call signal, not a brace count?\n- Is there an ordering_dependency check before dispatch, for tools whose outputs feed other tools\' inputs?\n- Has the downstream rate limit been checked against the widest fan-out this registry allows?\n- Is the progress UI a list of rows keyed by id, not a single spinner with a label?',
     },
     demoCaption:
-      'Compare serial and parallel fan-out on the same three executors (400, 600, 800 ms). The number changes from a sum to a max, and the surface changes from one status line to three rows finishing out of order.',
+      'Flip between serial and parallel and watch the timeline. Wall clock goes from 3000ms to 1400ms, and in parallel the rows settle out of order, Mumbai first.',
     demo: {
       archetype: 'before-after',
       subject: 'Weather fan-out · 3 cities',
@@ -569,7 +569,7 @@ export const phase13Part1: Lesson[] = [
       body: '- Parse error: output is not valid JSON. Strict mode: impossible. UI: should never be visible; if it is, strict mode is off somewhere.\n- Schema violation: output parses but breaks types, required, enum, or range. Strict mode: impossible. UI: same as above, a strict-mode leak.\n- Refusal: model declines because the input does not fit the schema. Strict mode: expected. UI: its own state, showing the model\'s stated reason, no retry affordance.',
     },
     demoCaption:
-      'Toggle between validate-after and constrained decoding on the same invoice extraction. The failure list goes from six shapes to one, and the one that remains needs a reason surfaced rather than a retry.',
+      'Extract 20 invoices both ways and click any cell to see the raw attempts. Validate-after needs 24 calls and fails three different ways; constrained decoding needs 20 and leaves one typed refusal.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Invoice extraction · {customer, line_items, total_usd}',
@@ -723,7 +723,7 @@ export const phase13Part1: Lesson[] = [
       body: '- Is the name snake_case, verb-noun ordered, and free of baked-in arguments?\n- Does the description say "Use when X. Do not use for Y." in under 1024 characters?\n- Is every closed set an enum, never a free-text string?\n- Does the action argument, if any, have three or fewer values, or has the tool been split?\n- Does every error message name the field and show an example payload?\n- Is the tool versioned with a new name rather than a mutated one, with a deprecation window before removal?\n- Has the description been scanned for injection-shaped text before it shipped?',
     },
     demoCaption:
-      'Toggle two registry entries between ambiguous and disambiguated. Same tools, same capabilities. The only change is label and helper text, and it is worth 27 points of selection accuracy on the Databricks registry.',
+      'Toggle the two tool descriptions and watch six queries get routed. Identical text forces ties broken by list order (3/6 right); a second sentence that says when not to use each tool gets 6/6.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Registry entry · people lookup',
@@ -879,7 +879,7 @@ export const phase13Part1: Lesson[] = [
       body: '- LiteLLM: self-hosted, your own keys, 100+ providers, OpenTelemetry. Wins with an SRE team and a data-sovereignty requirement.\n- OpenRouter: managed SaaS, 300+ providers, credit-based billing, a dashboard. Wins for rapid prototyping and single-subscription simplicity.\n- Portkey: open-sourced March 2026, self-hosted or managed, full OpenTelemetry plus PII redaction built in. Wins when guardrails and compliance need to exist on day one.\n- In every case: confirm the fallback chain has a bounded retry budget, and the per-key budget has a named refusal state, before shipping.',
     },
     demoCaption:
-      'One alias, four legs. The headline says a single average cost per request; the breakdown shows the routing decisions and the fallback leg hiding inside it, which is the leg your users felt.',
+      'Send 20 requests through one model, then through the routed alias. The lanes show where each request went, and the readout shows cost per request, p50 latency, and the fallback leg that hid a 5xx.',
     demo: {
       archetype: 'meter',
       subject: 'our_smart_model · 1000 requests',
