@@ -106,7 +106,7 @@ export const deCraftMotion: Lesson[] = [
       body: '- Count every distinct duration value used across the codebase. More than 6? You have drift.\n- Count every distinct easing curve. More than 4? Same problem.\n- For each duration and curve, write down the semantic name it should carry (modal-enter, toast-exit, hover-lift).\n- Check that every semantic token has a reduced-motion sibling defined, not just the primary product.\n- Confirm the token file is the single source both design (Figma variables or Tokens Studio) and code (CSS variables or Style Dictionary output) read from.\n- Add a lint rule that flags a literal ms value in a transition or animation-duration property outside the token file.',
     },
     demoCaption:
-      'Flip between an ad-hoc timing sheet and a tokenized one. Same components, one is a vocabulary and the other is a pile of numbers.',
+      'Flip between inline values and the token ladder, then press Replay. The readout counts how many distinct durations and curves the same five components use.',
     demo: {
       archetype: 'toggle-fix',
       badLabel: 'Ad-hoc timings',
@@ -260,7 +260,7 @@ export const deCraftMotion: Lesson[] = [
       body: '- Under 100ms: does the interaction get a visible response (color, ripple, pressed state) with nothing more elaborate attempted?\n- 100 to 300ms: is there exactly one standard duration in use, not three or four competing ones?\n- 300 to 1000ms: is there a skeleton, spinner, or optimistic state, and can the user cancel or navigate away mid-wait?\n- Past 1000ms: is the work moved off the critical path, made optional, or given real progress information instead of a spinner?\n- Field check: is the slowest 25 percent of real interactions, not the average, what gets reviewed before shipping?',
     },
     demoCaption:
-      'One headline hides four different perceptual regimes. See how the same average splits across bands the user actually feels.',
+      'Press Save eight times in each mode. Both average 300ms; the band chart and p75 show what the average hides.',
     demo: {
       archetype: 'meter',
       badCaption:
@@ -404,7 +404,7 @@ export const deCraftMotion: Lesson[] = [
       body: '// Ask this before writing the animation:\n// Did the user\'s own gesture produce a velocity this motion must honor?\n\nif (triggeredByGesture) {\n  // drag, swipe, flick, pull-to-refresh\n  use: spring({ stiffness: 200, damping: 24, mass: 1 })\n  // or Apple-style: spring(duration: 0.35, bounce: 0.15)\n} else {\n  // click, hover, programmatic state change\n  use: tween({ duration: 240, ease: \'cubic-bezier(0.4, 0, 0.2, 1)\' })\n}\n\n// If you find yourself capping a spring\'s duration to hit a number,\n// you wanted a tween. Switch primitives, do not fight the physics.',
     },
     demoCaption:
-      'Same drag-to-dismiss card. On the left, a fixed tween ignores release velocity. On the right, a spring reads the flick and follows through.',
+      'Drag the sheet down and release it, once slowly and once with a flick. The readout compares your release velocity with the velocity of the first animated frames.',
     demo: {
       archetype: 'toggle-fix',
       badLabel: 'Tween on dismiss',
@@ -558,7 +558,7 @@ export const deCraftMotion: Lesson[] = [
       body: 'Paste this against any animation you are reviewing, your own or someone else\'s:\n\n"Here is an animation: [describe it in one sentence]. If I removed it entirely and the state change happened instantly with no transition, what would the user fail to understand or notice that they currently do understand or notice? List specifically what breaks. If nothing breaks, tell me this animation is decorative and should be cut or reduced to a single channel."',
     },
     demoCaption:
-      'Same checkbox event, two motion budgets. The busy version fires four channels; the honest one fires the one channel the user needs.',
+      'Tick a task in each mode. The readout lists every animated channel and when the last one settles.',
     demo: {
       archetype: 'toggle-fix',
       badLabel: 'Motion as decoration',
@@ -712,7 +712,7 @@ export const deCraftMotion: Lesson[] = [
       body: '- List every animation in the product. For each, assign a tier: preserve, shorten, or replace.\n- Preserve tier: confirm it is opacity, color, or under-5-percent scale only.\n- Shorten tier: confirm every duration over 200ms has a reduced value at 100 to 150ms.\n- Replace tier: confirm parallax, long translates, springs, and continuous motion all have a fade or instant fallback defined.\n- Confirm the fallback lives in the token file, not copy-pasted per component.\n- Turn on Reduce Motion in your own OS and use the product for at least one full session before sign-off.',
     },
     demoCaption:
-      'Same modal, two motion specs. The blanket off strips the state cue; the designed reduced variant keeps the "it appeared" signal without the translate.',
+      'Open the dialog under each spec. The readout shows exactly what moves: translate, scale, fade and duration.',
     demo: {
       archetype: 'toggle-fix',
       badLabel: 'Blanket off',
@@ -866,7 +866,7 @@ export const deCraftMotion: Lesson[] = [
       body: '- Can you state, in one sentence, what the sequence is supposed to communicate (reading order, focal emphasis, origin of action)? If not, stop before setting any numbers.\n- Is the per-item delay between 30 and 80ms, adjusted down for longer lists?\n- Is the total sequence duration under 500ms regardless of list length?\n- Past twenty items, is the effect windowed to the first visible N rather than applied to the full list?\n- Does the direction (top-to-bottom, center-out, origin-first) match the stated communicative intent, not just whatever the code\'s default iteration order happens to produce?',
     },
     demoCaption:
-      'Same five list items, two phrasings. The all-at-once version reads as one event; the staggered one sets a reading order without instructions.',
+      'Drag the stagger slider and let go to replay the chart. The verdict and readout show when the last bar starts and when the sequence ends.',
     demo: {
       archetype: 'sequence',
       badLabel: 'All at once',
@@ -1024,7 +1024,7 @@ export const deCraftMotion: Lesson[] = [
       body: '// 1. Variants: coordinate multiple elements with one state name\nconst backdrop = { hidden: { opacity: 0 }, visible: { opacity: 1 } }\nconst panel = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }\n\n// 2. Layout: animate position and size changes automatically\n<motion.div layout>...</motion.div>\n\n// 3. AnimatePresence: catch exit animations before unmount\n<AnimatePresence>\n  {isOpen && <motion.div variants={panel} initial="hidden" animate="visible" exit="hidden" />}\n</AnimatePresence>\n\n// 4. Gesture props: hover and tap share the animate surface\n<motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} />\n\n// Reach for useDrag + real spring physics only when release velocity matters.',
     },
     demoCaption:
-      'The API surface hidden behind one summary. Reveal the primitives and their jobs; state, layout, and gesture on the same declarative rail.',
+      'Press Shuffle with and without the layout prop and follow the outlined tag. The readout measures how many tags moved and how far.',
     demo: {
       archetype: 'reveal',
       badCaption:

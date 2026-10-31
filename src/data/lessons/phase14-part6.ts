@@ -103,7 +103,7 @@ export const phase14Part6: Lesson[] = [
       body: '- Instructions: does every rule name a check, or is it a wish?\n- State: does the next session read a file, or does it read your chat history?\n- Scope: is there a forbidden list, or only an allowed one?\n- Feedback: is there a captured exit code for the last command, or a sentence about one?\n- Verification: does a gate run automatically at task close, or does the agent self-report?\n- Review: does a second pass with different inputs exist, or does the builder mark its own homework?\n- Handoff: could a stranger start the next session from a file alone?',
     },
     demoCaption:
-      'Toggle between a prompt-only run and a workbench run on the same task with the same model. Read what each surface is actually holding, and which symptom appears the moment one is missing.',
+      'Start from a prompt-only run and click files to add them back to the workbench, or the reverse. Each missing surface shows the symptom it lets through; the readout counts surfaces, symptoms, and whether the run ships.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Task: add input validation to the signup handler',
@@ -253,7 +253,7 @@ export const phase14Part6: Lesson[] = [
       body: 'AGENTS.md (router, under 50 lines):\n- What this repo is, one paragraph.\n- Read agent_state.json before acting.\n- Read task_board.json for the next task.\n- Deeper rules: docs/agent-rules.md.\n- Verify with: <your test command>.\n\nagent_state.json:\n{ "active_task": null, "touched_files": [], "assumptions": [], "blockers": [], "next_action": null }\n\ntask_board.json:\n{ "tasks": [ { "id": "", "goal": "", "status": "todo", "owner": "builder", "acceptance": "" } ] }',
     },
     demoCaption:
-      'Two shapes of the same instruction set: one monolith, one router plus files. Watch which parts the agent actually reaches, and where the depth goes when it leaves the root file.',
+      'Switch between a 3,000-line AGENTS.md and a router plus three files, and click each need to see where it lives. The readout shows lines loaded, how many the agent reads closely, and how many needs it reaches.',
     demo: {
       archetype: 'before-after',
       subject: 'Repo instructions',
@@ -403,7 +403,7 @@ export const phase14Part6: Lesson[] = [
       body: 'For every line in your instructions file, answer:\n1. Category: startup, forbidden, definition of done, uncertainty, or approval? If none fit cleanly, split it into two rules.\n2. Check: name the function or command that verifies this rule. No name, no rule, delete or upgrade it.\n3. Severity: block, warn, or info, decided now, not under deadline pressure.\n4. Expiry: a date, default 90 days out.\n5. Override path: if severity is block, where does an override get signed?\nA rule that fails question 2 is decoration. Delete it or give it a check today.',
     },
     demoCaption:
-      'Flip one instruction between its prose form and its constraint form. The words barely change; what changes is whether any part of the run can fail because of it.',
+      'Run the same four agent actions under the prose version of a rule and its constraint version. The readout counts checks run and violations caught, and whether the run halted before the release script was edited.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'One line from agent-rules.md',
@@ -553,7 +553,7 @@ export const phase14Part6: Lesson[] = [
       body: '{\n  "task_id": "",\n  "goal": "one verifiable sentence",\n  "allowed_files": ["app/auth/**"],\n  "forbidden_files": ["scripts/**", "migrations/**", "config/prod/**"],\n  "acceptance_criteria": ["pytest tests/test_login.py exits 0"],\n  "rollback_plan": "git revert <commit>, redeploy previous tag",\n  "approvals_required": ["any new dependency"],\n  "time_budget_minutes": 45,\n  "network_egress": []\n}',
     },
     demoCaption:
-      'Same task, same model, one diff run against the contract. Step through the file writes and watch where the boundary actually catches, and which paths only warn.',
+      'Step through the diff for a login bug fix, with no contract and with scope.json. The readout tallies in-scope writes, warnings against the violation budget, blocked paths, and whether the diff is accepted.',
     demo: {
       archetype: 'sequence',
       subject: 'Task: fix the login bug',
@@ -705,7 +705,7 @@ export const phase14Part6: Lesson[] = [
       body: '- Does every shell command go through one wrapper, with no direct subprocess calls elsewhere?\n- Does a failed capture write exit_code: null plus an error reason, instead of silently omitting the field?\n- Is truncation head-plus-tail and deterministic, never sampled?\n- Are secrets stripped before the record is written to disk, not after?\n- Does every retry carry a parent_command_id back to the attempt before it?\n- Does the loop refuse to claim success on a null exit code, every time, with no exception path?',
     },
     demoCaption:
-      'A run that claims a clean test pass, opened up against the record it should have produced. The interesting field is the one that is null.',
+      'Run the loop once reading the agent\'s narration and once reading exit codes, and click a command to open its feedback record. The test run has exit_code null; the readout shows where each loop advances or refuses.',
     demo: {
       archetype: 'reveal',
       subject: 'Agent turn: "running tests now"',
@@ -851,7 +851,7 @@ export const phase14Part6: Lesson[] = [
       body: 'Score each 0 (fails), 1 (partial), 2 (clear pass). Total out of 10.\n1. Problem fit: did the change solve the task as stated, not a nearby task?\n2. Scope discipline: were edits confined to the contract, or was the contract grown without flagging it?\n3. Assumptions: are the hidden assumptions written down somewhere reviewable?\n4. Verification quality: does the acceptance command prove the actual goal, or a weaker version of it?\n5. Handoff readiness: could the next session pick up cleanly from what is on disk right now?\nBelow 7: soft fail, findings go back to the builder. Below 5, or any single 0: hard fail, halt and surface to a human.',
     },
     demoCaption:
-      'One change that passed every deterministic check, scored across the five rubric dimensions. The headline verdict and the dimension breakdown disagree, which is the entire reason the reviewer exists.',
+      'Flip between the builder\'s self-assessment and the reviewer\'s scores on a change that passed every gate check, and click a dimension for its evidence. The readout shows the total, the lowest dimension, and the verdict the thresholds produce.',
     demo: {
       archetype: 'meter',
       subject: 'Task close-out: "fix the login bug"',
@@ -994,7 +994,7 @@ export const phase14Part6: Lesson[] = [
       body: 'Before generating the packet:\n- Working tree: everything committed or explicitly stashed with a note.\n- Temp artifacts: no scratch dirs, debug prints, or commented-out blocks.\n- Tests: green, or red with the failure named in open_risks.\n- Feature board: status reflects reality.\n- Branch: expected branch, no detached HEAD, no orphan branches.\nAfter generating the packet:\n- next_action names one concrete first step, not a decision.\n- verdict_pointer resolves to real verification and review files.\n- Exactly one handoff has status: active for this branch.',
     },
     demoCaption:
-      'Two session endings, same work completed. Read what the next session opens to in each, and note which single missing field turns a handoff back into a status report.',
+      'Start from a chat summary, then add or drop handoff fields. The next session lists the calls it spends re-orienting for each missing field; drop only next_action and a full packet turns into a status report.',
     demo: {
       archetype: 'before-after',
       subject: 'End of session',

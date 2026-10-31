@@ -105,7 +105,7 @@ export const phase13Part2: Lesson[] = [
       body: '- Does every outgoing request build its own _meta block, or does some code path reuse one saved from an earlier call?\n- Does any part of the client assume a previously declared capability still holds on a later request?\n- Is server/discover implemented, and is it treated as optional to call rather than a required gate?\n- Do the six cacheable results (tools/list, resources/list, prompts/list, resources/templates/list, resources/read, server/discover) carry ttlMs and cacheScope?\n- Is the legacy initialize branch isolated behind an explicit allowlist, never the default path for a new peer?',
     },
     demoCaption:
-      'Same four messages, two orderings. Calling tools/call before notifications/initialized is the bug that makes a server look broken on first connect: the handshake has not closed, so the capability set the call depends on is not agreed yet.',
+      'Click Call tool a few times. The load balancer alternates replicas, so the session version re-handshakes every time it switches, while the per-request _meta version spends two messages per call.',
     demo: {
       archetype: 'sequence',
       subject: 'MCP session start',
@@ -260,7 +260,7 @@ export const phase13Part2: Lesson[] = [
       body: '- Does every handler route through one wrapper that stamps resultType: "complete" and server identity?\n- Do tools/list, resources/list, prompts/list, resources/templates/list, and resources/read all carry ttlMs and cacheScope?\n- Does every tool executor return content[] blocks, never a bare string?\n- Are annotations set per tool, and does destructiveHint true actually correspond to an irreversible action?\n- Does any handler still try to send its own JSON-RPC request instead of returning input_required?',
     },
     demoCaption:
-      'The tool list shows a name and a description. Expanding one shows what the host actually consumes: the input schema it validates against, the annotations that decide whether a confirmation gate appears, and the block types the result can contain.',
+      'Receive the four queued messages with checks on the first message only, then on every message. The handler table, the notes store, and the log show which bad requests reached a handler and deleted a note.',
     demo: {
       archetype: 'reveal',
       subject: 'tools/list entry',
@@ -412,7 +412,7 @@ export const phase13Part2: Lesson[] = [
       body: '- Did this peer return a DiscoverResult, or a recognized -32020/-32021/-32022 error? Then it is modern, full stop.\n- Did this peer time out, close the connection, or return an unrecognized error? That is ambiguous, not legacy evidence.\n- Is this exact peer explicitly allowlisted for legacy probing, by pinned command or endpoint, not a wildcard?\n- Did the bounded initialize probe return a structurally valid result: matching id, object capabilities, non-empty serverInfo?\n- Is the selected era cached per peer and cleared on reconnect, rather than re-probed on every call?',
     },
     demoCaption:
-      'One tool picker reads as a flat list of 7 tools. Underneath, those 7 belong to three independent sessions with independent liveness, so a single dead server takes a specific slice of the namespace down while the rest keeps working.',
+      'Call search from the files server, then kill github and call open_pr. The flat list misroutes the collision and hangs on the dead server; grouping by server shows each failure where it lives.',
     demo: {
       archetype: 'meter',
       subject: 'Merged tool namespace',
@@ -559,7 +559,7 @@ export const phase13Part2: Lesson[] = [
       body: '- Does the server expose exactly one endpoint, accepting POST only, with GET and DELETE returning 405?\n- Are MCP-Protocol-Version, Mcp-Method, and Mcp-Name validated against the JSON-RPC body before anything else runs?\n- Is Mcp-Session-Id ignored rather than minted or echoed, and is Last-Event-ID ignored rather than used for resumption?\n- Is Origin checked with an exact allowlist match, never a prefix check, returning 403 on a mismatch?\n- Does any workflow state live in a server-minted handle passed as an argument, rather than in transport or connection affinity?',
     },
     demoCaption:
-      'Same session, two transport generations. The middle generation needed a session header and could resume a dropped stream with Last-Event-ID; the current one keys everything to one path and treats a drop as something you reissue, not resume.',
+      'Switch transports and replay. The wire log shows what each one sends, and the readout says what the server holds between requests and how a dropped stream recovers.',
     demo: {
       archetype: 'before-after',
       subject: 'Remote MCP session',
@@ -716,7 +716,7 @@ export const phase13Part2: Lesson[] = [
       body: '- Who chooses to invoke this: the model on a related query (tool), the host or user pulling in context (resource), or the user starting a prepared workflow (prompt)?\n- Does this capability change state? If yes, it cannot be a resource.\n- Would a host attachment panel or file picker want to show this? If yes, it should be a resource, not only a tool.\n- Is the content addressable by a stable URI? If not, design that URI before writing the handler.\n- Does an unknown identifier return -32602, or does it silently return an empty success? Fix the latter.\n- Does the list carry a cacheScope that matches who is actually allowed to see it?',
     },
     demoCaption:
-      'Same notes server, two primitive splits. All-tools works and is invisible: nothing appears in the attachment panel, nothing can push an update, nothing is a slash-command. Splitting across the three primitives changes what the host can render without changing the code behind it.',
+      'Open the paperclip and the slash menu, attach notes://n-3, then edit it on disk. Splitting by primitive adds attachments, a slash-command and pushed updates without changing what the server can do.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Notes MCP server surface',
@@ -873,7 +873,7 @@ export const phase13Part2: Lesson[] = [
       body: '{\n  "csp": {\n    "connectDomains": [],\n    "resourceDomains": [],\n    "frameDomains": [],\n    "baseUriDomains": []\n  },\n  "permissions": {}\n}\n\n// Add one origin at a time, with a written reason, to whichever\n// list the specific feature actually needs. Never start from a\n// wildcard and narrow down later.',
     },
     demoCaption:
-      'Drag connect-src from none to wildcard. Interactivity does not improve past the first notch, because host.callTool already routes through the protocol. What grows is the set of destinations your frame can post the user\'s data to.',
+      'Drag connect-src from none to wildcard and press Refresh in the card. The card works at every notch; what grows is the list of origins the frame can send data to, including the tracker.',
     demo: {
       archetype: 'slider-map',
       subject: 'MCP App CSP breadth',

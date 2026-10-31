@@ -105,7 +105,7 @@ export const deCraftVisual: Lesson[] = [
       body: '/* Accent ramp: walk L, hold C, keep H fixed per hue.\n   Swap H per brand color; the L steps below stay constant. */\n:root {\n  --accent-1: oklch(0.99 0.01 250); /* app background tint */\n  --accent-3: oklch(0.94 0.03 250); /* subtle surface */\n  --accent-5: oklch(0.85 0.08 250); /* border, hover surface */\n  --accent-7: oklch(0.72 0.14 250); /* secondary UI element */\n  --accent-9: oklch(0.62 0.19 250); /* vibrant CTA, the brand step */\n  --accent-11: oklch(0.40 0.16 250); /* readable text on light bg */\n  --accent-12: oklch(0.22 0.10 250); /* max-contrast text */\n}\n\n/* Dark mode: invert L, keep C and H. No new hex values, no second palette. */\n[data-theme=\'dark\'] {\n  --accent-1: oklch(0.18 0.02 250);\n  --accent-9: oklch(0.68 0.19 250);\n  --accent-11: oklch(0.82 0.12 250);\n}',
     },
     demoCaption:
-      'Flip between the same three-step palette expressed in hex and in OKLCH at a shared L. Watch the OKLCH row hold its perceived brightness across hues; the hex row shifts because "same HSL lightness" is not the same thing.',
+      'Switch between equal HSL lightness and equal OKLCH lightness. The grey row removes chroma so you see the perceived L of each colour, and the readout gives the spread.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Accent ramp across three hues',
@@ -255,7 +255,7 @@ export const deCraftVisual: Lesson[] = [
       body: '/* Token the outer radius and padding once, derive the inner radius everywhere. */\n.card {\n  --radius-outer: 16px;\n  --padding-inner: 8px;\n  border-radius: var(--radius-outer);\n  padding: var(--padding-inner);\n}\n\n.card > .button {\n  /* Never hard-code this. Always derive it. */\n  border-radius: calc(var(--radius-outer) - var(--padding-inner));\n}',
     },
     demoCaption:
-      'A card with a nested button. Flip between the wrong nested radius (button 12 inside card 16 with 8 padding, arcs cross) and the correct one (button 8, arcs share a center).',
+      'Drag the inner radius. The dots mark both arc centres, and they meet only when inner radius equals outer radius minus padding.',
     demo: {
       archetype: 'before-after',
       subject: 'Card 16, padding 8',
@@ -403,7 +403,7 @@ export const deCraftVisual: Lesson[] = [
       body: '- Play/pause triangles in circular buttons: nudged 1-2px toward the point, not dead-centered by bounding box?\n- Chevrons and arrows in circular frames: nudged toward their pointed end?\n- Single characters or short labels in pill/chip shapes: checked for baseline sitting too low from unused descender space?\n- Icon-plus-label button pairs: extra 1-2px gap added on the icon side to compensate for its lack of ascender?\n- Any nudge applied: is it stored as a named token (`--icon-nudge-x-*`) next to the component, not an unexplained inline style?\n- Skipped on purpose: text above 32px, icons at 12px or smaller, or containers with intentional asymmetric padding?',
     },
     demoCaption:
-      'A play triangle inside a circular button. Toggle between math center (transform-based) and optical center (2 px right nudge tokenized). The bounding boxes agree; only one looks right.',
+      'Switch between box centre and centroid. The hollow dot is the bounding box centre, the filled dot is the centroid, and the readout gives the offset in px.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Play button',
@@ -553,7 +553,7 @@ export const deCraftVisual: Lesson[] = [
       body: '/* Base 16px, ratio 1.25. Eight steps, most screens use three. */\n:root {\n  --text-0: 1rem;      /* 16px, body */\n  --text-1: 1.25rem;   /* 20px, skip this next to body */\n  --text-2: 1.563rem;  /* 25px, card title, pairs with --text-0 */\n  --text-3: 1.953rem;  /* 31px, section heading */\n  --text-4: 2.441rem;  /* 39px, page heading */\n  --text-5: 3.052rem;  /* 49px, hero subhead */\n  --text-6: 3.815rem;  /* 61px, hero headline */\n  --text-7: 4.768rem;  /* 76px, display */\n\n  /* Line-height tightens as size grows */\n  --leading-0: 1.5;\n  --leading-2: 1.35;\n  --leading-4: 1.2;\n  --leading-6: 1.05;\n}',
     },
     demoCaption:
-      'Drag the ratio slider and watch the H1 pull away from body text. Small ratios keep H1 and body close (dense app feel); large ratios push them apart (marketing feel).',
+      'Drag the ratio and watch the hierarchy spread. The readout prints every step in px and how many times larger h1 is than body.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Scale ratio (1.1 to 1.6)',
@@ -686,7 +686,7 @@ export const deCraftVisual: Lesson[] = [
       body: '/* Endpoints: 320px viewport to 1440px viewport.\n   Always rem for min/max, vw is fine in the middle only. */\n:root {\n  --text-body: clamp(1rem, 0.86rem + 0.36vw, 1.125rem);      /* 16px -> 18px */\n  --text-heading: clamp(1.5rem, 1.15rem + 1.07vw, 2rem);      /* 24px -> 32px */\n  --text-display: clamp(2.25rem, 1.5rem + 2.14vw, 3.5rem);    /* 36px -> 56px */\n\n  --space-section: clamp(1.5rem, 0.5rem + 3vw, 4rem);\n  --space-card: clamp(1rem, 0.75rem + 1vw, 1.5rem);\n}\n\n/* Discrete layout switch: keep a real breakpoint here, clamp() cannot do this. */\n@media (max-width: 768px) {\n  .layout { grid-template-columns: 1fr; }\n}',
     },
     demoCaption:
-      'Drag the viewport width slider and watch a single `clamp(1rem, 0.5rem + 2vw, 1.5rem)` produce the right size at every width. No breakpoints, no stairs.',
+      'Drag the viewport slider under media queries, then under clamp(). The chart plots size against width and the readout prints the rule in force.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Viewport width (320 to 1440)',
@@ -823,7 +823,7 @@ export const deCraftVisual: Lesson[] = [
       body: '- Does the token name describe a role (accent, danger, muted) rather than an appearance (blue, red, gray)?\n- Would the name still make sense if the underlying color, spacing, or radius value changed completely?\n- Does every component reference only semantic tokens, never a primitive directly?\n- Is there a lint rule (Stylelint/ESLint) that fails a raw hex, `rgb()`, or literal px value inside a component file?\n- If a three-tier system is in use, is the component-scoped tier reserved for genuinely component-specific overrides, not used as an escape hatch from naming a real semantic?\n- Does a theme change (light/dark, brand pivot) require editing only the semantic-to-primitive mapping, with zero component file changes?',
     },
     demoCaption:
-      'Toggle between a component styled with raw hex and one styled with semantic tokens. Only the second responds to a dark-mode flip; the first would need a hand edit at every call site.',
+      'Press the moon in the mini app to switch it to dark, in both modes. The readout counts which elements followed the theme and which stayed on hardcoded hex.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Button styling',
@@ -975,7 +975,7 @@ export const deCraftVisual: Lesson[] = [
       body: '- Every margin, padding, and gap value in this file is a token from the spacing scale, not a raw pixel number.\n- The system uses either base-4 or base-8, never a mix of both within one component.\n- Icon sizes and radii used in this file also come from a value on the same base grid.\n- Any off-grid value present has a code comment explaining why (hairline, optical offset, overshoot for translation).\n- No two visually similar gaps in this file use different tokens that resolve to nearly the same pixel value (a half-step in disguise).',
     },
     demoCaption:
-      'The same card laid out with arbitrary pixel spacing (14, 18, 22) versus a base-4 grid (16, 16, 24). One decision, one rhythm.',
+      'Switch between freeform pixels and the base-4 grid. Every gap is measured from the rendered card, and off-grid values show in red.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Card spacing',
@@ -1127,7 +1127,7 @@ export const deCraftVisual: Lesson[] = [
       body: '1. Contrast first: does each surface tier have a measured, non-arbitrary lightness step from the tier below it?\n2. Hairline present: is there a visible 0.5-1px border between adjacent surfaces of similar brightness, rather than relying on shadow alone to separate them?\n3. Text contrast: does every text element on every surface meet 4.5:1 (or 3:1 for large text) against its actual background, not just against a nominal "white" background?\n4. Structural contrast: do borders, dividers, and disabled controls sit around 1.5:1 to 2:1, visible but not competing with content?\n5. Shadow restraint: is shadow reserved for genuinely floating surfaces (modals, dropdowns, popovers) rather than applied to every card in a list?\n6. Dark-mode correctness: does dark mode lighten surfaces at higher elevation tiers, rather than only adding more or darker shadow?',
     },
     demoCaption:
-      'A card at WCAG-AA-ish contrast, with a breakdown of every element\'s ratio against the surface. The headline number hides what is failing; the breakdown says where.',
+      'Switch the meta label between --ink-2, --ink-3 and --ink-4. Ratios are measured from the live tokens of this app in your current theme, so try both themes.',
     demo: {
       archetype: 'meter',
       headline: 'Overall contrast: 4.7:1',
@@ -1270,7 +1270,7 @@ export const deCraftVisual: Lesson[] = [
       body: '- Every icon currently on screen comes from the same library (or is a custom glyph drawn to match its exact grid and stroke).\n- The stroke width in use is matched to the product\'s body-text type weight, not chosen independently.\n- Custom, in-house icons are drawn on the same grid size, stroke width, and terminal style (rounded/squared/beveled) as the library icons they sit next to.\n- Icons below 20px use a dedicated size-tuned variant, not a naive scale-down of the 24px artwork.\n- Filled/bold variants are reserved for active or selected states, not mixed in as a stylistic choice on resting-state controls.\n- If the product has streaming or generative UI states, the icon system supports a weight or fill transition for those states without introducing a visually unrelated glyph.',
     },
     demoCaption:
-      'A toolbar of six icons. Toggle between a mixed set (Phosphor, Lucide, and a stray Material icon) and a unified set (all Phosphor Regular at 24 px). Same glyphs, one system.',
+      'Switch between per-icon stroke and size and one shared spec. The readout shows the stroke each icon actually renders at, in px.',
     demo: {
       archetype: 'before-after',
       subject: 'Toolbar icons',

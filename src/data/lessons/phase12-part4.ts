@@ -112,7 +112,7 @@ export const phase12Part4: Lesson[] = [
       body: '- What frame rate does the sampler run: uniform, dynamic FPS, or event-driven?\n- What pooling factor ships (3x3, 6x6), and what spatial detail does it cost?\n- Does the encoder carry an absolute timestamp per token (TMRoPE) or only a frame index?\n- What output format does grounding use: free text, structured JSON, or time tokens?\n- Which benchmark matches this feature\'s job: VideoMME (general), TempCompass (ordering), EgoSchema (long-horizon), Video-MMMU (multi-discipline)?\n- Can the UI parse the model\'s timestamp output directly into a seek action, or does a person have to interpret it first?',
     },
     demoCaption:
-      'Same question, two temporal encodings. Flip between a clip-compressed model and a timestamp-encoded one and compare what each can actually tell you about when.',
+      'Ask the question under each position encoding and click the answer to seek. The readout shows the window the answer resolves to and how far the seek lands from the actual jump.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Q: at what second does the cat jump?',
@@ -269,7 +269,7 @@ export const phase12Part4: Lesson[] = [
       body: '- What is the longest video duration this feature must handle, in minutes?\n- At the target sampling rate and pooling factor, what is the raw token count?\n- Does that count fit inside your model\'s native context, or does it require compression or retrieval?\n- If retrieval: what happens in the UI when the index misses? Is there a "not fully sure" affordance?\n- If compression: does the product actually need the exact frame, or just the general gist?\n- Does the spec\'s duration promise match an architecture that has been benchmarked at that duration?',
     },
     demoCaption:
-      'Drag the video duration and watch the token count cross each model\'s ceiling. The strategy switches are not preferences; they are walls.',
+      'Drag the recording length. The readout multiplies seconds by 81 tokens, and the bar shows which context ceiling the video crosses and what that forces you to build.',
     demo: {
       archetype: 'slider-map',
       sliderLabel: 'Video duration (1 FPS, 81 tokens/frame)',
@@ -413,7 +413,7 @@ export const phase12Part4: Lesson[] = [
       body: '- Is the answer fully contained in words, with no tone, speaker, or timing component? -> cascade is sufficient.\n- Does the feature need mood, emotion, or sentiment beyond word choice? -> end-to-end required.\n- Does the feature need to distinguish who is speaking? -> end-to-end required.\n- Does the feature need to locate a sound event in time (an explosion, a door slam)? -> end-to-end required.\n- Does the feature involve music, singing, or environmental sound? -> end-to-end required.\n- Is deepfake or authenticity detection in scope? -> end-to-end required, cascade cannot see the waveform.\n- If two or more end-to-end rows are checked, budget for an audio-LLM (AF3-class), not a transcription API.',
     },
     demoCaption:
-      'This is what your meeting-notes AI receives when the pipeline is transcribe-then-reason. Reveal what the audio actually carried and the transcript silently dropped.',
+      'Hover along the waveform with the transcript as input, then with audio as input. The readout shows what the model receives at that moment, and the notes line shows what it can conclude.',
     demo: {
       archetype: 'reveal',
       opaqueLabel: 'Transcript: "Fine. Let\'s go with your plan then."',
@@ -563,7 +563,7 @@ export const phase12Part4: Lesson[] = [
       body: '- What is the target time-to-first-audio-byte, and does it assume a 7B or 70B Thinker?\n- Does the system prompt length or persona verbosity add measurable prefill time?\n- Is vision-in (camera) enabled, and has its prefill cost been added to the budget?\n- Does every stage stream, or does any stage wait for a complete input before starting?\n- Is the interaction half-duplex (turn-taking) or full-duplex (interrupts, backchannel)? Full-duplex needs a model trained for it, not just a UI affordance.\n- Does the Talker\'s token rate exceed 50 tokens per second of audio, sustained, at the chosen model size?',
     },
     demoCaption:
-      'Two ways to schedule the same reply. Step through the batch pipeline, then the streaming one, and watch where the first audible word lands.',
+      'Drag the Talker size and watch the reply play. Speech needs 50 tokens a second; the readout shows the simulated decode rate, the first-audio delay, and how often the voice stalls.',
     demo: {
       archetype: 'sequence',
       badLabel: 'Batch pipeline',

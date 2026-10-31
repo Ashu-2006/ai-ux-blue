@@ -108,7 +108,7 @@ export const phase15Part2: Lesson[] = [
       body: '- Retrieval: repo map, file index, or context window alone?\n- Verifier: runs tests and reads the stack trace before proposing a patch?\n- Sandbox: bad edits contained and rollback-capable, or touching the working tree directly?\n- License and execution model: MIT/Apache you can audit, or a managed VM you cannot see inside?\n- Benchmark fit: is the published score from a task distribution anything like your backlog?\n- Build a 20 to 30 task Pro-like slice from your own bug tracker and score every candidate on it before adopting.',
     },
     demoCaption:
-      'The 80.9 percent headline on SWE-bench Verified is one number covering three very different task classes. Open the breakdown and the score you can plan against drops toward the Pro band.',
+      'Drag the number of multi-file tasks in a 500-task mix. The readout does the weighted arithmetic: 80.9 percent on the Verified mix, falling into the Pro band as your backlog tilts toward multi-file work.',
     demo: {
       archetype: 'meter',
       subject: 'SWE-bench Verified · 2026 frontier',
@@ -254,7 +254,7 @@ export const phase15Part2: Lesson[] = [
       body: '- Unfamiliar repo or prod-adjacent code -> plan\n- Known refactor across many files -> acceptEdits\n- Unattended background run in a measured, credential-free workspace -> auto, with max_turns and max_budget_usd set\n- Ephemeral container, disposable credentials -> dontAsk or bypassPermissions\n- Before any unattended run: confirm no production mounts, no unscoped egress, and a visible spend/turn counter in the chrome.',
     },
     demoCaption:
-      'Drag the mode from plan to bypassPermissions. Prompts per hour is the number people optimise. Reachable state is the number that decides what a single wrong action costs, and it moves in the opposite direction.',
+      'Drag the mode from plan to bypassPermissions over one modeled hour of 69 actions. Prompts per hour fall from 69 to 0 while unattended reach grows from 0 to 5 of 5 action types.',
     demo: {
       archetype: 'slider-map',
       subject: 'Permission mode · 4-hour refactor run',
@@ -398,7 +398,7 @@ export const phase15Part2: Lesson[] = [
       body: '- Which trust zones does this deployment touch (open web, authenticated sessions, internal tools)?\n- Which actions are writes, and which of those are authorized for this task specifically?\n- Are credentials scoped and disposable, with no production auth and no personal email?\n- Is every HTTP request logged for audit?\n- Does every write initiated by out-of-trust content require fresh human approval with visible provenance?\n- Does every persisted memory entry carry an origin field and a canary?',
     },
     demoCaption:
-      'A crafted page asks the agent to email a file to an external address. Toggle between an agent that treats page text as instruction and one that classifies the action as a write crossing out of trust.',
+      'Run the task against a page with a hidden instruction, once treating page text as instruction and once as data. The readout counts external writes executed and whether you were ever asked.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Agent visits an attacker-crafted page',
@@ -552,7 +552,7 @@ export const phase15Part2: Lesson[] = [
       body: '- Is every LLM call, tool call, and side-effecting operation wrapped as a logged activity?\n- Is the orchestrator deterministic (no unregistered wall-clock reads, random values, or unlogged model output)?\n- What is the checkpoint backend, and does it survive a production deploy?\n- Is waiting-on-human a persisted state, not an open socket?\n- Does the session UI show a resumed-from state after recovery, not a fresh empty state?\n- Is there a fresh-approval checkpoint and a compute cap for runs past the 35-minute reliability horizon?',
     },
     demoCaption:
-      'A four-hour run with three tool calls, two approvals, and forty model calls, crashing at activity three. Compare what the host does on restart when the event log exists and when it does not.',
+      'Start the run, reboot the host partway, and compare the restart with and without the event log. The readout counts model calls re-billed, side effects fired twice, and approvals asked again.',
     demo: {
       archetype: 'before-after',
       subject: 'Host reboots mid-run',
@@ -708,7 +708,7 @@ export const phase15Part2: Lesson[] = [
       body: '- Does every consequential action carry an idempotency key and a separate precondition check?\n- Does success mean a re-read of the target system, not just a 200 response?\n- Is there a named rollback plan (in-band, compensating, or out-of-band) for every action, including a named no-op for actions that truly cannot be undone?\n- Has the rollback path actually been rehearsed end to end, not just written down?\n- Are reversible and irreversible actions two different approval components, not one button with different copy?\n- Is the checkpoint backend queryable by an auditor and does it survive a deploy?',
     },
     demoCaption:
-      'One approved payment, one crash between the call and the status write. The only difference between the two runs is where the persist step sits relative to execution and verification.',
+      'Run one approved $200 transfer that crashes before the status write, once per persist order. The ledger and the readout show whether the transfer fired once or twice.',
     demo: {
       archetype: 'sequence',
       subject: 'Approved transfer · crash before status write',

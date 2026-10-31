@@ -102,7 +102,7 @@ export const phase16Part4: Lesson[] = [
       body: '- What is the intent primitive (performative) of each message type?\n- Is there a correlation id for request-response pairing and cancellation?\n- Is there an explicit content language (JSON-RPC, plain text, typed artifact), or is meaning inferred from prose alone?\n- Are interaction protocols first-class, or are you re-implementing contract-net and subscribe-notify from scratch under a new name?\n- What happens when two agents disagree about what a shared term means, and what catches it before a bad action executes?',
     },
     demoCaption:
-      'The same request in both syntaxes. Toggle between the 2000 ACL envelope and the 2026 JSON-RPC call and count the fields: the envelope is unchanged, the formal semantics and the ontology are what went missing.',
+      'Send each of the three messages as free text, then as performatives. From free text the receiver guesses intent and fires the wrong handler twice (once confirming an order); with a performative it routes all three correctly.',
     demo: {
       archetype: 'before-after',
       subject: 'One tool request · two decades apart',
@@ -257,7 +257,7 @@ export const phase16Part4: Lesson[] = [
       body: '- Population budget stated as N x T x per-eval cost, visible before the run starts.\n- A live cost meter and a convergence curve, not a spinner.\n- Quality gate on any pheromone or best-solution update, so fast-and-wrong cannot out-accumulate slow-and-right.\n- A decay-reset rule for when the eval distribution shifts mid-run.\n- A stop condition: at what convergence-curve flatness does the run auto-stop rather than keep spending.',
     },
     demoCaption:
-      'Step through 100 routed tasks with the quality gate off, then on. Ungated, the fastest agent accrues the most pheromone regardless of whether it was right, and the router converges on it. Gated, only verified-good runs deposit.',
+      'Press Route 10 tasks up to 100 with the quality gate off, then on. Ungated, the router sends most work to the fastest agent and serves 41 wrong answers; gated, work shifts to Balanced and wrong answers drop to 18.',
     demo: {
       archetype: 'sequence',
       subject: 'Pheromone routing · 100 tasks',
@@ -406,7 +406,7 @@ export const phase16Part4: Lesson[] = [
       body: '- At design time, write down what full team visibility would look like: what would a full view of this system see.\n- At runtime, enforce that each agent\'s prompt or state only contains its own observation. No silent shared state.\n- Name the non-stationarity risk: which upstream agent, if it changes behavior, breaks this agent\'s assumptions.\n- If you ever do train a policy, reproduce MAPPO first before reaching for MADDPG or QMIX.\n- Log every agent\'s observation and action stream. Debugging coordination without per-agent traces is close to hopeless.',
     },
     demoCaption:
-      'Toggle between independent learners and CTDE on the same 2-agent grid task. The independent pair treats each other as weather and averages about 6 steps to the goal. The CTDE pair trains against a joint critic and converges near 3.5, with optimal at 3.',
+      'Press Play episode four times with independent learners, then with CTDE. Both pairs act on local views only; the readout averages episode length, 6 steps for the independent pair and 3.5 for CTDE, with 3 optimal.',
     demo: {
       archetype: 'toggle-fix',
       subject: '2 agents, 4x4 grid, one pellet',
@@ -554,7 +554,7 @@ export const phase16Part4: Lesson[] = [
       body: '- Durable state: a checkpoint or event log survives any single worker crash.\n- Idempotent side effects: every paid or external call carries a dedup key.\n- Async I O layer for model calls, threads or processes reserved for CPU-bound work only.\n- At-least-once delivery with a dedup consumer, not a promise of exactly-once you cannot back up.\n- Rainbow or canary deploys so an hour-long run is never killed by a routine deploy.\n- Per-agent traces with a super-step audit and a retry counter, so a resumed run is visibly different from a retried one.',
     },
     demoCaption:
-      'Step through a crash at step 37 with and without checkpoints. Without, the run restarts from zero and re-fires every side effect it already performed. With, a second worker picks up the thread and continues, and the UI owes the user a different word than retry.',
+      'Press Run with no checkpoints, then with a checkpoint every step; the worker dies at step 37 both times. The readout counts steps re-run (36 versus 0) and side effects re-fired, the email and the charge that went out twice.',
     demo: {
       archetype: 'sequence',
       subject: 'One agent run · worker dies at step 37',
@@ -704,7 +704,7 @@ export const phase16Part4: Lesson[] = [
       body: '- Sample roughly 1000 real execution traces.\n- Categorize each failure against MAST\'s three root categories and the Groupthink five.\n- Compute the failure rate per category for your system specifically, not the published averages.\n- Rank candidate mitigations by how many failures each would eliminate.\n- Pick two or three mitigations, ship them, and re-audit next quarter rather than annually.',
     },
     demoCaption:
-      'Watch the retry storm build from a 10 percent payment failure, then toggle the circuit breaker. Ungated, load reaches 10x in seconds and the cluster goes down. Gated, the breaker opens at threshold and serves degraded responses instead.',
+      'Press Run with retries and no breaker, then with a circuit breaker. A 10 percent failure rate pushes load past capacity, retries feed it and peak load hits 10x; the breaker trips at 1.3x and serves degraded responses instead.',
     demo: {
       archetype: 'sequence',
       subject: 'Retry cascade · payment fails 10 percent',
@@ -854,7 +854,7 @@ export const phase16Part4: Lesson[] = [
       body: '- Which benchmark, and which split. Verified and Pro are not the same claim.\n- Was the benchmark released after the model\'s training cutoff.\n- What is the baseline: a single model, a random baseline, and prior multi-agent work, not an untuned version of the same system.\n- N trials and a confidence interval, not one lucky run.\n- One task or many: does the result generalize.\n- Cost disclosed: tokens per task and wall-clock, since a 90 percent solution at 20x cost is a pricing decision, not a capability claim.',
     },
     demoCaption:
-      'The headline says frontier models solve 70 percent of software engineering tasks. Open the breakdown and the same models are near 23 percent on the uncontaminated split, with the agent-scaffolded runs sitting in between.',
+      'Dispatch 100 tickets at the Verified rate, then at the Pro rate. The readout shows how many land in your recovery flow, 30 versus 77, which is the point where failure handling becomes the primary flow.',
     demo: {
       archetype: 'meter',
       subject: 'SWE-bench · one model, two splits',

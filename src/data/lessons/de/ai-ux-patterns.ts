@@ -112,7 +112,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Does every answer get a stored id, a timestamp, and a model id?\n- Is the prompt hash logged so two runs can be confirmed as "the same question"?\n- Is the seed logged when the provider exposes one, and the system_fingerprint alongside it?\n- Is the full tool call trace stored, not just the final answer?\n- Can a support agent pull up all four of the above from a single trace id?\n- Does the regenerate control say what it will do (same prompt, different model, one paragraph) before the user clicks it?\n- Is there a version tray, or does regenerate silently overwrite the previous answer?\n- For this specific feature, is variance a feature (let the user pick a favorite) or a liability (needs a fixed seed and a visible warning)?',
     },
     demoCaption:
-      'The card claims "same query, same result." Reveal the run trace and two different source orderings fall out. The pretense is the failure. The exposed run is the fix.',
+      'Press Re-run a few times in each mode. Overwrite shows one answer that quietly changes; Keep versions lets you step through v1, v2, v3 with moved sources and rewritten words marked, and the readout counts both.',
     demo: {
       archetype: 'reveal',
       subject: 'Perplexity re-run',
@@ -261,7 +261,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- P95 TTFT under 500ms for chat, under 250ms for anything voice-adjacent: pass or fail?\n- Does the answer container render before the first token, or only after?\n- Is there a status line naming the current step (searching, calling a tool, retrying), or a generic spinner?\n- Does the shimmer or skeleton ever run forever without an honest fallback?\n- Are the first tokens spent on the verdict, or on a restated question and a throat-clear?\n- Is TTFT reported as a distribution (P50/P95/P99), or as a single misleading average?\n- Is there a distinct UI state for a tool-call stall, separate from the token-stream loading state?',
     },
     demoCaption:
-      'The headline says "answered in 8s." Break it down and the truth is a 400ms first token versus a 3s first token, hidden inside the same average. TTLB averages lie about the wait users actually feel.',
+      'Send all three runs in each mode. TTLB is 4.0s every time; the readout measures how long the screen actually stayed blank, which tracks TTFT only when you render from the first token.',
     demo: {
       archetype: 'meter',
       headline: 'avg answered in 8.0s',
@@ -404,7 +404,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Which of the three shapes (token stream, partial JSON, component tree) is this surface actually producing?\n- Does the container match the shape, or is prose being forced into a card, or structured data forced into a paragraph?\n- Is the highest-signal field emitted first, or does the whole card wait on the last key?\n- Is there a dedicated fail state per shape, or one generic error message covering all three?\n- If this is a component tree: is the data-fetching tool separated from the rendering tool?\n- Is every interactive element disabled until its props are fully resolved?\n- Does the display mode (inline, carousel, fullscreen, picture-in-picture) match the content, or is a rich multi-step task crammed into a small card?',
     },
     demoCaption:
-      'Step through one request as it arrives in three shapes: tokens append into prose, keys resolve into a form, nodes mount into a panel. Each rung of the ladder is a different commitment the UI has to honor.',
+      'Switch shape and press Replay. Each container commits a different unit (a token, a closed field, a mounted node), and the readout shows that unit live, including JSON.parse failing on the partial document.',
     demo: {
       archetype: 'sequence',
       badLabel: 'One container',
@@ -558,7 +558,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Name and prop schema, typed and validated.\n- A one-line "when to use this, not that" description the model can read.\n- A composition constraint (what it can contain, what it cannot).\n- A content cap (max items, max actions, max text length).\n- A stated degrade path if a prop is missing or out of range.\n- The three escape-hatch verbs: does this node support regenerate, pin, and explain?\n- A state contract: what does the widget own, what does the model own, what resets on the next turn versus what persists.\n- Is there an Unknown fallback registered for shapes outside this catalog, and is every fallback trigger logged?',
     },
     demoCaption:
-      'The plain reply says "here are your flights, in text." The generative reply picks `FlightList`, `PriceCard`, and `WeatherWidget` from the registry and returns a component tree. Same prompt, different ceiling.',
+      'Flip between the prose reply and the component tree, then sort the flights and pick one. The readout counts the nodes the model returned and the interactive targets each version gives you.',
     demo: {
       archetype: 'before-after',
       subject: 'flights to Lisbon this weekend',
@@ -712,7 +712,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Is every chip attached to the clause it backs, or only to the end of the paragraph?\n- Does the chip carry a corroboration count when more than one source agrees?\n- Can the user select any span and see a filtered evidence list for just that selection?\n- Is the evidence panel ranked by claims supported, with a matching snippet, or is it a flat list of URLs?\n- Is there a distinct visual treatment for an ungrounded claim, or does it look identical to a grounded one?\n- Does the hover or tap preview show domain, title, and a matched snippet, or just a bare link?\n- Does the feedback flow separate "wrong source" from "wrong writing," or is there only one generic complaint box?',
     },
     demoCaption:
-      'The paragraph carries one citation at the end and the reader has to guess which sentence it backs. Toggle to the clause-level version and the promise gets specific: chip on the noun, corroboration count next to it.',
+      'Click any sentence and look for the source that backs it. With a paragraph citation the readout lists every candidate; with span citations it narrows to the exact sources and quotes.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Perplexity answer, EV subsidies',
@@ -864,7 +864,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Is a raw percent ever shown to the user, and if so, can it be replaced with a severity band?\n- Does copy on high-certainty findings read as definitive, and copy on low-certainty findings read as suggestive?\n- Is rejecting a suggestion free (no dialog, no undo needed), and is accepting it a single deliberate action?\n- Does every low-confidence state carry a companion verb: verify, cite, explain, or retry?\n- Is the friction of the confirmation step matched to the blast radius of the action, not to a house style?\n- Has the band system been checked against ground truth, and would a miscalibration actually be visible in the data you collect?',
     },
     demoCaption:
-      'The bad side shows a bare 87 percent tag: precise, useless. The good side swaps it for a severity band and a verb the user can act on. Same underlying score, different behavior.',
+      'Drag the model score. The number never reaches the user; the readout shows which band it lands in and which verb becomes the default action.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Grammarly suggestion',
@@ -1014,7 +1014,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Is every tone rule specific and testable (a banned phrase, a sentence limit, a formatting rule), not a vague brand adjective?\n- Is the prompt versioned and diffable, with a changelog a designer can review before it ships?\n- Do output constraints the UI depends on (format, length, citation style) live in the prompt, not scattered in parsing code?\n- If the product offers user-selectable styles or custom instructions, is the conflict-resolution rule explicit and disclosed to the user?\n- Is user-authored content (custom instructions, shared conversation links) visually and technically separated from trusted system content?\n- Does the prompt state the model\'s knowledge cutoff and the fallback behavior for anything that might be stale?\n- Who owns this file: is it a designer\'s responsibility, or whatever an engineer wrote in a hurry before launch?',
     },
     demoCaption:
-      'The bad prompt is product-neutral. The good prompt is voiced: short lines, no meta-commentary, hedge vocabulary, format rules. Same model, different product identity.',
+      'Ask each question under both prompts, and open the hidden system prompt to see the lines doing the work. The readout counts words, filler openers, hedges, and citations in each reply.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'system prompt, v0.4',
@@ -1167,7 +1167,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: '- Does anything the user changes more than once per session live in the composer, not buried in settings?\n- Are mode (what the agent can touch) and model (what reasons about it) two visibly separate controls?\n- Is the current mode and model always visible, not just at the moment of switching?\n- Does the slash command vocabulary stay small enough that a user can name most of it from memory?\n- Do the most-used, least-ambiguous commands skip their own confirmation menu?\n- Does every attachment show a parse-state chip (indexed, embedded, in-context), and can the user remove it inline?\n- Has voice, camera, or clipboard input earned a permanent composer slot based on actual usage, or is it still provisional?',
     },
     demoCaption:
-      'The bare textarea says "chatbot." The proper composer, with an @ menu, an attachment chip, a mode toggle, and a mic slot, says "agent." Same product code below it. Very different ceiling.',
+      'Type a slash or an @ in each composer, and try the model, mode, and attachment controls. The readout counts how many actions are reachable from the box itself.',
     demo: {
       archetype: 'before-after',
       subject: 'AI product composer',
@@ -1321,7 +1321,7 @@ export const deAiUxPatterns: Lesson[] = [
       body: 'header:\n  - model id or persona\n  - timestamp\n  - status: idle | streaming | tools-running | stopped (consider a named 3-phase variant: searching, reading, writing)\n\nbody:\n  - shape: token stream | partial JSON | component tree\n  - tool rows: collapsible, name + args + result, stay inside the reply\n  - inline citation chips: bound to clause, not paragraph\n\nfooter:\n  - copy\n  - regenerate (stacks new version, lives here)\n  - cite (sources: N, expands to evidence panel)\n  - share / export (must preserve tool rows and citations)\n  - product-specific actions (open artifact, thumbs, etc)\n\nnote: edit lives on the user message above the reply, not in this footer.',
     },
     demoCaption:
-      'Step through one reply as it earns each affordance: header status, streaming body, tool row, inline citations, footer chip, regenerate, edit, copy. Each step is a decision the block would otherwise leak to some other surface.',
+      'Let the reply stream, then press regenerate and copy in each mode. The readout tracks versions kept and affordances, and shows that the block copies its sources along with the text.',
     demo: {
       archetype: 'sequence',
       badLabel: 'Prose in a bubble',

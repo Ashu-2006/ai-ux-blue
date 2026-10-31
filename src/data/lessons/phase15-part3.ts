@@ -101,7 +101,7 @@ export const phase15Part3: Lesson[] = [
       body: '- Does every new tool ship with its own per-tool cap and its own growth alert?\n- Is there a velocity limit (dollars per short window), not just a monthly cap?\n- Is max_turns set, separate from any dollar cap, to stop infinite reasoning loops?\n- Does the pre-tool-use hook emit a spend event the UI can subscribe to, or is spend only visible after the fact?\n- Is prompt caching enabled for the stable parts of the system prompt?\n- Does the settings screen show which specific cap is closest to tripping, not just a single aggregate number?\n- Is there a documented, human-gated re-enable path after a kill-switch trip?',
     },
     demoCaption:
-      'One monthly cap versus the layered stack on the same polling-loop trajectory. The trajectory is identical; the time to detection is not, and the difference is entirely which limits exist.',
+      'Run the same stuck polling loop under one monthly cap and under the layered stack. The readout shows when the first limit fires and what was spent: $50.22 at 7m 45s against $4,100.22 at 10h 32m.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Polling-loop run · same trajectory',
@@ -248,7 +248,7 @@ export const phase15Part3: Lesson[] = [
       body: '- Does the kill switch live in a system the agent\'s own credentials cannot write to?\n- Is the kill switch checked on every consequential action, not only at session start?\n- Is re-enabling the kill switch an explicit human action with no automatic timeout?\n- Does every circuit breaker have a named trip condition (repetition count, failure count, rate threshold)?\n- Is half-open rendered as its own state in the UI, not collapsed into "on" or "off"?\n- Is at least one canary token placed somewhere the agent has no legitimate reason to touch?\n- Is there a hard limit underneath every statistical detector, so slow drift cannot walk past it?',
     },
     demoCaption:
-      'Two responses to the same drifting trajectory: an adaptive rate detector versus an adaptive detector plus a hard limit. The drift is slow enough that the moving baseline absorbs it.',
+      'Replay the same slow drift under the EWMA detector alone and with a hard limit added. The EWMA never sees more than 1.25 times its baseline; the 40-call ceiling opens the breaker at minute 85.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Slow-drift trajectory · 90 minutes',
@@ -395,7 +395,7 @@ export const phase15Part3: Lesson[] = [
       body: '- Does the proposal record carry intent, data lineage, permissions touched, blast radius, a rollback plan, and an idempotency key?\n- Is the idempotency key derived from thread id plus action signature, never from a timestamp?\n- Is the proposal persisted to a durable store that survives a process restart, not held in memory?\n- Is the reviewer a human distinct from the agent that proposed the action?\n- Is Approve disabled until a challenge-and-response checklist is positively answered?\n- Does a verify step read the side effect back after commit, rather than trusting the commit call\'s return value?\n- Is the review surface built for every irreversible write, financial transaction, or outbound communication, and skipped for reads?',
     },
     demoCaption:
-      'The same proposed action rendered as a confirm dialog and as a proposal record. The action is identical; what the reviewer can actually evaluate is not.',
+      'Approve or reject the same outbound email as a confirm dialog and as a proposal record. The readout times your decision and counts how many of the six fields you had in view.',
     demo: {
       archetype: 'reveal',
       subject: 'Proposed action · send outbound email',
@@ -537,7 +537,7 @@ export const phase15Part3: Lesson[] = [
       body: '- For every toggle on the settings screen, is it soft-coded (operator moves it inside a bound) or hardcoded (no control at all)?\n- Do hardcoded prohibitions appear as documented text, never as a disabled switch with a tooltip?\n- Does refusal copy name the tier that won, rather than presenting a generic "I can\'t help with that"?\n- Are response length, topical scope, style, and tool-use patterns the only things exposed as operator-adjustable?\n- Is there a documented answer for what happens when two tiers conflict in a way the design did not anticipate?\n- Has anyone checked this settings screen against the Constitution\'s actual tier order, not an internal guess at it?',
     },
     demoCaption:
-      'The same operator settings screen built on a flat permission model and on the tier model. One of these lets a rename look like an override.',
+      'Try every switch in the flat settings list, then switch to tiers. The readout counts switches that can never move: 2 of 6 in the flat list, none once the floor is text instead of a control.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Operator settings · agent deployment',
@@ -684,7 +684,7 @@ export const phase15Part3: Lesson[] = [
       body: '- Does every hazard category map to one of three affordances (block, queue, annotate), rather than a single allowed/blocked binary?\n- Does an output-rail trip trigger a retract-and-replace state, rather than the message silently vanishing?\n- Does the trust or safety page describe the classifier as a layer, never as a guarantee?\n- Is there a dialog rail covering conversation-level attempts, not just single-turn input and output checks?\n- Has the taxonomy been checked against the current Llama Guard version (3 vs 4) for category coverage relevant to this product\'s agent surface?\n- Is there a documented plan for what happens when ASR on a new attack class is measured above zero, which it always eventually is?',
     },
     demoCaption:
-      'One classifier verdict rendered as a binary block and as a category route. The same 14 categories can drive one component or three, and only one of those is honest about severity.',
+      'Send each message under a binary block and under category routing. The readout shows which affordance each verdict gets: one toast for everything, or three distinct handlings.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Classifier verdict · input and output rails',
@@ -831,7 +831,7 @@ export const phase15Part3: Lesson[] = [
       body: '- Does the findings store sit entirely outside every agent\'s sandbox, with no credential able to edit a past record?\n- Is every revision a new append-only entry with provenance to the entry it revises, rather than an in-place overwrite?\n- Does a denied write to a past record surface as a visible timeline event, not a silent failure?\n- Does the task queue give agents room for free decomposition, or does a prescribed step-by-step plan risk degrading their results?\n- Is there a named human step that commits, retracts, or refines each finding before it counts as accepted?\n- Is this system\'s scope checked against the AI R and D capability threshold so nobody assumes it is closer to full automation than it is?',
     },
     demoCaption:
-      'A findings history where records are mutable versus one that is append-only and out of sandbox. The tamper attempt is the same in both; only one of them can render it.',
+      'As agent-3, revise finding 12 and erase failed run 11 under each log design. The readout counts what survives: versions of the finding and any trace of the erased run.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Research forum · agent-3 revises a finding',

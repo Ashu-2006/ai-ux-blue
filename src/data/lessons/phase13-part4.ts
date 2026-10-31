@@ -112,7 +112,7 @@ export const phase13Part4: Lesson[] = [
       body: '- Discovered issuer matches the exact HTTPS issuer your policy expects.\n- code_challenge_methods_supported lists S256, or refuse to deploy.\n- Enrollment path advertised: CIMD preferred, pre-registration accepted, DCR only as compatibility.\n- authorization_response_iss_parameter_supported true means you validate RFC 9207 iss on every redirect.\n- Token requests carry resource, and the resource server checks aud on every call, not once at session start.\n- Client credentials are keyed by issuer; access tokens are keyed by (issuer, resource).\n- JWKS cache has a scheduled refresh job plus a re-fetch-on-miss fallback, never a rotate-on-miss fallback.',
     },
     demoCaption:
-      'Fetch the JWKS once at boot and every session survives until the authorization server rotates a key, then all of them fail at once. Add a scheduled refresh plus a one-shot re-fetch on kid miss and the same rotation is invisible.',
+      'Let traffic run, then rotate the signing key. Fetching keys at boot turns every later request into a 401; the refresh job with a re-fetch on unknown kid absorbs the rotation with zero failures.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'JWKS handling at the resource server',
@@ -265,7 +265,7 @@ export const phase13Part4: Lesson[] = [
       body: '- Does the callee have its own reasoning and tool calls you are willing not to see? If yes, A2A.\n- Do you need to invoke one specific, named operation and see the call? If yes, MCP.\n- Does the output need a lifecycle, a pause for input, or an outright rejection? If yes, an A2A Task, not a tool result.\n- Is the output a single typed artifact you can stream in chunks? Design the render around Artifact, not token text.\n- Are you delegating across organizations or frameworks that should not share internals? A2A\'s opacity is a feature there, not a limitation.',
     },
     demoCaption:
-      'An MCP tool call and an A2A task both return an answer, but they hand you different amounts of interior. Compare what the progress UI can honestly show in each.',
+      'Run the same research request as MCP tool calls and as an A2A task. MCP shows every inner step; A2A shows only lifecycle states, a mid-flight question, and the final artifact.',
     demo: {
       archetype: 'before-after',
       subject: 'What the caller can render',
@@ -413,7 +413,7 @@ export const phase13Part4: Lesson[] = [
       body: '- Every model call has gen_ai.request.model and gen_ai.response.model as separate fields.\n- Every tool dispatch has gen_ai.tool.name and gen_ai.tool.call.id.\n- Every cross-process call (model provider, MCP server) is SpanKind.CLIENT; everything else is INTERNAL.\n- One trace id covers the full request, agent loop through sub-agent.\n- Content capture is off by default and its enable path is a reviewed config change, not a debug toggle anyone can flip.\n- traceparent is propagated on every MCP call, including a manual _meta path for stdio transports.',
     },
     demoCaption:
-      'One request took 30 seconds. The roll-up number hides where they went, and the per-span breakdown moves the fix from the model to a single cold-starting MCP server.',
+      'Switch from model-call logs to the GenAI trace and click a span to read its attributes. The logs explain 3.6s of 30.4s; the trace puts 26.1s on one cold-starting MCP call.',
     demo: {
       archetype: 'meter',
       subject: 'Agent run · total latency',
@@ -562,7 +562,7 @@ export const phase13Part4: Lesson[] = [
       body: '- Reusable model judgment across several steps, procedure stable but decisions vary: skill.\n- Must happen every time an event fires, missing one execution is unacceptable: hook or application code.\n- Model needs an external capability with typed inputs, the operation lives outside model context: MCP tool.\n- Work needs isolated context, state, or ownership, a separate worker returns a bounded result: subagent.\n- Guidance specific to one repository, describes local commands and constraints: AGENTS.md.\n- One interaction is enough, no package lifecycle needed: prompt.',
     },
     demoCaption:
-      'The same release-notes workflow, written twice. One inlines everything into the skill body, the other splits by load time, and the difference shows up as tokens spent on turns that never needed them.',
+      'Toggle where the release-notes words live and click any turn. Each bar shows what was in context for that turn; inlining puts the style guide on all six turns, splitting loads it only on the one that needs it.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Release-notes workflow · where the words live',
@@ -719,7 +719,7 @@ export const phase13Part4: Lesson[] = [
       body: '- Discovery: replaced the static tool list with real server/discover and tools/list calls?\n- Auth: replaced the token dictionary with OAuth authorization and resource-server validation?\n- RBAC: checked at the gateway edge, before the client renders any affordance, not on the response?\n- Tasks: durable store behind tasks/get, tasks/update, tasks/cancel, with a TTL and restart recovery?\n- Delegation: a real A2A client resolving a signed Agent Card, not a sleep and a nested span?\n- Sandbox: ui:// resource rendered with a real App bridge and a restrictive CSP?\n- Telemetry: spans exported to a real collector with parentage asserted at the receiver?\n- Audit: Rule of Two run against the actual tool list, not the architecture diagram?',
     },
     demoCaption:
-      'One request, seven hops, in order. The positions of the OAuth check and the RBAC decision are the whole design, because moving them later turns a disabled button into a failure after the click.',
+      'As a viewer, click generate_report under each design. Checking on the way out runs six hops and spends 18,400 tokens before the 403; checking at the edge disables the tool and explains why before you click.',
     demo: {
       archetype: 'sequence',
       subject: 'Research and report · one request',

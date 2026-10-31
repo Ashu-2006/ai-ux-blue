@@ -103,7 +103,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Can you draw the steps and arrows in under a minute? If yes, it is a workflow.\n- Is the step count the same regardless of input difficulty? If yes, workflow.\n- Does a compliance or audit reviewer need to read the graph, not infer it? If yes, workflow.\n- Does the next step genuinely depend on what the last step returned, in a way you cannot pre-script? If yes, agent.\n- Is the honest step-count estimate "somewhere between 3 and 30"? If yes, agent.\n- Before either: can one augmented LLM call (search plus tools plus memory) do this alone? If yes, skip the graph entirely.',
     },
     demoCaption:
-      'Flip between the workflow framing and the agent framing of the same feature. Watch what the progress component is allowed to promise in each. Step count is the property your UI inherits.',
+      'Run the same refund request with the engineer owning the graph, then the model. The workflow quotes $0.010 before it starts and shows step N of 5; the agent takes 9 steps nobody could predict and spends $0.041.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Support request handler',
@@ -254,7 +254,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Can this run plausibly fail partway through a multi-step sequence? If no, skip the checkpointer.\n- Does resuming at the failure point matter more than the cost of restarting? If yes, checkpoint.\n- Does a human need to approve or edit state mid-run, possibly from a different device? If yes, checkpoint.\n- Is every node deterministic given its input state, or does it read a clock, a random seed, or a live API? If the latter, capture that value in state before checkpointing.\n- Would an auditor or a support engineer need to see the exact state at the point of failure? If yes, the checkpoint is your run-detail view for free.',
     },
     demoCaption:
-      'Kill the run at step 38 with and without checkpoints. The sequence shows what gets replayed, what gets paid for twice, and where the human-approval gate can honestly live.',
+      'Run the 40-node graph, let it fail at node 38, then Resume. Without a checkpointer it replays from node 1, paying 78 steps and sending the email twice; with checkpoints it resumes at 38 and pays 41.',
     demo: {
       archetype: 'sequence',
       subject: 'A 40-step run that fails at step 38',
@@ -403,7 +403,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Do your agents need to run concurrently with no shared state? Actor model fits.\n- Should one agent\'s crash never take down the others? Actor model fits.\n- Do you need durable, step-level resume of a single sequential run? A checkpointed graph (LangGraph) fits better.\n- Will the team eventually run across multiple machines? Actor model\'s inbox-plus-transport abstraction ports to distribution with the least rework.\n- Can you tolerate messages arriving out of order unless you explicitly sequence them? If not, add sequence numbers before you rely on ordering.',
     },
     demoCaption:
-      'The same four-agent review with a synchronous stack and with actor inboxes. One agent fails in both. Compare what the interface can still show the user afterwards.',
+      'Run the four-agent review under each runtime. On a call stack the Reviewer timeout kills the run and loses the Linter result that had already finished; as actors, three results survive and you retry only the Reviewer.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Four-agent code review, one agent fails',
@@ -560,7 +560,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Does this ship to production, or is it a research and brainstorming pass? Production means wrap it in a Flow.\n- Does any step POST, DELETE, or move money? That step is a Flow step, never a bare Crew tool.\n- Does the next task need a specific shape from this one? Add output_pydantic instead of trusting free text.\n- Are there four or more specialists whose order depends on prior output? Consider Hierarchical, and budget for roughly triple the token cost.\n- Would support need to diff a bad run against a good one? If yes, you need a Flow\'s stable step ids, not a Crew\'s single output blob.',
     },
     demoCaption:
-      'The same three-role brief run as a Crew and as a Flow. The reveal shows what a support engineer can actually open when a customer reports a bad run.',
+      'Run the brief a second time under each shape. A Crew picks different steps each run, so only 1 of 5 steps lines up and there is nothing to diff; a Flow keeps fixed step ids, and the diff points at the one step whose output changed.',
     demo: {
       archetype: 'reveal',
       subject: 'A bad run lands in support',
@@ -706,7 +706,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Blocking guardrail chosen: does the UI show a skeleton with a specific label ("checking policy"), not a blank screen? If not, fix the skeleton before shipping.\n- Parallel guardrail chosen: is there a designed retraction transition, distinct from a normal content update? If not, a trip will read as a rendering bug.\n- Every handoff: does the transcript relabel the speaker at the transfer point? If not, users cannot tell which specialist is answering.\n- Every tripwire: is it rendered as a policy refusal, with its own copy, rather than a generic "something went wrong"? If not, fix the copy before the mode.',
     },
     demoCaption:
-      'Slide the guardrail from fully blocking to fully parallel and watch first-token latency trade against wasted tokens and the chance of retracting text mid-render.',
+      'Send both messages under each guardrail mode. Blocking holds the first token until the 900ms check passes; parallel streams at 40ms but has to strike out 22 tokens when the risky request trips the guardrail.',
     demo: {
       archetype: 'slider-map',
       subject: 'Guardrail mode on a support answer',
@@ -845,7 +845,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Are any two subagent tasks independent enough to run in parallel? If yes, batch them instead of running inline.\n- Does the orchestrator context grow every time a subagent runs? If yes, the subagent is returning its transcript, not just its result.\n- Is every approval gate registered on PreToolUse, not PostToolUse? If not, the "approval" is a notification about a write that already happened.\n- Does PreCompact fire before the user loses verbatim access to earlier turns? If not, add a visible warning there.\n- How many hooks are currently registered, and when were they last reviewed? If the answer is "never," schedule the review.',
     },
     demoCaption:
-      'One orchestrator, twenty file lookups. Compare running them inline against spawning subagents, and watch what happens to the orchestrator context budget and to the transcript the user reads.',
+      'Run 20 file lookups inline, then in subagents, and watch the orchestrator meter. Inline crosses the 80k compaction line at lookup 17; in subagents each lookup returns one line and the orchestrator ends at 12k.',
     demo: {
       archetype: 'meter',
       subject: 'Orchestrator context after 20 file lookups',
@@ -991,7 +991,7 @@ export const phase14Part3: Lesson[] = [
       body: '- Python backend with thousands of short-lived agents per second: Agno.\n- TypeScript backend, Next.js or Vercel deploy, frontend and agent sharing types: Mastra.\n- Need durable per-node checkpoints and explicit graph reasoning: LangGraph, not either of these.\n- Promising "resumes at the exact failed step" without verifying the runtime persists that granularly: stop, rewrite the copy to the smaller true claim.\n- Planning a fork or a competing hosted product: read the license (ee/ in Mastra) before writing code.',
     },
     demoCaption:
-      'A tool argument gets renamed. Compare a runtime where the schema stops at the API boundary against one where the agent and the component share a Zod type.',
+      'Rename the field under each schema setup. With copied types tsc passes and production renders undefined; with one shared Zod object the rename fails the build in 3 places, so the bug never ships.',
     demo: {
       archetype: 'before-after',
       subject: 'Renaming a tool argument',

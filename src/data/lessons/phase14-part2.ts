@@ -109,7 +109,7 @@ export const phase14Part2: Lesson[] = [
       body: '- Does every archival write carry a session id and a turn id?\n- Can the UI show which store answered: core, archival, or conversation search?\n- Is there a labeled state for the retrieval pause, distinct from ordinary latency?\n- Is there an edit or delete affordance on any recalled fact the agent surfaces?\n- Is third-party content entering a memory write path flagged untrusted before it is stored?',
     },
     demoCaption:
-      'A transcript that looks like one continuous conversation hides the moment the agent went to disk. Reveal the archival records behind the answer and you get the thing a user needs to trust a recalled fact: which session it came from, and a place to fix it if it is wrong.',
+      'Send the messages one at a time and watch the 2,000-token window fill. On overflow, dropping the oldest loses the Postgres decision before you ask about it; paging to archival lets the agent search for it and pull it back in.',
     demo: {
       archetype: 'reveal',
       subject: 'Recalled answer',
@@ -255,7 +255,7 @@ export const phase14Part2: Lesson[] = [
       body: '- Does every block declare id, label, value, limit, and description?\n- Is there a summarizer wired before any write that would overflow the cap?\n- Does the UI expose block_history so a version diff is one click away?\n- Are sleep-time writes to Persona or Safety gated behind a review step?\n- Can a user tell, from the interface alone, whether a block was last edited by them or by the sleep-time agent?',
     },
     demoCaption:
-      'Same Human block, before and after a sleep-time pass. The left is what unbounded appends produce over four sessions. The right is what a consolidation pass leaves behind, including one fact quietly invalidated, which is exactly the change a user deserves to see in a diff.',
+      'Run four sessions under each mode. Append-only ends at 433 of 400 chars with duplicates and a Berlin vs Lisbon contradiction; rewriting fixes the block, inline adds 1,800ms to the reply, sleep-time adds none.',
     demo: {
       archetype: 'before-after',
       subject: 'Human block (limit 400 chars)',
@@ -411,7 +411,7 @@ export const phase14Part2: Lesson[] = [
       body: '- Does every memory row expose its fused score plus the relevance, importance, and recency components?\n- Is scope (user, session, agent) enforced as a hard filter before ranking, not after?\n- Are contradicted facts invalidated rather than deleted, with the old value still queryable?\n- Is there a cap on edges written per add() call to prevent graph explosion?\n- Is there a recurring audit of the KV fact_type set?',
     },
     demoCaption:
-      'Move the recency weight and watch the ranked list reorder. A chat agent wants the top result to be what you said an hour ago; a compliance agent wants the policy you signed in 2024. Same store, same query, different product.',
+      'Drag w_recency and watch the stacked score bars. Past 0.45, a week-long trip to Berlin outranks where the user actually lives, and the readout names the record the model receives.',
     demo: {
       archetype: 'slider-map',
       subject: 'search("where does the user live?")',
@@ -549,7 +549,7 @@ export const phase14Part2: Lesson[] = [
       body: '- Is every skill deduped on write, or can two near-identical descriptions both register?\n- Do composed skills pin an explicit version of every dependency they call?\n- Is there a visible dependency column showing what breaks if a skill is refined?\n- Past a few hundred skills, are tag filters available alongside similarity search?\n- Does a failed run return success, error, or self-verification failure as three distinct signals, not one generic retry?',
     },
     demoCaption:
-      'The failure signal decides whether the next version of a skill is better or just different. Step through what the agent gets back after a run and note that only two of the three signals point at a specific line to change.',
+      'Run the four tasks with the library off, then on. Off, every task rewrites the log-mining loop from scratch; on, each task retrieves earlier skills by description and calls them, so lines written per task stay flat.',
     demo: {
       archetype: 'sequence',
       subject: 'One refinement round',
@@ -700,7 +700,7 @@ export const phase14Part2: Lesson[] = [
       body: 'import os\nimport tempfile\n\ndef atomic_write(path: str, data: bytes) -> None:\n    directory = os.path.dirname(path) or \'.\'\n    fd, tmp_path = tempfile.mkstemp(dir=directory)\n    try:\n        with os.fdopen(fd, \'wb\') as f:\n            f.write(data)\n            f.flush()\n            os.fsync(f.fileno())\n        os.replace(tmp_path, path)\n    except Exception:\n        os.unlink(tmp_path)\n        raise',
     },
     demoCaption:
-      'agent_state.json is the resume screen for the next session, so its fields are UI, not plumbing. Compare a state file written as free-form notes against one written under a schema, and read them the way the next agent will: as the only thing it knows.',
+      'End session 1, then start session 2 with each handoff format. The readout runs a real schema check: free-form notes recover 0 of 4 fields and force a 14-file rescan, the validated JSON recovers 4 of 4 and resumes T-104.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'agent_state.json at session end',

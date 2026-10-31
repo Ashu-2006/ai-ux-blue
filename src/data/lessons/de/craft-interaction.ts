@@ -117,7 +117,7 @@ export const deCraftInteraction: Lesson[] = [
         '- Does the user need to keep the list visible while reading the detail? If no, go to drill or detach.\n- If yes: does the detail need its own actions with weight (delete, publish, escalate)? If yes, promote to a peek with a toolbar, or a drill.\n- Does the detail belong to exactly one row and stay under a screen height? If yes, expand is fine.\n- Is this an interruption that must be resolved before the user continues (confirm, sign in, pay)? That is always detach, never peek or expand.\n- Does the detail deserve a shareable link? If yes, it needs a route, whether that route is peeked, drilled, or both.\n- At your smallest supported breakpoint, does the mechanism still make sense, or does it need to collapse to drill or detach?',
     },
     demoCaption:
-      'Step through the four mechanisms in order of reveal weight. Row is the resting state, peek adds a lane, drawer floats over, full route replaces the list. Each step is one more thing the list gives up.',
+      'Open the same issue four ways. Watch the address bar and the readout: each mechanism changes how much of the list survives and what it costs to get back.',
     demo: {
       archetype: 'sequence',
       badLabel: 'Everything is a modal',
@@ -276,7 +276,7 @@ export const deCraftInteraction: Lesson[] = [
         '- What must the user lose access to? Nothing (popover), part of the page (drawer/sheet), the whole page (modal).\n- Is the action reversible? Reversible favors drawer or popover. Irreversible favors modal with an explicit confirm.\n- How many interactions does the task take? One or two (popover), a short form (drawer/sheet), a multi-step flow (a route, not an overlay at all).\n- Touch or pointer? Touch favors a sheet with detents. Pointer favors a drawer or popover.\n- Does it need a title bar? If yes, it has outgrown a popover.\n- Does it dismiss on outside click? Only if the content is non-destructive to lose.',
     },
     demoCaption:
-      'A triage inbox with a "reply" action. Modal for a quick reply stops the whole world; a right-edge drawer keeps the list navigable while you finish.',
+      'Open a reply, then try to open another thread. The modal refuses and counts every refused click. The drawer lets you retarget the reply without closing anything.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Inbox · reply to row 3',
@@ -436,7 +436,7 @@ export const deCraftInteraction: Lesson[] = [
         '- Does a typical session visit more than 2-3 rows in sequence? If no, use a drill instead.\n- Is there a full keyboard loop: next row, open, action key, auto-advance? If any step needs a mouse, the loop is not done.\n- Is the split ratio matched to content: 30-40 percent list for text-heavy detail, up to 50 percent for tabular lists?\n- Does each pane scroll independently?\n- Does the detail have its own URL (for example /queue/:id) so it can be shared and back-buttoned to?\n- What does this collapse to below 768px: a route (list) plus a route (detail), or a route plus a sheet?',
     },
     demoCaption:
-      'Triaging a ten-row inbox. Modal-per-row means ten full open-close cycles. Master-detail keeps the list mounted and moves only the pane on the right.',
+      'Read all six emails. Modal per row costs two actions an email (open, close). Master-detail costs one, and J and K make it zero clicks.',
     demo: {
       archetype: 'before-after',
       subject: 'Inbox · triage 10 messages',
@@ -595,7 +595,7 @@ export const deCraftInteraction: Lesson[] = [
         '- Is there a command palette (Cmd/Ctrl+K) indexing every action, route, and entity, ranked by recency?\n- Does every palette result show its direct shortcut, if one exists?\n- Are single keys reserved for the highest-frequency, reversible actions, and chords reserved for rare or destructive ones?\n- Is there one visible focus token (ring color, offset, width) applied consistently, meeting WCAG 2.2 2.4.13 (2px perimeter, 3:1 contrast)?\n- Does DOM order match visual reading order, so Tab does not jump around the layout?\n- Is there a ? cheatsheet or equivalent hint layer, one keystroke away from anywhere in the app?',
     },
     demoCaption:
-      'The same "assign a task" flow, twice. Mouse-only means five clicks through menus. Keyboard-first means Cmd K, type the person, Enter.',
+      'Assign all three tasks in each mode and compare the readout. The mouse path racks up pointer travel; the keyboard path is J, A, a letter, Enter.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Assign task to teammate',
@@ -760,7 +760,7 @@ export const deCraftInteraction: Lesson[] = [
         '- Empty: headline names the value, one primary action, one secondary link. Never "No data."\n- Loading: shown only when the result shape or duration is unknown.\n- Skeleton: shown when layout is predictable; shimmer blocks match final positions.\n- Error: names what failed, why if known, offers retry, contact, or go back.\n- Partial: each independent widget owns its own success/error state.\n- Stale: cached data is visibly marked with an age or a refresh indicator.\n- Permissioned-out: names the missing role, plan, or approval, and a path to get it.\n- Offline: a persistent, unobtrusive indicator; writes queue and reconcile on reconnect.',
     },
     demoCaption:
-      'Step through the four states a real screen owes. Each one is a different design job, not a decoration on the happy path.',
+      'Flip through the states. Spinner and Skeleton both load into the same list: the readout measures how far the layout jumps when the data lands.',
     demo: {
       archetype: 'sequence',
       badLabel: 'Happy path only',
@@ -916,7 +916,7 @@ export const deCraftInteraction: Lesson[] = [
         'useMutation({\n  mutationFn: likePost,\n  onMutate: async (postId) => {\n    await queryClient.cancelQueries({ queryKey: [\'post\', postId] });\n    const previous = queryClient.getQueryData([\'post\', postId]);\n    queryClient.setQueryData([\'post\', postId], (old) => ({ ...old, liked: true, likes: old.likes + 1 }));\n    return { previous };\n  },\n  onError: (err, postId, context) => {\n    queryClient.setQueryData([\'post\', postId], context.previous);\n    toast.error(\'Could not save. Retry?\');\n  },\n  onSettled: (data, error, postId) => {\n    queryClient.invalidateQueries({ queryKey: [\'post\', postId] });\n  },\n})',
     },
     demoCaption:
-      'A like button, twice. Wait-for-server means every tap sits under a 400ms spinner. Optimistic flips the state on tap and reconciles when the server answers, with a graceful rollback if it does not.',
+      'Tap the heart a few times in each mode. The server takes 800ms and every fourth request fails, so you see both the wait and the rollback.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Like button',
@@ -1075,7 +1075,7 @@ export const deCraftInteraction: Lesson[] = [
         ':root {\n  --z-base: 0;\n  --z-raised: 10;\n  --z-sticky: 100;\n  --z-overlay: 1000;\n  --z-modal: 2000;\n  --z-popover: 3000;\n}\n\n/* usage: */\n.sticky-header { z-index: var(--z-sticky); }\n.drawer-veil { z-index: var(--z-overlay); }\n.confirm-dialog { z-index: var(--z-modal); }\n.confirm-dialog--secondary { z-index: calc(var(--z-modal) + 1); }\n.toast { z-index: var(--z-popover); }\n\n/* lint: flag any raw z-index value not drawn from this token set */',
     },
     demoCaption:
-      'A confident "z-index: 9999" hides a real stack: fifteen values, none of which agree. Break down the meter and the ladder shows.',
+      'Click Edit on any invoice, then Save. With ad-hoc values the sticky header paints over the modal and the toast hides under its veil. The ladder shows why.',
     demo: {
       archetype: 'meter',
       headline: 'z-index: 9999',

@@ -103,7 +103,7 @@ export const phase15Part4: Lesson[] = [
       body: '- Does the evaluator live in a repo or namespace the agent has write access to. If yes, stop here.\n- Is the score computed by code the agent proposed or edited during this run.\n- Does the run record a parent id, a diff, a score before, and a score after.\n- Is there a separate, agent-unreachable check that would catch a score-only change (like a removed marker) with no behaviour change.\n- Does the run detail view render an evaluator hash or reachability flag next to every score delta, not just the number.',
     },
     demoCaption:
-      'Two generation-8 winners, same archive loop. One ran with the evaluator inside the agent\'s write scope, one with it outside. Both report a score improvement; only one of the improvements is about the task.',
+      'Replay eight generations with the evaluator inside the agent\'s write scope and outside it. Both reported scores climb; the dashed line counts tasks actually passed, and only one of them moves.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'DGM archive · generation 8 winner',
@@ -545,7 +545,7 @@ export const phase15Part4: Lesson[] = [
       body: 'Before quoting a vendor time horizon in a spec, check four things.\n\n1. Which crossing is quoted, 50 percent, 10 percent, or 90 percent. A bare number with no percent attached is almost always the 50 percent headline.\n2. What tooling produced it. Idealized benchmark tooling inflates the number relative to your production stack.\n3. Whether the task carries real consequences in your deployment. If a mistake is irreversible, use the 10 percent horizon, not the 50.\n4. How old the number is. At a 4.3-month doubling time, a horizon older than a quarter is already stale.',
     },
     demoCaption:
-      'One headline scalar and the fit underneath it. The 14 hours is a 50 percent crossing on a curve, so the interesting numbers are the other crossings and the conditions the curve was measured under.',
+      'Drag the expert task length along the fitted curve. The readout gives success probability today and after one 4.3-month doubling; 14 hours is the 50 percent crossing, not a guarantee.',
     demo: {
       archetype: 'meter',
       subject: 'Time Horizon 1.1 · Claude Opus 4.6',
@@ -690,7 +690,7 @@ export const phase15Part4: Lesson[] = [
       body: '- detected_at timestamp, captured separately from reported_at.\n- severity field, set at write time, not inferred later.\n- imminent_harm as an explicit boolean, not a judgment call buried in free text.\n- owner assigned at write time, not whoever opens the ticket later.\n- model_version and deployment_surface captured on the record.\n- clock derived from the fields above: 15 days by default, 24 hours if imminent_harm is true.',
     },
     demoCaption:
-      'The same incident record written two ways. One is a log line that reads fine in review and cannot answer a 24-hour reporting clock. The other carries the fields the statute actually asks for.',
+      'Switch the incident from a log line to a reportable record, then flip imminent_harm. The readout computes the SB-53 deadline from detected_at: 15 days, or 24 hours when harm is imminent.',
     demo: {
       archetype: 'before-after',
       subject: 'Critical safety incident record',

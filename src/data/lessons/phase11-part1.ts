@@ -108,7 +108,7 @@ export const phase11Part1: Lesson[] = [
       body: '- Is every ambiguous dimension (length, audience, format, tone) named explicitly?\n- Is there a conditional constraint for the uncertainty case: does it hedge or bluff?\n- Is the prompt under 500 tokens, or is there a reason it needs more?\n- Does any instruction contradict another (concise vs exhaustive)?\n- Has it been tested at temperature 0 to isolate prompt quality from sampling noise?\n- Has it been tested against at least one prompt-injection attempt?\n- Does it still work, with minor edits, on a second model provider?',
     },
     demoCaption:
-      'Flip between the same request written two ways. The vague version leaves length, audience, and format unspecified, so the model picks. Watch which parts of the output stop being a guess once each constraint is named.',
+      'Add constraints to the prompt one at a time and watch the sixteen plausible drafts collapse toward the one you meant. Hover any draft to see which guess the model made for it.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Same task, two prompts',
@@ -265,7 +265,7 @@ export const phase11Part1: Lesson[] = [
       body: '- Base accuracy under 60%? Fix the prompt or examples first; more reasoning will not save a bad setup.\n- Base accuracy 60-85%? Self-consistency at N=5 is worth the 5x cost.\n- Base accuracy above 95%? Skip self-consistency, the gain is under a point.\n- Task has a large, evaluatable search space (planning, puzzles)? Consider tree-of-thought, budget up to 40 calls.\n- Task needs grounded facts mid-reasoning? Use ReAct, not pure CoT.\n- Calling a reasoning model (o-series, DeepSeek-R1)? Drop "think step by step", it is already internal.',
     },
     demoCaption:
-      'One headline accuracy number, six ways of getting there. Open the breakdown and the differences are not just points, they are calls per answer and tokens per call. That is the latency budget for whatever screen this sits behind.',
+      'Switch reasoning strategy and the same question re-runs. The readout shows what each extra accuracy point costs in calls, output tokens, milliseconds, and dollars per thousand answers.',
     demo: {
       archetype: 'meter',
       subject: 'GSM8K accuracy by reasoning strategy',
@@ -414,7 +414,7 @@ export const phase11Part1: Lesson[] = [
       body: 'type Extraction = {\n  product: string;\n  price: number | null; // required, explicit null when absent\n  in_stock: boolean;\n  category: "electronics" | "apparel" | "home" | "other";\n};\n\n// Mark every semantically important field required, even when the\n// source sometimes omits it. An explicit null is a state your UI\n// can render. A missing key is a silent hole in your table.',
     },
     demoCaption:
-      'Step through the four levels of enforcement, from a polite request to token-level masking. The step where invalid output stops being unlikely and starts being impossible is the step where your components can stop defending themselves.',
+      'Switch the enforcement level and ten calls run through a real JSON.parse and a component that maps over attendees. Count the crashes, then click any red call to see the raw output that caused it.',
     demo: {
       archetype: 'sequence',
       subject: 'Getting a typed object out of a model',
@@ -573,7 +573,7 @@ export const phase11Part1: Lesson[] = [
       body: '- Chunk size set to 256-512 tokens with about 50 tokens overlap, not "whatever the loader defaults to"?\n- Similarity score exposed to the UI, not hidden behind a plain result list?\n- A relevance floor defined below which results do not render, or render as low-confidence?\n- Bi-encoder retrieval paired with a cross-encoder rerank for anything user-facing?\n- Dimension count and quantization chosen as a storage-versus-recall tradeoff, not a default?\n- Benchmarked on your own queries, not just the MTEB leaderboard number?',
     },
     demoCaption:
-      'Drag the dimension count and watch storage, recall, and cost move together. This is the same dial behind a product decision about how many documents you can afford to make searchable, and how good that search is allowed to be.',
+      'Pick a query, then switch between matching on spelling and matching on meaning. Spelling finds nothing for "get my money back"; meaning draws lines to the nearest documents and scores them.',
     demo: {
       archetype: 'slider-map',
       subject: 'Embedding dimensions',
@@ -718,7 +718,7 @@ export const phase11Part1: Lesson[] = [
       body: '- Line-item the window: system prompt, tools, retrieval, history, generation reserve, each with a token count.\n- Is any single component over 30% of the budget without a specific reason?\n- Are tool definitions pruned by classified intent, or is every tool sent on every call?\n- Is history summarized past a fixed threshold, or does it grow unbounded?\n- Are critical instructions placed first and the live query placed last?\n- Is at least 2,000-4,000 tokens reserved so the model always has room to answer?',
     },
     demoCaption:
-      'A 200K window sounds like room to spare. Open the allocation and see what a normal coding assistant is already spending before the user types, and which line item you are quietly adding to every call when you ship one more tool.',
+      'Drag the tool count and watch the allocation rows. The readout shows how many tokens are spent before the user types and what share of every call goes to tool definitions.',
     demo: {
       archetype: 'reveal',
       subject: 'What is actually in the window',
@@ -866,7 +866,7 @@ export const phase11Part1: Lesson[] = [
       body: '- Stable content (system prompt, tools, few-shot, static corpus) placed above a single breakpoint?\n- Volatile content (history, live query, timestamp) placed below it, never above?\n- Tool definitions serialized in a fixed order across deploys, not a dict that can reshuffle?\n- No live timestamp, request ID, or random value anywhere above the breakpoint?\n- Blocks above the 1,024-token floor (2,048 on Haiku), or they will silently never cache?\n- Dashboard splits cached versus uncached input tokens, not one blended number?\n- TTL matches the actual reuse window: 5 minutes for chat, 1 hour for batch, explicit multi-day cache for a reused corpus?',
     },
     demoCaption:
-      'Two prompt layouts holding identical content in different order. One reuses a warm prefix on every turn, the other pays full rate forever, and the only difference is which blocks sit above the breakpoint.',
+      'Send a few turns in each layout. The readout tracks cache hit rate, cost per turn, running total, and time to first token; only the order of the same six blocks changes.',
     demo: {
       archetype: 'before-after',
       subject: 'Prompt layout',

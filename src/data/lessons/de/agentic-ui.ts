@@ -98,7 +98,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Human in the loop', gloss: '"a person checks it"', meaning: 'An agent design pattern that yields control to a human at defined checkpoints rather than running fully unattended end to end.' },
     ],
     demoCaption:
-      'Step through one cycle. Each stage lights its own affordance, and the seams between them are where the user gets to see, steer, or stop the run.',
+      'Press Run in each mode. One spinner hides four stages; Four stages stops at each seam so you can skip a plan step, correct the observation, and approve the plan diff, and the readout counts the decisions you got to make.',
     demo: {
       archetype: 'sequence',
       subject: 'Agent run · one full cycle',
@@ -263,7 +263,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Circuit breaker', gloss: '"the hard stop"', meaning: 'A rule that forces a prompt or blocks an action unconditionally, regardless of permission mode, for the small set of actions that must never run silently.' },
     ],
     demoCaption:
-      'Peel back the friendly "Run task" summary and the JSON schema underneath is the copy on the permission modal. Every field name, every type, every scope shows up in the prompt whether the designer edited it or not.',
+      'Switch the schema and hover any schema line to see which row of the permission prompt it produced. The readout counts how many facts the user can actually check before approving.',
     demo: {
       archetype: 'reveal',
       subject: 'Permission prompt · what is under the button',
@@ -418,7 +418,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Center of gravity', gloss: '"what the tool is really for"', meaning: 'The core job a platform is architected around (integration depth, openness, or evaluation), which predicts its strengths better than a feature-by-feature list.' },
     ],
     demoCaption:
-      'Flip between a run summary and a real trace. The summary tells you the agent finished. The trace tells you which span burned the time, what went in, what came out, and where the eval score dropped.',
+      'Switch from the run summary to the span trace and click any span. The readout names the slow span, its share of the run, and the eval that fell under threshold, none of which the summary records.',
     demo: {
       archetype: 'before-after',
       subject: 'Agent run · what the reviewer sees',
@@ -580,7 +580,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Deny rule', gloss: '"a hard no"', meaning: 'An explicit, unconditional rule that blocks an action before any classifier or user intent is consulted, immune to being talked around.' },
     ],
     demoCaption:
-      'Watch one Stop button pretend to do three jobs, then split it into the three real verbs. Cancel, pause, and rollback are different contracts, and the failure modes only diverge when the button is pressed at the wrong time.',
+      'Press Run and interrupt it mid-run, ideally just before send_email. The readout tracks files written, files reverted, and emails sent, so you can see which verb actually protected what.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Long running agent · interrupt controls',
@@ -742,7 +742,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Swarm architecture', gloss: '"lots of agents working together"', meaning: 'A multi-agent pattern (popularized by OpenAI\'s experimental Swarm framework) where peer agents hand off to each other via tool calls rather than a strict hierarchy.' },
     ],
     demoCaption:
-      'Flip between a blended transcript and one with per agent attribution, a handoff card, and a coordinator panel. The same run reads as confused babble or as three named collaborators depending on the treatment.',
+      'Click any sentence in the transcript, then flip attribution on and click it again. The readout answers who said it and which handoff brought that agent in.',
     demo: {
       archetype: 'toggle-fix',
       subject: 'Multi agent run · reviewer view',
@@ -903,7 +903,7 @@ export const deAgenticUi: Lesson[] = [
       { term: 'Paywalled AI feature', gloss: '"the free thing that stopped being free"', meaning: 'A previously included AI capability moved behind a subscription, a business-model shift a design engineer should expect from any competitive reference over time.' },
     ],
     demoCaption:
-      'Flip between a traditional browser tab and Dia\'s. The URL bar looks the same in both, and the difference is in what the shell absorbs: the mode switch, the tab context, and the saved workflow.',
+      'Try the four inputs under the bar in each mode, or type your own. The readout compares the intent of what you typed with where the shell routed it, and counts the misroutes and mode switches.',
     demo: {
       archetype: 'before-after',
       subject: 'Browser tab · agent surface',
